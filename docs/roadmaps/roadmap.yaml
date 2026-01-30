@@ -23,11 +23,11 @@ roadmap:
   github_issue: null
   item_type: task
   title: Implement deployment optimization module
-  status: planned
+  status: inprogress
   priority: high
   assigned_to: null
   created: 2026-01-30T10:57:48Z
-  updated: 2026-01-30T10:57:48Z
+  updated: 2026-01-30T11:00:29.373130793+00:00
   spec: null
   acceptance_criteria:
   - Add hf_gtc.deployment.optimization with quantization and model optimization
