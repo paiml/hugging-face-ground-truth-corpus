@@ -169,3 +169,23 @@ roadmap:
   estimated_effort: null
   labels: []
   notes: null
+- id: PMAT-026
+  github_issue: null
+  item_type: task
+  title: Implement knowledge distillation module (training/distillation.py)
+  status: completed
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T17:00:00Z
+  updated: 2026-01-30T17:30:00Z
+  spec: null
+  acceptance_criteria:
+  - Implement teacher-student model compression patterns
+  - Add soft label training with temperature scheduling
+  - Support feature matching distillation
+  - Achieve 95%+ test coverage
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null

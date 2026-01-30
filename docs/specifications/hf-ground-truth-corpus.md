@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.20.0
+**Version**: 2.21.0
 **Status**: COMPLETE - COMPREHENSIVE ML PATTERNS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-025
+**PMAT Tickets**: PMAT-001 through PMAT-026
 
 ---
 
@@ -65,13 +65,14 @@
 | `hf_gtc.safety.watermarking` | COMPLETE | 98% | 88 | PMAT-023 |
 | `hf_gtc.training.dpo` | COMPLETE | 100% | 85 | PMAT-024 |
 | `hf_gtc.training.ppo` | COMPLETE | 100% | 92 | PMAT-024 |
+| `hf_gtc.training.distillation` | COMPLETE | 99% | 165 | PMAT-026 |
 | `hf_gtc.deployment.onnx` | COMPLETE | 100% | 87 | PMAT-025 |
 | `hf_gtc.deployment.tflite` | COMPLETE | 100% | 95 | PMAT-025 |
 | `hf_gtc.deployment.torchscript` | COMPLETE | 100% | 88 | PMAT-025 |
 | `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 4814 tests, 98.37% coverage
-**Complete**: All 17 expansion modules across PMAT-020 through PMAT-025
+**Total**: 4979 tests, 98.40% coverage
+**Complete**: All 17 expansion modules across PMAT-020 through PMAT-025, plus knowledge distillation (PMAT-026)
 
 ---
 
@@ -2303,6 +2304,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.18.0 | 2026-01-30 | Claude Code | **Advanced ML Patterns**: Added 8 new modules - generation/sampling (68 tests), inference/optimization (56 tests), preprocessing/tokenizer_training (52 tests), hub/collections (68 tests), audio/speech (68 tests), agents/tools (68 tests), rag/retrieval (62 tests), training/distributed (57 tests). Total: 2388 tests, 97.86% coverage. |
 | 2.19.0 | 2026-01-30 | Claude Code | **Comprehensive ML Patterns**: Planned 17 new modules across 6 PMAT tickets: RAG expansion (indexing, reranking), agents expansion (memory, planning), generation expansion (structured, chat), inference streaming, multimodal expansion (video, document), audio music, safety (guardrails, watermarking), training alignment (DPO, PPO), deployment formats (ONNX, TFLite, TorchScript). |
 | 2.20.0 | 2026-01-30 | Claude Code | **Complete ML Patterns**: Implemented all 17 planned modules - RAG (indexing 89%, reranking 100%), agents (memory 100%, planning 100%), generation (structured 100%, chat 99%), inference (streaming 100%), multimodal (video 99%, document 100%), audio (music 100%), safety (guardrails 100%, watermarking 98%), training (DPO 100%, PPO 100%), deployment (ONNX 100%, TFLite 100%, TorchScript 100%). Total: 4814 tests, 98.37% coverage. |
+| 2.21.0 | 2026-01-30 | Claude Code | **Knowledge Distillation**: Added training/distillation module (165 tests, 99% coverage) with teacher-student model compression, soft label training, temperature scheduling, and feature matching patterns. Total: 4979 tests, 98.40% coverage. |
 
 ---
 
