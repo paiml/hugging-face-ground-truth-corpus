@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.8.1
+**Version**: 2.9.0
 **Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -628,7 +628,32 @@ cd ../realizar && cargo test
 > and integration with trueno/aprender/realizar that Python tooling cannot guarantee.
 > This ensures end-to-end Rust-native data lineage from source to deployment.
 
-#### 4.6.1 Dataset Publishing Pipeline
+#### 4.6.1 Implementation Requirements
+
+The following components MUST be implemented to enable corpus distribution:
+
+| Component | Location | Status | Description |
+|-----------|----------|--------|-------------|
+| `export_corpus.py` | `scripts/export_corpus.py` | **TODO** | Python script to extract modules → Parquet |
+| `test_export_corpus.py` | `tests/unit/test_export_corpus.py` | **TODO** | Tests for export script (95% coverage) |
+| Makefile target | `Makefile` | **TODO** | `make export` target for corpus export |
+| README dataset card | `scripts/dataset_card.md` | **TODO** | HuggingFace dataset card template |
+
+**Export Script Requirements**:
+1. Parse all `src/hf_gtc/**/*.py` modules (excluding `__init__.py`)
+2. Extract AST: functions, classes, docstrings, type annotations
+3. Extract doctests using `doctest.DocTestParser`
+4. Compute coverage per module from pytest-cov JSON
+5. Output Arrow/Parquet with schema defined in 4.6.3
+6. Validate output with `alimentar quality score`
+
+**Acceptance Criteria**:
+- [ ] `make export` produces valid `hf_gtc_corpus.parquet`
+- [ ] `alimentar quality score hf_gtc_corpus.parquet` passes
+- [ ] `alimentar hf upload` succeeds to test repository
+- [ ] 95% test coverage for export script
+
+#### 4.6.2 Dataset Publishing Pipeline
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -662,7 +687,7 @@ cd ../realizar && cargo test
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 4.6.2 Corpus Schema
+#### 4.6.3 Corpus Schema
 
 The exported dataset uses Arrow/Parquet format with the following schema:
 
@@ -683,7 +708,7 @@ The exported dataset uses Arrow/Parquet format with the following schema:
 | `coverage` | `float32` | Module test coverage percentage |
 | `test_count` | `int32` | Number of tests for module |
 
-#### 4.6.3 Publishing via alimentar CLI
+#### 4.6.4 Publishing via alimentar CLI
 
 ```bash
 # Export corpus to parquet (Python script)
@@ -703,7 +728,7 @@ alimentar hf upload hf_gtc_corpus.parquet paiml/hf-ground-truth-corpus \
     --commit-message "HF-GTC v2.7.0 - 1258 tests, 98.46% coverage"
 ```
 
-#### 4.6.4 Publishing via alimentar Rust API
+#### 4.6.5 Publishing via alimentar Rust API
 
 ```rust
 use alimentar::hf_hub::{HfPublisher, DatasetCardValidator};
@@ -773,7 +798,7 @@ corpus = load_dataset("paiml/hf-ground-truth-corpus")
 }
 ```
 
-#### 4.6.5 alimentar Integration Points
+#### 4.6.6 alimentar Integration Points
 
 | alimentar Component | HF-GTC Usage |
 |---------------------|--------------|
@@ -784,7 +809,7 @@ corpus = load_dataset("paiml/hf-ground-truth-corpus")
 | `Quality` | Validate data completeness and integrity |
 | `StorageBackend` | Abstract storage (local, S3, memory) |
 
-#### 4.6.6 Dataset Card Validation
+#### 4.6.7 Dataset Card Validation
 
 alimentar validates dataset cards against HuggingFace standards:
 
@@ -816,7 +841,7 @@ batuta oracle --cross-ref \
 # Returns: Mapping table with equivalence status
 ```
 
-### 4.6 Genchi Genbutsu: Direct Observation Protocol
+### 4.8 Genchi Genbutsu: Direct Observation Protocol
 
 Following Toyota's "go and see" principle [2], when validating against Rust sources:
 
@@ -2207,6 +2232,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.7.0 | 2026-01-30 | Claude Code | **Remediation Complete**: Updated test counts (1214→1258), F-005 mitigated via adversarial tests, F-007 complete (remaining Any at API boundaries). |
 | 2.8.0 | 2026-01-30 | Claude Code | **Distribution Ready**: Added Section 4.6 alimentar dataset distribution pipeline. Corpus can now be published to HuggingFace Hub via alimentar. |
 | 2.8.1 | 2026-01-30 | Claude Code | **Policy Addition**: Added Sovereign Stack Exclusivity policy. ONLY alimentar permitted for HuggingFace Hub publishing. Python tooling prohibited. |
+| 2.9.0 | 2026-01-30 | Claude Code | **Implementation Requirements**: Added Section 4.6.1 with explicit TODO table for export tooling. Fixed section numbering (4.6.1-4.6.7). Clarified that export script, tests, Makefile target, and dataset card are TODO items. |
 
 ---
 
