@@ -121,3 +121,19 @@ roadmap:
   estimated_effort: null
   labels: []
   notes: null
+- id: PMAT-008
+  github_issue: null
+  item_type: task
+  title: Implement Spaces API module (hub/spaces.py)
+  status: completed
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T11:32:30Z
+  updated: 2026-01-30T11:35:28Z
+  spec: null
+  acceptance_criteria: []
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null

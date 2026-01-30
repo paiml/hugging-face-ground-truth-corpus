@@ -15,6 +15,7 @@
 |--------|--------|----------|-------|-------------|
 | `hf_gtc.hub.search` | COMPLETE | 100% | 19 | - |
 | `hf_gtc.hub.cards` | COMPLETE | 96% | 38 | PMAT-005 |
+| `hf_gtc.hub.spaces` | COMPLETE | 100% | 64 | PMAT-008 |
 | `hf_gtc.inference.device` | COMPLETE | 100% | 19 | - |
 | `hf_gtc.inference.pipelines` | COMPLETE | 100% | 14 | - |
 | `hf_gtc.inference.batch` | COMPLETE | 100% | 56 | PMAT-007 |
@@ -26,7 +27,7 @@
 | `hf_gtc.evaluation.metrics` | COMPLETE | 100% | 42 | PMAT-001 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
 
-**Total**: 444 tests, 99% coverage, 927 statements covered
+**Total**: 508 tests, 99% coverage, 1023 statements covered
 
 ---
 
