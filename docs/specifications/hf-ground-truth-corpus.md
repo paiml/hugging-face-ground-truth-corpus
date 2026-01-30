@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.7.0
-**Status**: IMPLEMENTATION COMPLETE - REMEDIATION COMPLETE
+**Version**: 2.8.0
+**Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -610,7 +610,179 @@ cd ../aprender && cargo test
 cd ../realizar && cargo test
 ```
 
-### 4.6 Batuta Oracle Rust Queries
+### 4.6 alimentar Dataset Distribution
+
+**alimentar** (`../alimentar`) is the Sovereign AI Stack's pure Rust data loading and distribution library. It provides native HuggingFace Hub upload support for publishing the HF-GTC corpus as a dataset.
+
+#### 4.6.1 Dataset Publishing Pipeline
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                 HF-GTC → HuggingFace Hub Pipeline                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  STAGE 1: Export Corpus                                             │
+│  ──────────────────────                                             │
+│  src/hf_gtc/**/*.py  ──►  Arrow RecordBatch  ──►  corpus.parquet   │
+│  - Module content                                                   │
+│  - Function signatures                                              │
+│  - Doctests                                                         │
+│  - Coverage metrics                                                 │
+│                                                                     │
+│  STAGE 2: Validate & Version                                        │
+│  ───────────────────────────                                        │
+│  alimentar registry publish hf-gtc 2.7.0 corpus.parquet            │
+│  - SHA256 provenance                                                │
+│  - Metadata validation                                              │
+│  - Local versioning                                                 │
+│                                                                     │
+│  STAGE 3: Publish to HuggingFace                                    │
+│  ───────────────────────────────                                    │
+│  alimentar hf upload corpus.parquet paiml/hf-ground-truth-corpus   │
+│  - Dataset card validation                                          │
+│  - Git LFS for parquet                                              │
+│  - README.md with metadata                                          │
+│                                                                     │
+│  OUTPUT: https://huggingface.co/datasets/paiml/hf-ground-truth-corpus│
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### 4.6.2 Corpus Schema
+
+The exported dataset uses Arrow/Parquet format with the following schema:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `module` | `string` | Module path (e.g., `training/lora.py`) |
+| `category` | `string` | Category name (hub, inference, preprocessing, training, evaluation, deployment) |
+| `content` | `string` | Full module source code |
+| `functions` | `list<struct>` | Extracted function metadata |
+| `functions.name` | `string` | Function name |
+| `functions.signature` | `string` | Type signature |
+| `functions.docstring` | `string` | Full docstring with examples |
+| `functions.line_number` | `int32` | Source line number |
+| `doctests` | `list<struct>` | Extracted doctest examples |
+| `doctests.source` | `string` | Doctest input code |
+| `doctests.expected` | `string` | Expected output |
+| `doctests.line_number` | `int32` | Source line number |
+| `coverage` | `float32` | Module test coverage percentage |
+| `test_count` | `int32` | Number of tests for module |
+
+#### 4.6.3 Publishing via alimentar CLI
+
+```bash
+# Export corpus to parquet (Python script)
+python scripts/export_corpus.py --output hf_gtc_corpus.parquet
+
+# Validate dataset quality
+alimentar quality score hf_gtc_corpus.parquet
+
+# Publish to local registry first
+alimentar registry push hf-gtc 2.7.0 hf_gtc_corpus.parquet \
+    --license apache-2.0 \
+    --tags huggingface,transformers,ground-truth,recipes
+
+# Upload to HuggingFace Hub
+export HF_TOKEN="hf_xxxxxxxxxxxxx"
+alimentar hf upload hf_gtc_corpus.parquet paiml/hf-ground-truth-corpus \
+    --commit-message "HF-GTC v2.7.0 - 1258 tests, 98.46% coverage"
+```
+
+#### 4.6.4 Publishing via alimentar Rust API
+
+```rust
+use alimentar::hf_hub::{HfPublisher, DatasetCardValidator};
+use alimentar::{ArrowDataset, Registry, LocalBackend, DatasetMetadata};
+
+async fn publish_hf_gtc() -> Result<(), Box<dyn std::error::Error>> {
+    // Load exported corpus
+    let dataset = ArrowDataset::from_parquet("hf_gtc_corpus.parquet")?;
+
+    // Create HuggingFace publisher
+    let publisher = HfPublisher::new("paiml/hf-ground-truth-corpus")
+        .with_token(std::env::var("HF_TOKEN")?)
+        .with_private(false)
+        .with_commit_message("HF-GTC v2.7.0");
+
+    // Dataset card with validated metadata
+    let readme = r#"---
+license: apache-2.0
+task_categories:
+  - text-generation
+  - text2text-generation
+language:
+  - en
+size_categories:
+  - 1K<n<10K
+tags:
+  - huggingface
+  - transformers
+  - ground-truth
+  - recipes
+  - peft
+  - lora
+  - qlora
+  - depyler
+---
+
+# HuggingFace Ground Truth Corpus (HF-GTC)
+
+Curated Python recipes for HuggingFace ML patterns with 98.46% test coverage.
+
+## Statistics
+
+| Metric | Value |
+|--------|-------|
+| Modules | 22 |
+| Tests | 1258 |
+| Coverage | 98.46% |
+| Statements | 2726 |
+
+## Usage
+
+```python
+from datasets import load_dataset
+corpus = load_dataset("paiml/hf-ground-truth-corpus")
+```
+"#;
+
+    // Validate against HuggingFace standards
+    DatasetCardValidator::validate_readme_strict(readme)?;
+
+    // Create repo and upload
+    publisher.create_repo().await?;
+    publisher.upload_parquet_file("hf_gtc_corpus.parquet", "data/train.parquet").await?;
+    publisher.upload_readme_validated(readme).await?;
+
+    Ok(())
+}
+```
+
+#### 4.6.5 alimentar Integration Points
+
+| alimentar Component | HF-GTC Usage |
+|---------------------|--------------|
+| `HfPublisher` | Upload corpus to HuggingFace Hub |
+| `DatasetCardValidator` | Validate README metadata (license, tags, size) |
+| `ArrowDataset` | Load/export corpus in columnar format |
+| `Registry` | Local versioning before cloud publish |
+| `Quality` | Validate data completeness and integrity |
+| `StorageBackend` | Abstract storage (local, S3, memory) |
+
+#### 4.6.6 Dataset Card Validation
+
+alimentar validates dataset cards against HuggingFace standards:
+
+| Field | Validation | HF-GTC Value |
+|-------|------------|--------------|
+| `license` | SPDX identifier | `apache-2.0` |
+| `task_categories` | Official HF list | `text-generation`, `text2text-generation` |
+| `size_categories` | Format `n<1K`, `1K<n<10K`, etc. | `1K<n<10K` |
+| `language` | ISO 639-1 codes | `en` |
+| `tags` | Free-form strings | `huggingface`, `transformers`, `ground-truth` |
+
+### 4.7 Batuta Oracle Rust Queries
 
 The Batuta oracle supports querying Rust ground truth sources:
 
@@ -2019,6 +2191,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.5.0 | 2026-01-30 | Claude Code | **P0 Remediation**: F-001 (126 float comparisons → pytest.approx), F-002 (NFC normalization added to preprocess_text). All adversarial tests pass. |
 | 2.6.0 | 2026-01-30 | Claude Code | **P1 Partial**: F-007 Any elimination (85→53, 38% reduction). Added TypeVar to streaming.py and batch.py for generic functions. |
 | 2.7.0 | 2026-01-30 | Claude Code | **Remediation Complete**: Updated test counts (1214→1258), F-005 mitigated via adversarial tests, F-007 complete (remaining Any at API boundaries). |
+| 2.8.0 | 2026-01-30 | Claude Code | **Distribution Ready**: Added Section 4.6 alimentar dataset distribution pipeline. Corpus can now be published to HuggingFace Hub via alimentar. |
 
 ---
 
