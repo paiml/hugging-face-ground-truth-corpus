@@ -91,7 +91,7 @@ class TestStreamStats:
         assert stats.total_samples == 10000
         assert stats.total_batches == 10
         assert stats.bytes_read == 1024000
-        assert stats.samples_per_second == 5000.0
+        assert stats.samples_per_second == pytest.approx(5000.0)
 
     def test_frozen(self) -> None:
         """Test that StreamStats is immutable."""
@@ -119,7 +119,7 @@ class TestStreamProgress:
         assert progress.samples_processed == 500
         assert progress.batches_processed == 5
         assert progress.estimated_total == 1000
-        assert progress.percent_complete == 50.0
+        assert progress.percent_complete == pytest.approx(50.0)
 
     def test_none_values(self) -> None:
         """Test StreamProgress with None values."""
@@ -438,12 +438,12 @@ class TestComputeStreamStats:
         assert stats.total_samples == 10000
         assert stats.total_batches == 10
         assert stats.bytes_read == 1024000
-        assert stats.samples_per_second == 5000.0
+        assert stats.samples_per_second == pytest.approx(5000.0)
 
     def test_zero_elapsed_time(self) -> None:
         """Test with zero elapsed time."""
         stats = compute_stream_stats(100, 1, 1000, 0.0)
-        assert stats.samples_per_second == 0.0
+        assert stats.samples_per_second == pytest.approx(0.0)
 
     def test_negative_samples_raises_error(self) -> None:
         """Test that negative samples raises ValueError."""

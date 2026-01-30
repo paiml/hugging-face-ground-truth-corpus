@@ -27,8 +27,8 @@ class TestTrainingConfig:
         assert config.num_epochs == 3
         assert config.batch_size == 8
         assert config.learning_rate == 5e-5
-        assert config.weight_decay == 0.01
-        assert config.warmup_ratio == 0.1
+        assert config.weight_decay == pytest.approx(0.01)
+        assert config.warmup_ratio == pytest.approx(0.1)
         assert config.eval_strategy == "epoch"
         assert config.save_strategy == "epoch"
         assert config.logging_steps == 100
@@ -52,8 +52,8 @@ class TestTrainingConfig:
         assert config.num_epochs == 10
         assert config.batch_size == 16
         assert config.learning_rate == 1e-4
-        assert config.weight_decay == 0.05
-        assert config.warmup_ratio == 0.2
+        assert config.weight_decay == pytest.approx(0.05)
+        assert config.warmup_ratio == pytest.approx(0.2)
         assert config.eval_strategy == "steps"
         assert config.save_strategy == "steps"
         assert config.logging_steps == 50

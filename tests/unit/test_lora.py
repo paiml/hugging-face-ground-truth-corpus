@@ -71,7 +71,7 @@ class TestLoRAConfig:
         )
         assert config.r == 8
         assert config.lora_alpha == 16
-        assert config.lora_dropout == 0.1
+        assert config.lora_dropout == pytest.approx(0.1)
         assert "q_proj" in config.target_modules
         assert config.task_type == TaskType.CAUSAL_LM
         assert config.bias == "none"
@@ -153,7 +153,7 @@ class TestCreateLoraConfig:
         config = create_lora_config()
         assert config.r == 8
         assert config.lora_alpha == 16
-        assert config.lora_dropout == 0.1
+        assert config.lora_dropout == pytest.approx(0.1)
         assert config.task_type == TaskType.CAUSAL_LM
         assert config.bias == "none"
 
@@ -176,7 +176,7 @@ class TestCreateLoraConfig:
         )
         assert config.r == 16
         assert config.lora_alpha == 32
-        assert config.lora_dropout == 0.2
+        assert config.lora_dropout == pytest.approx(0.2)
         assert config.target_modules == ("q_proj", "v_proj")
         assert config.task_type == TaskType.SEQ_CLS
         assert config.bias == "all"
@@ -355,28 +355,28 @@ class TestGetRecommendedLoraConfig:
         config = get_recommended_lora_config("small")
         assert config.r == 4
         assert config.lora_alpha == 8
-        assert config.lora_dropout == 0.05
+        assert config.lora_dropout == pytest.approx(0.05)
 
     def test_medium_model(self) -> None:
         """Test recommended config for medium model."""
         config = get_recommended_lora_config("medium")
         assert config.r == 8
         assert config.lora_alpha == 16
-        assert config.lora_dropout == 0.1
+        assert config.lora_dropout == pytest.approx(0.1)
 
     def test_large_model(self) -> None:
         """Test recommended config for large model."""
         config = get_recommended_lora_config("large")
         assert config.r == 16
         assert config.lora_alpha == 32
-        assert config.lora_dropout == 0.1
+        assert config.lora_dropout == pytest.approx(0.1)
 
     def test_xlarge_model(self) -> None:
         """Test recommended config for xlarge model."""
         config = get_recommended_lora_config("xlarge")
         assert config.r == 32
         assert config.lora_alpha == 64
-        assert config.lora_dropout == 0.05
+        assert config.lora_dropout == pytest.approx(0.05)
 
     def test_custom_task_type(self) -> None:
         """Test recommended config with custom task type."""

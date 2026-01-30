@@ -79,16 +79,16 @@ class TestTrainerState:
         """Test default values."""
         state = TrainerState()
         assert state.global_step == 0
-        assert state.epoch == 0.0
-        assert state.best_metric == 0.0
+        assert state.epoch == pytest.approx(0.0)
+        assert state.best_metric == pytest.approx(0.0)
         assert state.best_model_checkpoint is None
 
     def test_custom_values(self) -> None:
         """Test custom values."""
         state = TrainerState(global_step=100, epoch=1.5, best_metric=0.95)
         assert state.global_step == 100
-        assert state.epoch == 1.5
-        assert state.best_metric == 0.95
+        assert state.epoch == pytest.approx(1.5)
+        assert state.best_metric == pytest.approx(0.95)
 
     def test_frozen(self) -> None:
         """Test that TrainerState is immutable."""
@@ -127,7 +127,7 @@ class TestEarlyStoppingConfig:
         """Test default values."""
         config = EarlyStoppingConfig()
         assert config.patience == 3
-        assert config.threshold == 0.0
+        assert config.threshold == pytest.approx(0.0)
         assert config.mode == EarlyStoppingMode.MIN
         assert config.metric_name == "eval_loss"
 
@@ -183,12 +183,12 @@ class TestTrainingProgress:
     def test_percent_complete(self) -> None:
         """Test percent_complete property."""
         progress = TrainingProgress(current_step=25, total_steps=100)
-        assert progress.percent_complete == 25.0
+        assert progress.percent_complete == pytest.approx(25.0)
 
     def test_percent_complete_zero_total(self) -> None:
         """Test percent_complete with zero total steps."""
         progress = TrainingProgress(current_step=0, total_steps=0)
-        assert progress.percent_complete == 0.0
+        assert progress.percent_complete == pytest.approx(0.0)
 
     def test_steps_remaining(self) -> None:
         """Test steps_remaining property."""
@@ -307,13 +307,13 @@ class TestCreateTrainerState:
         """Test creating trainer state."""
         state = create_trainer_state(global_step=100, epoch=1.5)
         assert state.global_step == 100
-        assert state.epoch == 1.5
+        assert state.epoch == pytest.approx(1.5)
 
     def test_default_values(self) -> None:
         """Test default values."""
         state = create_trainer_state()
         assert state.global_step == 0
-        assert state.epoch == 0.0
+        assert state.epoch == pytest.approx(0.0)
 
     def test_negative_step_raises_error(self) -> None:
         """Test that negative global_step raises ValueError."""
@@ -329,21 +329,21 @@ class TestUpdateTrainerState:
         state = create_trainer_state(global_step=100, epoch=1.0)
         updated = update_trainer_state(state, global_step=200, epoch=2.0)
         assert updated.global_step == 200
-        assert updated.epoch == 2.0
+        assert updated.epoch == pytest.approx(2.0)
 
     def test_preserves_unchanged_values(self) -> None:
         """Test that unchanged values are preserved."""
         state = create_trainer_state(global_step=100, epoch=1.0, best_metric=0.9)
         updated = update_trainer_state(state, global_step=200)
-        assert updated.epoch == 1.0
-        assert updated.best_metric == 0.9
+        assert updated.epoch == pytest.approx(1.0)
+        assert updated.best_metric == pytest.approx(0.9)
 
     def test_adds_log_entry(self) -> None:
         """Test adding log entry."""
         state = create_trainer_state()
         updated = update_trainer_state(state, new_log_entry={"loss": 0.5})
         assert len(updated.log_history) == 1
-        assert updated.log_history[0]["loss"] == 0.5
+        assert updated.log_history[0]["loss"] == pytest.approx(0.5)
 
     def test_none_state_raises_error(self) -> None:
         """Test that None state raises ValueError."""
@@ -538,12 +538,12 @@ class TestCreateTrainingProgress:
         progress = create_training_progress(50, 100, 1, 3)
         assert progress.current_step == 50
         assert progress.total_steps == 100
-        assert progress.percent_complete == 50.0
+        assert progress.percent_complete == pytest.approx(50.0)
 
     def test_with_loss(self) -> None:
         """Test with loss value."""
         progress = create_training_progress(50, 100, 1, 3, loss=0.5)
-        assert progress.loss == 0.5
+        assert progress.loss == pytest.approx(0.5)
 
     def test_negative_step_raises_error(self) -> None:
         """Test that negative current_step raises ValueError."""

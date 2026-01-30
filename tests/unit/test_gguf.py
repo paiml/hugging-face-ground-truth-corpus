@@ -131,7 +131,7 @@ class TestGGUFExportResult:
             compression_ratio=3.5,
             quant_type=GGUFQuantType.Q4_K_M,
         )
-        assert result.compression_ratio == 3.5
+        assert result.compression_ratio == pytest.approx(3.5)
 
 
 class TestGGUFModelInfo:
@@ -221,7 +221,7 @@ class TestCreateGGUFExportResult:
         result = create_gguf_export_result(
             "/model.gguf", 14000, 4000, GGUFQuantType.Q4_K_M
         )
-        assert result.compression_ratio == 3.5
+        assert result.compression_ratio == pytest.approx(3.5)
 
     def test_empty_path_raises_error(self) -> None:
         """Test that empty path raises ValueError."""

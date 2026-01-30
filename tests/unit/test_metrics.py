@@ -28,10 +28,10 @@ class TestClassificationMetrics:
         metrics = ClassificationMetrics(
             accuracy=0.9, precision=0.85, recall=0.88, f1=0.865
         )
-        assert metrics.accuracy == 0.9
-        assert metrics.precision == 0.85
-        assert metrics.recall == 0.88
-        assert metrics.f1 == 0.865
+        assert metrics.accuracy == pytest.approx(0.9)
+        assert metrics.precision == pytest.approx(0.85)
+        assert metrics.recall == pytest.approx(0.88)
+        assert metrics.f1 == pytest.approx(0.865)
 
     def test_frozen(self) -> None:
         """Test that ClassificationMetrics is immutable."""
@@ -47,15 +47,15 @@ class TestComputeAccuracy:
 
     def test_perfect_accuracy(self) -> None:
         """Test 100% accuracy."""
-        assert compute_accuracy([1, 0, 1, 0], [1, 0, 1, 0]) == 1.0
+        assert compute_accuracy([1, 0, 1, 0], [1, 0, 1, 0]) == pytest.approx(1.0)
 
     def test_zero_accuracy(self) -> None:
         """Test 0% accuracy."""
-        assert compute_accuracy([1, 1, 1, 1], [0, 0, 0, 0]) == 0.0
+        assert compute_accuracy([1, 1, 1, 1], [0, 0, 0, 0]) == pytest.approx(0.0)
 
     def test_partial_accuracy(self) -> None:
         """Test partial accuracy."""
-        assert compute_accuracy([1, 0, 1, 1], [1, 0, 1, 0]) == 0.75
+        assert compute_accuracy([1, 0, 1, 1], [1, 0, 1, 0]) == pytest.approx(0.75)
 
     def test_empty_predictions_raises_error(self) -> None:
         """Test that empty predictions raises ValueError."""
@@ -86,15 +86,15 @@ class TestComputePrecision:
 
     def test_perfect_precision(self) -> None:
         """Test 100% precision."""
-        assert compute_precision([1, 1], [1, 1]) == 1.0
+        assert compute_precision([1, 1], [1, 1]) == pytest.approx(1.0)
 
     def test_zero_precision(self) -> None:
         """Test 0% precision (all predictions wrong)."""
-        assert compute_precision([1, 1], [0, 0]) == 0.0
+        assert compute_precision([1, 1], [0, 0]) == pytest.approx(0.0)
 
     def test_no_positive_predictions(self) -> None:
         """Test precision when no positive predictions made."""
-        assert compute_precision([0, 0, 0], [1, 1, 1]) == 0.0
+        assert compute_precision([0, 0, 0], [1, 1, 1]) == pytest.approx(0.0)
 
     def test_partial_precision(self) -> None:
         """Test partial precision."""
@@ -118,20 +118,20 @@ class TestComputeRecall:
 
     def test_perfect_recall(self) -> None:
         """Test 100% recall."""
-        assert compute_recall([1, 1], [1, 1]) == 1.0
+        assert compute_recall([1, 1], [1, 1]) == pytest.approx(1.0)
 
     def test_zero_recall(self) -> None:
         """Test 0% recall (missed all positives)."""
-        assert compute_recall([0, 0], [1, 1]) == 0.0
+        assert compute_recall([0, 0], [1, 1]) == pytest.approx(0.0)
 
     def test_no_actual_positives(self) -> None:
         """Test recall when no actual positives exist."""
-        assert compute_recall([1, 1], [0, 0]) == 0.0
+        assert compute_recall([1, 1], [0, 0]) == pytest.approx(0.0)
 
     def test_partial_recall(self) -> None:
         """Test partial recall."""
         # 1 true positive out of 2 actual positives = 0.5
-        assert compute_recall([1, 0], [1, 1]) == 0.5
+        assert compute_recall([1, 0], [1, 1]) == pytest.approx(0.5)
 
     def test_empty_raises_error(self) -> None:
         """Test that empty inputs raise ValueError."""
@@ -149,18 +149,18 @@ class TestComputeF1:
 
     def test_perfect_f1(self) -> None:
         """Test perfect F1 score."""
-        assert compute_f1([1, 1, 0, 0], [1, 1, 0, 0]) == 1.0
+        assert compute_f1([1, 1, 0, 0], [1, 1, 0, 0]) == pytest.approx(1.0)
 
     def test_zero_f1(self) -> None:
         """Test F1 of 0 when precision and recall are both 0."""
-        assert compute_f1([0, 0, 0], [1, 1, 1]) == 0.0
+        assert compute_f1([0, 0, 0], [1, 1, 1]) == pytest.approx(0.0)
 
     def test_f1_calculation(self) -> None:
         """Test F1 calculation: 2 * p * r / (p + r)."""
         # precision = 2/3, recall = 1.0
         # f1 = 2 * (2/3) * 1 / ((2/3) + 1) = 4/3 / 5/3 = 4/5 = 0.8
         result = compute_f1([1, 1, 0, 1], [1, 0, 0, 1])
-        assert result == 0.8
+        assert result == pytest.approx(0.8)
 
     def test_empty_raises_error(self) -> None:
         """Test that empty inputs raise ValueError."""
@@ -175,26 +175,26 @@ class TestComputeClassificationMetrics:
         """Test that all metrics are returned."""
         metrics = compute_classification_metrics([1, 1, 0, 1], [1, 0, 0, 1])
         assert isinstance(metrics, ClassificationMetrics)
-        assert metrics.accuracy == 0.75
+        assert metrics.accuracy == pytest.approx(0.75)
         assert abs(metrics.precision - 2 / 3) < 1e-10
-        assert metrics.recall == 1.0
-        assert metrics.f1 == 0.8
+        assert metrics.recall == pytest.approx(1.0)
+        assert metrics.f1 == pytest.approx(0.8)
 
     def test_perfect_metrics(self) -> None:
         """Test perfect classification."""
         metrics = compute_classification_metrics([1, 0, 1, 0], [1, 0, 1, 0])
-        assert metrics.accuracy == 1.0
-        assert metrics.precision == 1.0
-        assert metrics.recall == 1.0
-        assert metrics.f1 == 1.0
+        assert metrics.accuracy == pytest.approx(1.0)
+        assert metrics.precision == pytest.approx(1.0)
+        assert metrics.recall == pytest.approx(1.0)
+        assert metrics.f1 == pytest.approx(1.0)
 
     def test_custom_positive_label(self) -> None:
         """Test with custom positive label."""
         # Using 0 as positive label
         metrics = compute_classification_metrics([0, 0, 1], [0, 1, 1], positive_label=0)
         assert metrics.accuracy == pytest.approx(2 / 3)
-        assert metrics.precision == 0.5  # 1 TP, 1 FP
-        assert metrics.recall == 1.0  # 1 TP, 0 FN
+        assert metrics.precision == pytest.approx(0.5)  # 1 TP, 1 FP
+        assert metrics.recall == pytest.approx(1.0)  # 1 TP, 0 FN
 
 
 class TestComputePerplexity:
@@ -202,7 +202,7 @@ class TestComputePerplexity:
 
     def test_zero_loss(self) -> None:
         """Test perplexity with zero loss."""
-        assert compute_perplexity(0.0) == 1.0
+        assert compute_perplexity(0.0) == pytest.approx(1.0)
 
     def test_loss_one(self) -> None:
         """Test perplexity with loss of 1."""
@@ -237,11 +237,11 @@ class TestComputeMeanLoss:
 
     def test_single_value(self) -> None:
         """Test mean of single value."""
-        assert compute_mean_loss([5.0]) == 5.0
+        assert compute_mean_loss([5.0]) == pytest.approx(5.0)
 
     def test_multiple_values(self) -> None:
         """Test mean of multiple values."""
-        assert compute_mean_loss([1.0, 2.0, 3.0]) == 2.0
+        assert compute_mean_loss([1.0, 2.0, 3.0]) == pytest.approx(2.0)
 
     def test_empty_raises_error(self) -> None:
         """Test that empty list raises ValueError."""
@@ -278,7 +278,7 @@ class TestCreateComputeMetricsFn:
         assert "precision" in result
         assert "recall" in result
         assert "f1" in result
-        assert result["accuracy"] == 0.75
+        assert result["accuracy"] == pytest.approx(0.75)
 
     def test_handles_logits(self) -> None:
         """Test that function handles logits (takes argmax)."""
@@ -289,7 +289,7 @@ class TestCreateComputeMetricsFn:
 
         result = fn((logits, labels))
 
-        assert result["accuracy"] == 1.0
+        assert result["accuracy"] == pytest.approx(1.0)
 
     def test_custom_positive_label(self) -> None:
         """Test with custom positive label."""
@@ -300,5 +300,5 @@ class TestCreateComputeMetricsFn:
         result = fn((predictions, labels))
 
         # With positive_label=0: TP=1, FP=1, FN=0
-        assert result["precision"] == 0.5
-        assert result["recall"] == 1.0
+        assert result["precision"] == pytest.approx(0.5)
+        assert result["recall"] == pytest.approx(1.0)

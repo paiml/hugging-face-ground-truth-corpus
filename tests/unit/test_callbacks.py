@@ -42,7 +42,7 @@ class TestEarlyStoppingConfig:
         """Test default configuration values."""
         config = EarlyStoppingConfig()
         assert config.patience == 3
-        assert config.threshold == 0.0
+        assert config.threshold == pytest.approx(0.0)
         assert config.metric == "eval_loss"
         assert config.mode == MetricMode.MIN
 
@@ -55,7 +55,7 @@ class TestEarlyStoppingConfig:
             mode=MetricMode.MAX,
         )
         assert config.patience == 5
-        assert config.threshold == 0.01
+        assert config.threshold == pytest.approx(0.01)
         assert config.metric == "accuracy"
         assert config.mode == MetricMode.MAX
 
@@ -148,7 +148,7 @@ class TestCallbackMetrics:
             epochs_without_improvement=2,
             total_steps=500,
         )
-        assert metrics.best_metric == 0.5
+        assert metrics.best_metric == pytest.approx(0.5)
         assert metrics.best_step == 100
         assert metrics.epochs_without_improvement == 2
         assert metrics.total_steps == 500
@@ -269,7 +269,7 @@ class TestShouldStopEarly:
         config = EarlyStoppingConfig(patience=3, mode=MetricMode.MIN)
         should_stop, best, epochs = should_stop_early(0.5, None, 0, config)
         assert should_stop is False
-        assert best == 0.5
+        assert best == pytest.approx(0.5)
         assert epochs == 0
 
     def test_metric_improved_min_mode(self) -> None:
@@ -277,7 +277,7 @@ class TestShouldStopEarly:
         config = EarlyStoppingConfig(patience=3, threshold=0.0, mode=MetricMode.MIN)
         should_stop, best, epochs = should_stop_early(0.3, 0.5, 2, config)
         assert should_stop is False
-        assert best == 0.3
+        assert best == pytest.approx(0.3)
         assert epochs == 0
 
     def test_metric_improved_max_mode(self) -> None:
@@ -285,7 +285,7 @@ class TestShouldStopEarly:
         config = EarlyStoppingConfig(patience=3, threshold=0.0, mode=MetricMode.MAX)
         should_stop, best, epochs = should_stop_early(0.9, 0.7, 2, config)
         assert should_stop is False
-        assert best == 0.9
+        assert best == pytest.approx(0.9)
         assert epochs == 0
 
     def test_metric_not_improved(self) -> None:
@@ -293,7 +293,7 @@ class TestShouldStopEarly:
         config = EarlyStoppingConfig(patience=3, mode=MetricMode.MIN)
         should_stop, best, epochs = should_stop_early(0.6, 0.5, 0, config)
         assert should_stop is False
-        assert best == 0.5
+        assert best == pytest.approx(0.5)
         assert epochs == 1
 
     def test_stop_after_patience_exceeded(self) -> None:
@@ -301,7 +301,7 @@ class TestShouldStopEarly:
         config = EarlyStoppingConfig(patience=3, mode=MetricMode.MIN)
         should_stop, best, epochs = should_stop_early(0.6, 0.5, 2, config)
         assert should_stop is True
-        assert best == 0.5
+        assert best == pytest.approx(0.5)
         assert epochs == 3
 
     def test_threshold_prevents_false_improvement(self) -> None:
@@ -310,7 +310,7 @@ class TestShouldStopEarly:
         # Small improvement less than threshold
         should_stop, best, epochs = should_stop_early(0.45, 0.5, 0, config)
         assert should_stop is False
-        assert best == 0.5  # Not updated
+        assert best == pytest.approx(0.5)  # Not updated
         assert epochs == 1
 
     def test_none_config_raises_error(self) -> None:

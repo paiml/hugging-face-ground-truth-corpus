@@ -109,9 +109,9 @@ class TestTimingResult:
             latency_p90=1.2,
             latency_p99=1.8,
         )
-        assert result.total_time == 1.5
-        assert result.samples_per_second == 1000.0
-        assert result.latency_p50 == 0.8
+        assert result.total_time == pytest.approx(1.5)
+        assert result.samples_per_second == pytest.approx(1000.0)
+        assert result.latency_p50 == pytest.approx(0.8)
 
     def test_frozen(self) -> None:
         """Test that TimingResult is immutable."""
@@ -136,7 +136,7 @@ class TestBenchmarkResult:
             error_message=None,
         )
         assert result.success is True
-        assert result.metrics["accuracy"] == 0.95
+        assert result.metrics["accuracy"] == pytest.approx(0.95)
 
     def test_failed_result(self) -> None:
         """Test creating failed BenchmarkResult."""
@@ -209,17 +209,17 @@ class TestComputePercentile:
     def test_median(self) -> None:
         """Test computing median (50th percentile)."""
         result = compute_percentile([1, 2, 3, 4, 5], 50)
-        assert result == 3.0
+        assert result == pytest.approx(3.0)
 
     def test_zero_percentile(self) -> None:
         """Test 0th percentile (minimum)."""
         result = compute_percentile([1, 2, 3, 4, 5], 0)
-        assert result == 1.0
+        assert result == pytest.approx(1.0)
 
     def test_100_percentile(self) -> None:
         """Test 100th percentile (maximum)."""
         result = compute_percentile([1, 2, 3, 4, 5], 100)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_25th_percentile(self) -> None:
         """Test 25th percentile."""
@@ -234,7 +234,7 @@ class TestComputePercentile:
     def test_single_value(self) -> None:
         """Test with single value."""
         result = compute_percentile([5], 50)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_none_values_raises_error(self) -> None:
         """Test that None values raises ValueError."""
@@ -338,7 +338,7 @@ class TestRunBenchmark:
             return {"accuracy": 0.95}
 
         result = run_benchmark(runner, data, lambda x: x, metrics_fn)
-        assert result.metrics["accuracy"] == 0.95
+        assert result.metrics["accuracy"] == pytest.approx(0.95)
 
     def test_handles_error(self) -> None:
         """Test that errors are handled."""
@@ -535,8 +535,8 @@ class TestAggregateBenchmarkResults:
 
         agg = aggregate_benchmark_results([r1, r2])
         assert 0.92 < agg["acc_mean"] < 0.93
-        assert agg["acc_min"] == 0.9
-        assert agg["acc_max"] == 0.95
+        assert agg["acc_min"] == pytest.approx(0.9)
+        assert agg["acc_max"] == pytest.approx(0.95)
 
     def test_aggregate_timing(self) -> None:
         """Test aggregating timing from multiple results."""
@@ -547,8 +547,8 @@ class TestAggregateBenchmarkResults:
         r2 = BenchmarkResult(config, timing2, {}, 100, True, None)
 
         agg = aggregate_benchmark_results([r1, r2])
-        assert agg["total_time_mean"] == 1.5
-        assert agg["throughput_mean"] == 75.0
+        assert agg["total_time_mean"] == pytest.approx(1.5)
+        assert agg["throughput_mean"] == pytest.approx(75.0)
 
     def test_aggregate_empty(self) -> None:
         """Test aggregating empty results."""

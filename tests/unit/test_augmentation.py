@@ -62,7 +62,7 @@ class TestAugmentConfig:
     def test_default_values(self) -> None:
         """Test default configuration values."""
         config = AugmentConfig()
-        assert config.probability == 0.1
+        assert config.probability == pytest.approx(0.1)
         assert config.num_augmentations == 1
         assert config.augmentation_type == AugmentationType.SYNONYM_REPLACE
         assert config.min_length == 3
@@ -77,7 +77,7 @@ class TestAugmentConfig:
             min_length=5,
             preserve_case=False,
         )
-        assert config.probability == 0.3
+        assert config.probability == pytest.approx(0.3)
         assert config.num_augmentations == 5
         assert config.augmentation_type == AugmentationType.RANDOM_DELETE
         assert config.min_length == 5
@@ -523,7 +523,7 @@ class TestComputeAugmentationStats:
         assert stats["total_texts"] == 2
         assert stats["total_augmented"] == 2
         assert stats["total_operations"] == 3
-        assert stats["avg_operations_per_text"] == 1.5
+        assert stats["avg_operations_per_text"] == pytest.approx(1.5)
 
     def test_empty_results(self) -> None:
         """Test with empty results."""

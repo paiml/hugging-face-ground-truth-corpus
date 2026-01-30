@@ -140,7 +140,7 @@ class TestQuantResult:
             quantized_size_mb=4000,
             compression_ratio=3.5,
         )
-        assert result.compression_ratio == 3.5
+        assert result.compression_ratio == pytest.approx(3.5)
 
     def test_with_perplexity(self) -> None:
         """Test with perplexity values."""
@@ -151,7 +151,7 @@ class TestQuantResult:
             perplexity_before=5.0,
             perplexity_after=5.5,
         )
-        assert result.perplexity_before == 5.0
+        assert result.perplexity_before == pytest.approx(5.0)
 
 
 class TestGPTQConfig:
@@ -162,7 +162,7 @@ class TestGPTQConfig:
         config = GPTQConfig()
         assert config.bits == 4
         assert config.group_size == 128
-        assert config.damp_percent == 0.01
+        assert config.damp_percent == pytest.approx(0.01)
 
     def test_custom_values(self) -> None:
         """Test custom values."""
@@ -343,8 +343,8 @@ class TestComputeCompressionRatio:
 
     def test_computes_ratio(self) -> None:
         """Test computing ratio."""
-        assert compute_compression_ratio(16, 4) == 4.0
-        assert compute_compression_ratio(32, 4) == 8.0
+        assert compute_compression_ratio(16, 4) == pytest.approx(4.0)
+        assert compute_compression_ratio(32, 4) == pytest.approx(8.0)
 
     def test_zero_original_raises_error(self) -> None:
         """Test that zero original raises ValueError."""
@@ -358,12 +358,12 @@ class TestCreateQuantResult:
     def test_creates_result(self) -> None:
         """Test creating result."""
         result = create_quant_result(14000, 4000)
-        assert result.compression_ratio == 3.5
+        assert result.compression_ratio == pytest.approx(3.5)
 
     def test_with_perplexity(self) -> None:
         """Test with perplexity values."""
         result = create_quant_result(14000, 4000, 5.0, 5.5)
-        assert result.perplexity_degradation == 10.0
+        assert result.perplexity_degradation == pytest.approx(10.0)
 
     def test_zero_original_raises_error(self) -> None:
         """Test that zero original raises ValueError."""

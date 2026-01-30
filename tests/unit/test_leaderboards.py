@@ -121,7 +121,7 @@ class TestModelScore:
         """Test creating ModelScore instance."""
         score = ModelScore("accuracy", 0.95)
         assert score.metric_name == "accuracy"
-        assert score.score == 0.95
+        assert score.score == pytest.approx(0.95)
         assert score.is_higher_better is True
 
     def test_lower_is_better(self) -> None:
@@ -353,13 +353,13 @@ class TestComputeAverageScore:
         """Test with no scores."""
         entry = LeaderboardEntry("model", 1, [], "2024-01-01")
         avg = compute_average_score(entry)
-        assert avg == 0.0
+        assert avg == pytest.approx(0.0)
 
     def test_single_score(self) -> None:
         """Test with single score."""
         entry = LeaderboardEntry("model", 1, [ModelScore("a", 0.95)], "2024-01-01")
         avg = compute_average_score(entry)
-        assert avg == 0.95
+        assert avg == pytest.approx(0.95)
 
     def test_none_entry_raises_error(self) -> None:
         """Test that None entry raises ValueError."""
@@ -375,7 +375,7 @@ class TestGetScoreByMetric:
         scores = [ModelScore("accuracy", 0.95), ModelScore("f1", 0.92)]
         entry = LeaderboardEntry("model", 1, scores, "2024-01-01")
         score = get_score_by_metric(entry, "accuracy")
-        assert score == 0.95
+        assert score == pytest.approx(0.95)
 
     def test_not_found(self) -> None:
         """Test when metric not found."""
@@ -659,7 +659,7 @@ class TestComputeLeaderboardStats:
         board = create_leaderboard(config)
         stats = compute_leaderboard_stats(board)
         assert stats["total_entries"] == 0
-        assert stats["avg_score"] == 0.0
+        assert stats["avg_score"] == pytest.approx(0.0)
 
     def test_with_entries(self) -> None:
         """Test stats with entries."""

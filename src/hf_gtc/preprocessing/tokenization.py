@@ -11,6 +11,7 @@ Examples:
 
 from __future__ import annotations
 
+import unicodedata
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
@@ -23,6 +24,7 @@ def preprocess_text(
     *,
     lowercase: bool = True,
     strip_whitespace: bool = True,
+    unicode_normalize: bool = True,
 ) -> str:
     """Preprocess text for model input.
 
@@ -34,6 +36,10 @@ def preprocess_text(
         lowercase: Whether to convert to lowercase. Defaults to True.
         strip_whitespace: Whether to strip leading/trailing whitespace
             and normalize internal whitespace. Defaults to True.
+        unicode_normalize: Whether to apply Unicode NFC normalization.
+            This ensures visually identical characters (e.g., precomposed
+            vs decomposed accents) produce identical byte sequences.
+            Defaults to True.
 
     Returns:
         Preprocessed text string.
@@ -60,8 +66,27 @@ def preprocess_text(
         >>> # Unicode handling
         >>> preprocess_text("  Héllo Wörld  ")
         'héllo wörld'
+
+        >>> # NFC normalization: precomposed and decomposed produce same output
+        >>> import unicodedata
+        >>> nfc = "caf\u00e9"  # precomposed e-acute
+        >>> nfd = "cafe\u0301"  # e + combining acute
+        >>> preprocess_text(nfc) == preprocess_text(nfd)
+        True
+
+        >>> # Disable unicode normalization
+        >>> nfc_raw = preprocess_text(nfc, unicode_normalize=False)
+        >>> nfd_raw = preprocess_text(nfd, unicode_normalize=False)
+        >>> nfc_raw == nfd_raw
+        False
     """
     result = text
+
+    # Apply Unicode NFC normalization first to ensure consistent byte representation
+    # This prevents tokenizer divergence from visually identical but byte-different
+    # strings (e.g., precomposed vs decomposed accents)
+    if unicode_normalize:
+        result = unicodedata.normalize("NFC", result)
 
     if strip_whitespace:
         # Normalize internal whitespace and strip

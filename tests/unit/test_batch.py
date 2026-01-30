@@ -85,7 +85,7 @@ class TestBatchResult:
         assert result.predictions == ["a", "b", "c"]
         assert result.batch_index == 0
         assert result.num_samples == 3
-        assert result.processing_time_ms == 100.0
+        assert result.processing_time_ms == pytest.approx(100.0)
 
     def test_frozen(self) -> None:
         """Test that BatchResult is immutable."""
@@ -113,9 +113,9 @@ class TestBatchStats:
         )
         assert stats.total_samples == 100
         assert stats.total_batches == 4
-        assert stats.avg_batch_time_ms == 250.0
-        assert stats.total_time_ms == 1000.0
-        assert stats.samples_per_second == 100.0
+        assert stats.avg_batch_time_ms == pytest.approx(250.0)
+        assert stats.total_time_ms == pytest.approx(1000.0)
+        assert stats.samples_per_second == pytest.approx(100.0)
 
     def test_frozen(self) -> None:
         """Test that BatchStats is immutable."""
@@ -285,20 +285,20 @@ class TestComputeBatchStats:
         stats = compute_batch_stats(100, 4, 1000.0)
         assert stats.total_samples == 100
         assert stats.total_batches == 4
-        assert stats.avg_batch_time_ms == 250.0
-        assert stats.total_time_ms == 1000.0
-        assert stats.samples_per_second == 100.0
+        assert stats.avg_batch_time_ms == pytest.approx(250.0)
+        assert stats.total_time_ms == pytest.approx(1000.0)
+        assert stats.samples_per_second == pytest.approx(100.0)
 
     def test_zero_batches(self) -> None:
         """Test with zero batches (edge case)."""
         stats = compute_batch_stats(0, 0, 0.0)
-        assert stats.avg_batch_time_ms == 0.0
-        assert stats.samples_per_second == 0.0
+        assert stats.avg_batch_time_ms == pytest.approx(0.0)
+        assert stats.samples_per_second == pytest.approx(0.0)
 
     def test_zero_time(self) -> None:
         """Test with zero time (edge case)."""
         stats = compute_batch_stats(100, 4, 0.0)
-        assert stats.samples_per_second == 0.0
+        assert stats.samples_per_second == pytest.approx(0.0)
 
     def test_negative_samples_raises_error(self) -> None:
         """Test that negative samples raises ValueError."""
@@ -323,13 +323,13 @@ class TestEstimateMemoryPerBatch:
         """Test basic memory estimation."""
         memory = estimate_memory_per_batch(32, 512, 768, 4)
         # 32 * 512 * 768 * 4 = 50_331_648 bytes = 48 MB
-        assert round(memory, 2) == 48.0
+        assert round(memory, 2) == pytest.approx(48.0)
 
     def test_single_sample(self) -> None:
         """Test memory for single sample."""
         memory = estimate_memory_per_batch(1, 512, 768, 4)
         # 1 * 512 * 768 * 4 = 1_572_864 bytes = 1.5 MB
-        assert round(memory, 2) == 1.5
+        assert round(memory, 2) == pytest.approx(1.5)
 
     def test_zero_batch_size_raises_error(self) -> None:
         """Test that zero batch_size raises ValueError."""

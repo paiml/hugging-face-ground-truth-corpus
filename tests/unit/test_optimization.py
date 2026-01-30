@@ -91,9 +91,9 @@ class TestOptimizationResult:
             compression_ratio=4.0,
             quantization_type=QuantizationType.INT8,
         )
-        assert result.original_size_mb == 1000.0
-        assert result.optimized_size_mb == 250.0
-        assert result.compression_ratio == 4.0
+        assert result.original_size_mb == pytest.approx(1000.0)
+        assert result.optimized_size_mb == pytest.approx(250.0)
+        assert result.compression_ratio == pytest.approx(4.0)
         assert result.quantization_type == QuantizationType.INT8
 
     def test_frozen(self) -> None:
@@ -221,17 +221,17 @@ class TestCalculateCompressionRatio:
     def test_4x_compression(self) -> None:
         """Test 4x compression ratio."""
         ratio = calculate_compression_ratio(1000.0, 250.0)
-        assert ratio == 4.0
+        assert ratio == pytest.approx(4.0)
 
     def test_2x_compression(self) -> None:
         """Test 2x compression ratio."""
         ratio = calculate_compression_ratio(100.0, 50.0)
-        assert ratio == 2.0
+        assert ratio == pytest.approx(2.0)
 
     def test_no_compression(self) -> None:
         """Test 1x compression (no change)."""
         ratio = calculate_compression_ratio(100.0, 100.0)
-        assert ratio == 1.0
+        assert ratio == pytest.approx(1.0)
 
     def test_zero_original_raises_error(self) -> None:
         """Test that zero original size raises ValueError."""
@@ -261,20 +261,20 @@ class TestGetOptimizationResult:
         """Test optimization result for int8."""
         result = get_optimization_result(1_000_000_000, "int8")
         # float32 (4 bytes) to int8 (1 byte) = 4x compression
-        assert result.compression_ratio == 4.0
+        assert result.compression_ratio == pytest.approx(4.0)
         assert result.quantization_type == QuantizationType.INT8
 
     def test_int4_optimization(self) -> None:
         """Test optimization result for int4."""
         result = get_optimization_result(1_000_000_000, "int4")
         # float32 (4 bytes) to int4 (0.5 bytes) = 8x compression
-        assert result.compression_ratio == 8.0
+        assert result.compression_ratio == pytest.approx(8.0)
         assert result.quantization_type == QuantizationType.INT4
 
     def test_no_optimization(self) -> None:
         """Test optimization result with no quantization."""
         result = get_optimization_result(1_000_000_000, "none")
-        assert result.compression_ratio == 1.0
+        assert result.compression_ratio == pytest.approx(1.0)
 
 
 class TestGetModelLoadingKwargs:

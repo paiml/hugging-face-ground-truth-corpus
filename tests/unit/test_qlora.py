@@ -105,7 +105,7 @@ class TestQLoRAConfig:
         config = QLoRAConfig()
         assert config.r == 8
         assert config.lora_alpha == 16
-        assert config.lora_dropout == 0.05
+        assert config.lora_dropout == pytest.approx(0.05)
         assert config.bias == "none"
 
     def test_custom_values(self) -> None:
@@ -113,7 +113,7 @@ class TestQLoRAConfig:
         config = QLoRAConfig(r=16, lora_alpha=32, lora_dropout=0.1)
         assert config.r == 16
         assert config.lora_alpha == 32
-        assert config.lora_dropout == 0.1
+        assert config.lora_dropout == pytest.approx(0.1)
 
     def test_frozen(self) -> None:
         """Test that QLoRAConfig is immutable."""
@@ -140,7 +140,7 @@ class TestQLoRATrainingConfig:
         config = QLoRATrainingConfig(qlora_config=qlora, quant_config=quant)
         assert config.gradient_checkpointing is True
         assert config.gradient_accumulation_steps == 4
-        assert config.max_grad_norm == 0.3
+        assert config.max_grad_norm == pytest.approx(0.3)
 
 
 class TestMemoryEstimate:

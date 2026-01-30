@@ -7,6 +7,8 @@ security and correctness issues.
 IMPORTANT: This is refutation testing. Failures indicate potential
 vulnerabilities that should be documented and addressed.
 """
+# ruff: noqa: RUF001, RUF002
+# Ambiguous Unicode characters are intentional for adversarial testing
 
 from __future__ import annotations
 
@@ -14,7 +16,7 @@ import unicodedata
 from unittest.mock import MagicMock
 
 import pytest
-from hypothesis import given, settings, assume
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from hf_gtc.preprocessing.tokenization import (
@@ -504,7 +506,7 @@ class TestNormalizationConsistency:
 
         # These should ideally be equal after preprocessing
         if result_nfc != result_nfd:
-            print(f"DIVERGENCE: NFC/NFD normalization not consistent")
+            print("DIVERGENCE: NFC/NFD normalization not consistent")
 
     def test_compatibility_decomposition(self) -> None:
         """Test NFKC vs NFC (compatibility decomposition)."""
