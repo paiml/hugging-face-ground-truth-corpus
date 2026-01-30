@@ -53,7 +53,8 @@ build:
 
 # Export corpus for alimentar distribution
 export:
-	uv run python scripts/export_corpus.py --output hf_gtc_corpus.parquet --src-dir src/hf_gtc
+	uv run pytest --cov-report=json --cov-report=term-missing -q
+	uv run python scripts/export_corpus.py --output hf_gtc_corpus.parquet --src-dir src/hf_gtc --coverage coverage.json
 	@echo "Corpus exported to hf_gtc_corpus.parquet"
 	@echo "Next: alimentar quality score hf_gtc_corpus.parquet"
 
