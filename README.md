@@ -166,6 +166,83 @@ This project cross-references HuggingFace's Rust implementations for validation:
 - **[candle](https://github.com/huggingface/candle)** - Tensor operations
 - **[safetensors](https://github.com/huggingface/safetensors)** - Safe serialization
 
+## Usage
+
+### Hub Search
+
+```python
+from hf_gtc.hub import search_models, search_datasets, iter_models
+
+# Search models by task
+models = search_models(task="text-classification", limit=10)
+
+# Search datasets
+datasets = search_datasets(query="sentiment", limit=5)
+
+# Iterate through all models (lazy)
+for model in iter_models(library="transformers"):
+    print(model.model_id)
+```
+
+### Training
+
+```python
+from hf_gtc.training import create_training_args, create_trainer
+
+# Create training arguments
+args = create_training_args(
+    output_dir="./model",
+    num_epochs=3,
+    batch_size=16,
+    learning_rate=5e-5,
+)
+
+# Create trainer
+trainer = create_trainer(model, args, train_dataset)
+trainer.train()
+```
+
+### Evaluation
+
+```python
+from hf_gtc.evaluation import compute_classification_metrics, compute_perplexity
+
+# Compute all classification metrics
+metrics = compute_classification_metrics(predictions, labels)
+print(f"F1: {metrics.f1}, Accuracy: {metrics.accuracy}")
+
+# Compute perplexity from loss
+ppl = compute_perplexity(loss=2.5)
+```
+
+### Deployment Optimization
+
+```python
+from hf_gtc.deployment import get_quantization_config, estimate_model_size
+
+# Get INT8 quantization config
+config = get_quantization_config("int8")
+
+# Estimate model size after quantization
+size_mb = estimate_model_size(num_parameters=7_000_000_000, quantization_type="int4")
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/my-feature`
+3. Write tests first (TDD)
+4. Implement the feature
+5. Ensure all quality gates pass: `make check`
+6. Submit a pull request
+
+### Quality Requirements
+
+- 95% minimum test coverage
+- Zero ruff violations
+- All doctests must pass
+- Property-based tests for pure functions
+
 ## References
 
 - Ohno, T. (1988). *Toyota Production System: Beyond Large-Scale Production*
