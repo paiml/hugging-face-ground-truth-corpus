@@ -12,6 +12,47 @@ Examples:
 
 from __future__ import annotations
 
+from hf_gtc.rag.chunking import (
+    VALID_BOUNDARY_DETECTIONS,
+    VALID_OVERLAP_TYPES,
+    BoundaryDetection,
+    ChunkConfig,
+    OverlapType,
+    SemanticChunkConfig,
+    create_chunk_config,
+    create_chunk_result,
+    create_semantic_chunk_config,
+    estimate_retrieval_quality,
+    format_chunk_stats,
+    get_boundary_detection,
+    get_overlap_type,
+    get_recommended_chunking_config,
+    list_boundary_detections,
+    list_overlap_types,
+    optimize_chunk_size,
+    validate_chunk_boundaries,
+    validate_chunk_config,
+    validate_chunk_result,
+    validate_semantic_chunk_config,
+)
+from hf_gtc.rag.chunking import (
+    VALID_CHUNKING_STRATEGIES as VALID_CHUNKING_STRATEGIES_V2,
+)
+from hf_gtc.rag.chunking import (
+    ChunkingStrategy as ChunkingStrategyV2,
+)
+from hf_gtc.rag.chunking import (
+    ChunkResult as ChunkResultV2,
+)
+from hf_gtc.rag.chunking import (
+    calculate_chunk_count as calculate_chunk_count_v2,
+)
+from hf_gtc.rag.chunking import (
+    get_chunking_strategy as get_chunking_strategy_v2,
+)
+from hf_gtc.rag.chunking import (
+    list_chunking_strategies as list_chunking_strategies_v2,
+)
 from hf_gtc.rag.indexing import (
     VALID_BACKENDS,
     VALID_DISTANCE_FUNCTIONS,
@@ -95,32 +136,91 @@ from hf_gtc.rag.retrieval import (
     validate_chunking_config,
     validate_rag_config,
 )
+from hf_gtc.rag.vectorstore import (
+    VALID_DISTANCE_METRICS as VALID_VS_DISTANCE_METRICS,
+)
+from hf_gtc.rag.vectorstore import (
+    VALID_INDEX_TYPES,
+    VALID_STORE_TYPES,
+    IndexType,
+    SearchResult,
+    VectorStoreConfig,
+    VectorStoreType,
+    calculate_index_size,
+    calculate_recall_at_k,
+    create_search_result,
+    create_vectorstore_config,
+    estimate_search_latency,
+    format_search_stats,
+    get_index_type,
+    get_recommended_vectorstore_config,
+    get_store_type,
+    list_index_types,
+    list_store_types,
+    optimize_index_params,
+    validate_search_result,
+    validate_vectorstore_config,
+)
+from hf_gtc.rag.vectorstore import (
+    DistanceMetric as VSDistanceMetric,
+)
+from hf_gtc.rag.vectorstore import (
+    IndexConfig as VSIndexConfig,
+)
+from hf_gtc.rag.vectorstore import (
+    create_index_config as create_vs_index_config,
+)
+from hf_gtc.rag.vectorstore import (
+    get_distance_metric as get_vs_distance_metric,
+)
+from hf_gtc.rag.vectorstore import (
+    list_distance_metrics as list_vs_distance_metrics,
+)
+from hf_gtc.rag.vectorstore import (
+    validate_index_config as validate_vs_index_config,
+)
 
 __all__: list[str] = [
+    # Constants
     "VALID_BACKENDS",
+    "VALID_BOUNDARY_DETECTIONS",
     "VALID_CHUNKING_STRATEGIES",
+    "VALID_CHUNKING_STRATEGIES_V2",
     "VALID_DISTANCE_FUNCTIONS",
     "VALID_DISTANCE_METRICS",
     "VALID_FAISS_INDEX_TYPES",
     "VALID_FUSION_METHODS",
+    "VALID_INDEX_TYPES",
+    "VALID_OVERLAP_TYPES",
     "VALID_RERANKER_TYPES",
     "VALID_RETRIEVAL_METHODS",
-    # indexing
+    "VALID_STORE_TYPES",
+    "VALID_VS_DISTANCE_METRICS",
+    # Chunking (v2)
+    "BoundaryDetection",
+    # Indexing
     "ChromaConfig",
-    # retrieval
+    "ChunkConfig",
     "ChunkResult",
+    "ChunkResultV2",
+    # Retrieval
     "ChunkingConfig",
     "ChunkingStrategy",
+    "ChunkingStrategyV2",
     "DistanceFunction",
     "DistanceMetric",
     "DocumentChunk",
     "FAISSConfig",
     "FAISSIndexType",
+    # Reranking
     "FusionConfig",
     "FusionMethod",
     "HybridSearchConfig",
     "IndexConfig",
     "IndexStats",
+    # Vectorstore
+    "IndexType",
+    "OverlapType",
     "RAGConfig",
     "RerankerConfig",
     "RerankerResult",
@@ -129,14 +229,25 @@ __all__: list[str] = [
     "RetrievalResult",
     "RetrievalStats",
     "SearchConfig",
+    "SearchResult",
+    "SemanticChunkConfig",
+    "VSDistanceMetric",
+    "VSIndexConfig",
     "VectorStoreBackend",
+    "VectorStoreConfig",
+    "VectorStoreType",
     "calculate_chunk_count",
+    "calculate_chunk_count_v2",
+    "calculate_index_size",
     "calculate_linear_fusion",
     "calculate_optimal_nlist",
     "calculate_optimal_nprobe",
     "calculate_overlap_ratio",
+    "calculate_recall_at_k",
     "calculate_rrf_score",
     "create_chroma_config",
+    "create_chunk_config",
+    "create_chunk_result",
     "create_chunking_config",
     "create_document_chunk",
     "create_faiss_config",
@@ -149,26 +260,53 @@ __all__: list[str] = [
     "create_reranker_result",
     "create_retrieval_result",
     "create_search_config",
+    "create_search_result",
+    "create_semantic_chunk_config",
+    "create_vectorstore_config",
+    "create_vs_index_config",
     "estimate_index_size",
     "estimate_retrieval_latency",
+    "estimate_retrieval_quality",
+    "estimate_search_latency",
+    "format_chunk_stats",
     "format_retrieval_stats",
+    "format_search_stats",
     "get_backend",
+    "get_boundary_detection",
     "get_chunking_strategy",
+    "get_chunking_strategy_v2",
     "get_distance_function",
     "get_distance_metric",
     "get_faiss_index_type",
     "get_fusion_method",
+    "get_index_type",
+    "get_overlap_type",
     "get_recommended_chunk_size",
+    "get_recommended_chunking_config",
+    "get_recommended_vectorstore_config",
     "get_reranker_type",
     "get_retrieval_method",
+    "get_store_type",
+    "get_vs_distance_metric",
     "list_backends",
+    "list_boundary_detections",
     "list_chunking_strategies",
+    "list_chunking_strategies_v2",
     "list_distance_functions",
     "list_distance_metrics",
     "list_faiss_index_types",
     "list_fusion_methods",
+    "list_index_types",
+    "list_overlap_types",
     "list_reranker_types",
     "list_retrieval_methods",
+    "list_store_types",
+    "list_vs_distance_metrics",
+    "optimize_chunk_size",
+    "optimize_index_params",
+    "validate_chunk_boundaries",
+    "validate_chunk_config",
+    "validate_chunk_result",
     "validate_chunking_config",
     "validate_faiss_config",
     "validate_fusion_config",
@@ -176,4 +314,8 @@ __all__: list[str] = [
     "validate_rag_config",
     "validate_reranker_config",
     "validate_search_config",
+    "validate_search_result",
+    "validate_semantic_chunk_config",
+    "validate_vectorstore_config",
+    "validate_vs_index_config",
 ]
