@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.16.0
-**Status**: COMPLETE - EXPANDED WITH NEW MODULES
+**Version**: 2.17.0
+**Status**: COMPLETE - MULTIMODAL & DEPLOYMENT EXPANSION
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-017
+**PMAT Tickets**: PMAT-001 through PMAT-018
 
 ---
 
@@ -40,9 +40,12 @@
 | `hf_gtc.training.trl` | COMPLETE | 87% | 62 | PMAT-010 |
 | `hf_gtc.inference.embeddings` | COMPLETE | 99% | 67 | PMAT-010 |
 | `hf_gtc.evaluation.evaluate` | COMPLETE | 100% | 75 | PMAT-010 |
+| `hf_gtc.deployment.safetensors` | COMPLETE | 100% | 86 | PMAT-018 |
+| `hf_gtc.deployment.merging` | COMPLETE | 100% | 90 | PMAT-018 |
+| `hf_gtc.multimodal.vision` | COMPLETE | 100% | 127 | PMAT-018 |
 | `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 1586 tests (1539 core + 47 export), 97.97% coverage, 3251 statements
+**Total**: 1889 tests (1842 core + 47 export), ~98% coverage
 
 ---
 
