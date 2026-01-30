@@ -57,3 +57,7 @@ Thumbs.db
 *.bin
 *.pt
 *.pth
+
+# Generated artifacts
+coverage.json
+*.parquet
