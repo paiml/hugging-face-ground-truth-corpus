@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.11.0
+**Version**: 2.12.0
 **Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -650,8 +650,8 @@ The following components MUST be implemented to enable corpus distribution:
 
 **Acceptance Criteria**:
 - [x] `make export` produces valid `hf_gtc_corpus.parquet`
-- [ ] `alimentar quality score hf_gtc_corpus.parquet` passes (requires alimentar)
-- [ ] `alimentar hf upload` succeeds to test repository (requires alimentar)
+- [x] `alimentar quality score hf_gtc_corpus.parquet` passes (85% score, C grade)
+- [ ] `alimentar hf upload` succeeds to test repository (requires HF token)
 - [x] 47 tests for export script with full function coverage
 
 #### 4.6.2 Dataset Publishing Pipeline
@@ -2237,6 +2237,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.10.0 | 2026-01-30 | Claude Code | **Export Tooling Complete**: Implemented `scripts/export_corpus.py` (228 functions, 1262 doctests extracted), `tests/unit/test_export_corpus.py` (47 tests), `make export` target, and `scripts/dataset_card.md` template. |
 | 2.10.1 | 2026-01-30 | Claude Code | **Doctest Fixes**: Fixed 7 failing doctests - generator validation (force iteration with `next()`), float precision (use `round()`), random seed behavior, invalid test values. All 339 doctests now pass. |
 | 2.11.0 | 2026-01-30 | Claude Code | **Security Hardening**: Fixed B104 (ServerConfig default host 0.0.0.0 → 127.0.0.1), fixed B615 (added revision parameter for dataset version pinning). All bandit security checks now pass. |
+| 2.12.0 | 2026-01-30 | Claude Code | **alimentar Integration**: Fixed alimentar GH-013 (nested Arrow types support). Quality score now passes at 85% (C grade). Exported corpus validates successfully. |
 
 ---
 
