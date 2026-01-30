@@ -38,6 +38,7 @@ dev = [
     "pre-commit>=3.6.0",
     "peft>=0.10.0",
     "numpy>=1.26.0",
+    "ty>=0.0.14",
 ]
 peft = ["peft>=0.10.0"]
 vision = ["Pillow>=10.0.0"]
@@ -83,3 +84,6 @@ exclude_lines = [
     "raise NotImplementedError",
     "@overload",
 ]
+
+[tool.ty.environment]
+python-version = "3.11"

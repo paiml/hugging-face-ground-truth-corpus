@@ -216,7 +216,7 @@ def get_dataset_info(
 
     # Handle DatasetDict
     if hasattr(dataset, "keys"):
-        splits = tuple(dataset.keys())
+        splits = tuple(dataset.keys())  # type: ignore[call-non-callable]
         # Use first split to get column info
         first_split = dataset[splits[0]]
         columns = tuple(first_split.column_names)

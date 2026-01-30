@@ -198,7 +198,7 @@ def _convert_space_info(hf_info: HFSpaceInfo) -> SpaceInfo:
     """
     return SpaceInfo(
         space_id=hf_info.id,
-        author=hf_info.author,
+        author=hf_info.author or "",
         title=getattr(hf_info, "title", None),
         sdk=hf_info.sdk,
         likes=hf_info.likes or 0,

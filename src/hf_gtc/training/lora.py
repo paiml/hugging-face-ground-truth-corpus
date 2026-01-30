@@ -241,7 +241,7 @@ def get_peft_config(lora_config: LoRAConfig) -> Any:
         lora_dropout=lora_config.lora_dropout,
         target_modules=list(lora_config.target_modules),
         task_type=task_type_map[lora_config.task_type],
-        bias=lora_config.bias,
+        bias=lora_config.bias,  # type: ignore[arg-type]  # validated in validate_lora_config
         modules_to_save=modules_to_save,
     )
 
@@ -393,9 +393,10 @@ def get_recommended_lora_config(
         "xlarge": {"r": 32, "lora_alpha": 64, "lora_dropout": 0.05},
     }
 
+    cfg = configs[model_size]
     return create_lora_config(
-        r=configs[model_size]["r"],
-        lora_alpha=configs[model_size]["lora_alpha"],
-        lora_dropout=configs[model_size]["lora_dropout"],
+        r=int(cfg["r"]),
+        lora_alpha=int(cfg["lora_alpha"]),
+        lora_dropout=float(cfg["lora_dropout"]),
         task_type=task_type,
     )

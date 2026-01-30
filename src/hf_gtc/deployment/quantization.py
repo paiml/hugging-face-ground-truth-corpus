@@ -929,13 +929,9 @@ def get_recommended_profile(model_size: str) -> QuantProfile:
     model_size = model_size.lower().strip()
 
     if model_size in ("7b", "7B", "7") or model_size in ("13b", "13B", "13"):
-        return create_quant_profile(
-            method=QuantMethod.GPTQ, bits=4, group_size=128
-        )
+        return create_quant_profile(method=QuantMethod.GPTQ, bits=4, group_size=128)
     elif model_size in ("70b", "70B", "70"):
-        return create_quant_profile(
-            method=QuantMethod.GPTQ, bits=4, group_size=64
-        )
+        return create_quant_profile(method=QuantMethod.GPTQ, bits=4, group_size=64)
     else:
         msg = f"unrecognized model size: {model_size}"
         raise ValueError(msg)

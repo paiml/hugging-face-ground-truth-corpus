@@ -38,11 +38,11 @@ class TestZWJSequences:
         U+1F468 U+200D U+1F469 U+200D U+1F467 U+200D U+1F466
         (Man, ZWJ, Woman, ZWJ, Girl, ZWJ, Boy = Family)
         """
-        family = "\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466"
+        family = "\U0001f468\u200d\U0001f469\u200d\U0001f467\u200d\U0001f466"
         result = preprocess_text(f"Hello {family} World")
 
         # Document: Does preprocessing preserve or destroy ZWJ sequences?
-        assert family in result or "\u200D" not in result, (
+        assert family in result or "\u200d" not in result, (
             f"ZWJ sequence partially destroyed: {result!r}"
         )
 
@@ -52,38 +52,32 @@ class TestZWJSequences:
         Flags use pairs of Regional Indicator symbols.
         U+1F1FA U+1F1F8 = US flag
         """
-        us_flag = "\U0001F1FA\U0001F1F8"
+        us_flag = "\U0001f1fa\U0001f1f8"
         result = preprocess_text(f"Hello {us_flag}")
 
         # Both indicators must remain together
-        assert us_flag in result, (
-            f"Flag sequence broken: {result!r}"
-        )
+        assert us_flag in result, f"Flag sequence broken: {result!r}"
 
     def test_skin_tone_modifier(self) -> None:
         """Test emoji with skin tone modifiers.
 
         U+1F44B U+1F3FD = Waving hand, medium skin tone
         """
-        waving = "\U0001F44B\U0001F3FD"
+        waving = "\U0001f44b\U0001f3fd"
         result = preprocess_text(f"{waving} hi")
 
         # Modifier must stay with base emoji
-        assert waving in result, (
-            f"Skin tone modifier separated: {result!r}"
-        )
+        assert waving in result, f"Skin tone modifier separated: {result!r}"
 
     def test_profession_zwj_sequence(self) -> None:
         """Test profession emoji ZWJ sequence.
 
         Woman technologist: U+1F469 U+200D U+1F4BB
         """
-        technologist = "\U0001F469\u200D\U0001F4BB"
+        technologist = "\U0001f469\u200d\U0001f4bb"
         result = preprocess_text(technologist)
 
-        assert technologist in result, (
-            f"Profession ZWJ sequence broken: {result!r}"
-        )
+        assert technologist in result, f"Profession ZWJ sequence broken: {result!r}"
 
 
 class TestBidirectionalOverrides:
@@ -96,10 +90,10 @@ class TestBidirectionalOverrides:
         """Test RLO (Right-to-Left Override) character U+202E.
 
         This character reverses text direction and can hide malicious content.
-        Example: "hello\u202Eollehdlrow" displays as "helloworld" but
+        Example: "hello\u202eollehdlrow" displays as "helloworld" but
         contains hidden characters.
         """
-        rlo = "\u202E"
+        rlo = "\u202e"
         text = f"hello{rlo}dlrow"
         result = preprocess_text(text)
 
@@ -112,7 +106,7 @@ class TestBidirectionalOverrides:
 
     def test_left_to_right_override(self) -> None:
         """Test LRO (Left-to-Right Override) character U+202D."""
-        lro = "\u202D"
+        lro = "\u202d"
         text = f"{lro}forced ltr"
         result = preprocess_text(text)
 
@@ -121,8 +115,8 @@ class TestBidirectionalOverrides:
     def test_mixed_bidi_text(self) -> None:
         """Test mixed Arabic and English with bidi controls."""
         # Arabic text with explicit LRM markers
-        lrm = "\u200E"  # Left-to-Right Mark
-        rlm = "\u200F"  # Right-to-Left Mark
+        lrm = "\u200e"  # Left-to-Right Mark
+        rlm = "\u200f"  # Right-to-Left Mark
         text = f"English{lrm} {rlm}العربية{lrm} more"
         result = preprocess_text(text)
 
@@ -150,7 +144,7 @@ class TestCombiningDiacriticals:
         NFC: U+00E9 (é as single code point)
         NFD: U+0065 U+0301 (e + combining acute accent)
         """
-        precomposed = "\u00E9"  # é NFC
+        precomposed = "\u00e9"  # é NFC
         decomposed = "e\u0301"  # e + combining acute NFD
 
         result_nfc = preprocess_text(f"caf{precomposed}")
@@ -176,7 +170,7 @@ class TestCombiningDiacriticals:
         and potentially different tokenization.
         """
         # H with many combining marks
-        zalgo_h = "H\u0335\u0338\u0321\u034B\u036F"
+        zalgo_h = "H\u0335\u0338\u0321\u034b\u036f"
         text = f"{zalgo_h}ello"
         result = preprocess_text(text)
 
@@ -187,7 +181,7 @@ class TestCombiningDiacriticals:
 
     def test_combining_grapheme_joiner(self) -> None:
         """Test Combining Grapheme Joiner U+034F."""
-        cgj = "\u034F"
+        cgj = "\u034f"
         text = f"a{cgj}b"  # a and b joined
         result = preprocess_text(text)
 
@@ -244,13 +238,13 @@ class TestNullAndControlCharacters:
 
     def test_form_feed(self) -> None:
         """Test form feed U+000C."""
-        text = "hello\x0Cworld"
+        text = "hello\x0cworld"
         result = preprocess_text(text)
         assert isinstance(result, str)
 
     def test_vertical_tab(self) -> None:
         """Test vertical tab U+000B."""
-        text = "hello\x0Bworld"
+        text = "hello\x0bworld"
         result = preprocess_text(text)
         assert isinstance(result, str)
 
@@ -269,7 +263,7 @@ class TestSurrogatePairs:
         """
         try:
             # This may raise an error in some Python versions
-            text = "hello\uD800world"
+            text = "hello\ud800world"
             result = preprocess_text(text)
             print(f"Lone high surrogate result: {result!r}")
             assert isinstance(result, str)
@@ -280,7 +274,7 @@ class TestSurrogatePairs:
     def test_low_surrogate_alone(self) -> None:
         """Test lone low surrogate U+DC00."""
         try:
-            text = "hello\uDC00world"
+            text = "hello\udc00world"
             result = preprocess_text(text)
             print(f"Lone low surrogate result: {result!r}")
             assert isinstance(result, str)
@@ -290,7 +284,7 @@ class TestSurrogatePairs:
     def test_reversed_surrogate_pair(self) -> None:
         """Test reversed surrogate pair (low before high)."""
         try:
-            text = "\uDC00\uD800"  # Invalid: low before high
+            text = "\udc00\ud800"  # Invalid: low before high
             result = preprocess_text(text)
             print(f"Reversed surrogate pair result: {result!r}")
             assert isinstance(result, str)
@@ -307,7 +301,7 @@ class TestUnassignedCodePoints:
     def test_unassigned_plane_1(self) -> None:
         """Test unassigned code point in Plane 1 (SMP)."""
         # U+1FFFF is currently unassigned (as of Unicode 15)
-        text = "hello\U0001FFFFworld"
+        text = "hello\U0001ffffworld"
         result = preprocess_text(text)
 
         print(f"Unassigned SMP: {result!r}")
@@ -318,7 +312,7 @@ class TestUnassignedCodePoints:
 
         Noncharacters are permanently reserved and never assigned.
         """
-        text = "hello\uFFFEworld"
+        text = "hello\ufffeworld"
         result = preprocess_text(text)
 
         print(f"Noncharacter U+FFFE: {result!r}")
@@ -326,7 +320,7 @@ class TestUnassignedCodePoints:
 
     def test_bom_character(self) -> None:
         """Test Byte Order Mark U+FEFF at various positions."""
-        bom = "\uFEFF"
+        bom = "\ufeff"
 
         # BOM at start (common)
         result1 = preprocess_text(f"{bom}hello")
@@ -342,7 +336,7 @@ class TestUnassignedCodePoints:
     def test_private_use_area(self) -> None:
         """Test Private Use Area characters."""
         # U+E000 to U+F8FF are PUA
-        pua = "\uE000\uE001\uF8FF"
+        pua = "\ue000\ue001\uf8ff"
         text = f"hello{pua}world"
         result = preprocess_text(text)
 
@@ -352,7 +346,7 @@ class TestUnassignedCodePoints:
     def test_supplementary_pua(self) -> None:
         """Test Supplementary Private Use Area characters."""
         # Plane 15-16 PUA
-        spua = "\U000F0000\U000FFFFF\U00100000"
+        spua = "\U000f0000\U000fffff\U00100000"
         text = f"hello{spua}world"
         result = preprocess_text(text)
 
@@ -371,8 +365,8 @@ class TestHomoglyphs:
 
         U+0430 (Cyrillic) looks like U+0061 (Latin) but tokenizes differently.
         """
-        latin_a = "a"      # U+0061
-        cyrillic_a = "а"   # U+0430
+        latin_a = "a"  # U+0061
+        cyrillic_a = "а"  # U+0430
 
         latin_result = preprocess_text(f"hello {latin_a}bc")
         cyrillic_result = preprocess_text(f"hello {cyrillic_a}bc")
@@ -386,8 +380,8 @@ class TestHomoglyphs:
 
     def test_greek_omicron(self) -> None:
         """Test Greek ο vs Latin o."""
-        latin_o = "o"      # U+006F
-        greek_o = "ο"      # U+03BF
+        latin_o = "o"  # U+006F
+        greek_o = "ο"  # U+03BF
 
         latin_result = preprocess_text(f"hell{latin_o}")
         greek_result = preprocess_text(f"hell{greek_o}")
@@ -421,7 +415,7 @@ class TestWhitespaceVariants:
 
     def test_no_break_space(self) -> None:
         """Test No-Break Space U+00A0."""
-        nbsp = "\u00A0"
+        nbsp = "\u00a0"
         text = f"hello{nbsp}world"
         result = preprocess_text(text)
 
@@ -431,7 +425,7 @@ class TestWhitespaceVariants:
 
     def test_zero_width_space(self) -> None:
         """Test Zero Width Space U+200B."""
-        zwsp = "\u200B"
+        zwsp = "\u200b"
         text = f"hello{zwsp}world"
         result = preprocess_text(text)
 
@@ -534,8 +528,8 @@ class TestTokenizeBatchAdversarial:
             "normal text",
             "with\x00null",
             "zalgo\u0335\u0338text",
-            "\u202Ehidden",
-            "emoji\U0001F468\u200D\U0001F4BB",
+            "\u202ehidden",
+            "emoji\U0001f468\u200d\U0001f4bb",
         ]
 
         # Should not crash
@@ -545,9 +539,9 @@ class TestTokenizeBatchAdversarial:
     def test_very_long_emoji_sequence(self, mock_tokenizer: MagicMock) -> None:
         """Test extremely long ZWJ emoji sequence."""
         # Build a very long ZWJ chain
-        emoji_chain = "\U0001F468"
+        emoji_chain = "\U0001f468"
         for _ in range(50):
-            emoji_chain += "\u200D\U0001F469"
+            emoji_chain += "\u200d\U0001f469"
 
         result = tokenize_batch([emoji_chain], mock_tokenizer)
         assert result is not None
@@ -556,11 +550,17 @@ class TestTokenizeBatchAdversarial:
 class TestHypothesisAdversarial:
     """Property-based tests for adversarial inputs."""
 
-    @given(st.text(alphabet=st.characters(
-        whitelist_categories=("Cc", "Cf", "Co"),  # Control, Format, Private Use
-        min_codepoint=0,
-        max_codepoint=0x10FFFF,
-    ), min_size=1, max_size=100))
+    @given(
+        st.text(
+            alphabet=st.characters(
+                whitelist_categories=("Cc", "Cf", "Co"),  # Control, Format, Private Use
+                min_codepoint=0,
+                max_codepoint=0x10FFFF,
+            ),
+            min_size=1,
+            max_size=100,
+        )
+    )
     @settings(max_examples=50)
     def test_control_characters_dont_crash(self, text: str) -> None:
         """Test that control characters don't cause crashes."""
@@ -570,11 +570,17 @@ class TestHypothesisAdversarial:
         except Exception as e:
             pytest.fail(f"Crashed on control chars: {text!r}, error: {e}")
 
-    @given(st.text(alphabet=st.characters(
-        whitelist_categories=("Mn", "Mc", "Me"),  # Combining marks
-        min_codepoint=0x0300,
-        max_codepoint=0x036F,
-    ), min_size=1, max_size=50))
+    @given(
+        st.text(
+            alphabet=st.characters(
+                whitelist_categories=("Mn", "Mc", "Me"),  # Combining marks
+                min_codepoint=0x0300,
+                max_codepoint=0x036F,
+            ),
+            min_size=1,
+            max_size=50,
+        )
+    )
     @settings(max_examples=50)
     def test_combining_marks_dont_crash(self, marks: str) -> None:
         """Test that many combining marks don't crash."""

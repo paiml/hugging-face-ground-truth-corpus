@@ -169,11 +169,11 @@ def foo(x: int) -> int:
 
     def test_multiple_functions(self) -> None:
         """Test extracting multiple functions."""
-        code = '''
+        code = """
 def foo(): pass
 def bar(): pass
 def baz(): pass
-'''
+"""
         tree = ast.parse(code)
         funcs = extract_functions(tree)
         assert len(funcs) == 3
@@ -184,11 +184,11 @@ def baz(): pass
 
     def test_skips_private_functions(self) -> None:
         """Test that private functions are skipped."""
-        code = '''
+        code = """
 def public(): pass
 def _private(): pass
 def __dunder__(): pass
-'''
+"""
         tree = ast.parse(code)
         funcs = extract_functions(tree)
         assert len(funcs) == 1
@@ -196,11 +196,11 @@ def __dunder__(): pass
 
     def test_nested_functions_extracted(self) -> None:
         """Test that nested functions are also extracted."""
-        code = '''
+        code = """
 def outer():
     def inner():
         pass
-'''
+"""
         tree = ast.parse(code)
         funcs = extract_functions(tree)
         # ast.walk finds both outer and inner

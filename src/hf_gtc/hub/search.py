@@ -134,7 +134,7 @@ def _convert_dataset_info(hf_info: HFDatasetInfo) -> DatasetInfo:
         dataset_id=hf_info.id,
         downloads=hf_info.downloads or 0,
         likes=hf_info.likes or 0,
-        task_categories=hf_info.task_categories or [],
+        task_categories=getattr(hf_info, "task_categories", None) or [],
     )
 
 

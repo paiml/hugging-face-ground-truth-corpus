@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
 
 
 @dataclass(frozen=True, slots=True)
@@ -344,7 +344,7 @@ def compute_mean_loss(losses: Sequence[float]) -> float:
 
 def create_compute_metrics_fn(
     positive_label: int = 1,
-) -> callable:
+) -> Callable[[tuple], dict[str, float]]:
     """Create a compute_metrics function for HuggingFace Trainer.
 
     Args:

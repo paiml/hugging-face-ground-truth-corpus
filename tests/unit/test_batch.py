@@ -222,9 +222,7 @@ class TestCreateBatches:
         batch_size=st.integers(min_value=1, max_value=50),
     )
     @settings(max_examples=20)
-    def test_all_items_preserved(
-        self, items: list[int], batch_size: int
-    ) -> None:
+    def test_all_items_preserved(self, items: list[int], batch_size: int) -> None:
         """Test that all items are preserved after batching."""
         batches = list(create_batches(items, batch_size=batch_size))
         flattened = [item for batch in batches for item in batch]

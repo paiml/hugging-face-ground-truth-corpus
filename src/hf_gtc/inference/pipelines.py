@@ -124,7 +124,7 @@ def create_pipeline(
         detected = get_device()
         device = 0 if detected == "cuda" else detected
 
-    return _hf_pipeline(
+    return _hf_pipeline(  # type: ignore[no-matching-overload]
         task=task,
         model=model,
         device=device,

@@ -14,6 +14,7 @@ This is the **HuggingFace Ground Truth Corpus** (HF-GTC), a curated collection o
 ### Quality Standards
 - **95% minimum test coverage** - Enforced via pytest
 - **Zero ruff violations** - `make lint` must pass
+- **Zero ty type errors** - `make typecheck` must pass
 - **100% docstring coverage** for public APIs
 - **Property-based testing** via Hypothesis for all pure functions
 
@@ -41,10 +42,11 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 make setup          # Install dependencies + pre-commit
 make lint           # Run ruff linter
 make format         # Auto-fix formatting
+make typecheck      # Run ty type checker
 make test           # Full test suite with coverage
 make test-fast      # Quick unit tests, no coverage
 make coverage       # Generate HTML coverage report
-make check          # Full quality gates (lint + test + security)
+make check          # Full quality gates (lint + typecheck + test + security)
 make security       # Run bandit security scan
 ```
 

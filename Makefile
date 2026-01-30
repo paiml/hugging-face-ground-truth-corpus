@@ -1,4 +1,4 @@
-.PHONY: setup lint format test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export
+.PHONY: setup lint format typecheck test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export
 
 # Setup
 setup:
@@ -13,6 +13,10 @@ lint:
 format:
 	uv run ruff format src/ tests/
 	uv run ruff check --fix src/ tests/
+
+# Type checking
+typecheck:
+	uv run ty check src/
 
 # Testing
 test:
@@ -40,7 +44,7 @@ security:
 	uv run bandit -r src/ -ll
 
 # Full quality check (Jidoka gates)
-check: lint coverage-check security
+check: lint typecheck coverage-check security
 	@echo "All quality gates passed!"
 
 # Build
