@@ -40,6 +40,7 @@ dev = [
     "numpy>=1.26.0",
     "ty>=0.0.14",
     "pdoc>=15.0.0",
+    "mutmut>=3.2.0",
 ]
 peft = ["peft>=0.10.0"]
 vision = ["Pillow>=10.0.0"]
@@ -88,3 +89,8 @@ exclude_lines = [
 
 [tool.ty.environment]
 python-version = "3.11"
+
+[tool.mutmut]
+paths_to_mutate = "src/hf_gtc/"
+tests_dir = "tests/"
+runner = "pytest -x -q --no-cov"

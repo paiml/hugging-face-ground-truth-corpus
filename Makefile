@@ -1,4 +1,4 @@
-.PHONY: setup lint format typecheck test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export docs
+.PHONY: setup lint format typecheck test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export docs mutation
 
 # Setup
 setup:
@@ -55,6 +55,12 @@ build:
 docs:
 	uv run pdoc -o docs/api src/hf_gtc
 	@echo "API documentation generated in docs/api/"
+
+# Mutation testing (slow - run selectively)
+mutation:
+	uv run mutmut run --paths-to-mutate=src/hf_gtc/evaluation/metrics.py
+	uv run mutmut results
+	@echo "Mutation testing complete. Run 'uv run mutmut html' for report."
 
 # Export corpus for alimentar distribution
 export:
