@@ -11,6 +11,7 @@ from hf_gtc.hub.search import (
     ModelInfo,
     _convert_dataset_info,
     _convert_model_info,
+    iter_models,
     search_datasets,
     search_models,
 )
@@ -199,3 +200,26 @@ class TestSearchDatasets:
         """Test that invalid sort raises ValueError."""
         with pytest.raises(ValueError, match="sort must be one of"):
             search_datasets(sort="bad_sort")
+
+
+class TestIterModels:
+    """Tests for iter_models function."""
+
+    def test_iter_models_returns_iterator(self, mock_hf_api: MagicMock) -> None:
+        """Test that iter_models returns an iterator."""
+        result = iter_models()
+        assert hasattr(result, "__iter__")
+        assert hasattr(result, "__next__")
+
+    def test_iter_models_yields_model_info(self, mock_hf_api: MagicMock) -> None:
+        """Test that iter_models yields ModelInfo objects."""
+        models = list(iter_models())
+        assert len(models) == 1
+        assert isinstance(models[0], ModelInfo)
+        assert models[0].model_id == "test-org/test-model"
+
+    def test_iter_models_with_filters(self, mock_hf_api: MagicMock) -> None:
+        """Test iter_models with task and library filters."""
+        models = list(iter_models(task="text-classification", library="transformers"))
+        assert len(models) == 1
+        mock_hf_api.list_models.assert_called_once()
