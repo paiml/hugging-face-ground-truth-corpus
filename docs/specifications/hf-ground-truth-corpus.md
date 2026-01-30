@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Status**: IMPLEMENTATION IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001, PMAT-002
+**PMAT Tickets**: PMAT-001 through PMAT-007
 
 ---
 
@@ -14,16 +14,19 @@
 | Module | Status | Coverage | Tests | PMAT Ticket |
 |--------|--------|----------|-------|-------------|
 | `hf_gtc.hub.search` | COMPLETE | 100% | 19 | - |
+| `hf_gtc.hub.cards` | COMPLETE | 96% | 38 | PMAT-005 |
 | `hf_gtc.inference.device` | COMPLETE | 100% | 19 | - |
 | `hf_gtc.inference.pipelines` | COMPLETE | 100% | 14 | - |
+| `hf_gtc.inference.batch` | COMPLETE | 100% | 56 | PMAT-007 |
 | `hf_gtc.preprocessing.tokenization` | COMPLETE | 100% | 27 | - |
 | `hf_gtc.preprocessing.datasets` | COMPLETE | 100% | 41 | PMAT-004 |
 | `hf_gtc.training.fine_tuning` | COMPLETE | 100% | 40 | - |
 | `hf_gtc.training.lora` | COMPLETE | 100% | 50 | PMAT-003 |
+| `hf_gtc.training.callbacks` | COMPLETE | 99% | 54 | PMAT-006 |
 | `hf_gtc.evaluation.metrics` | COMPLETE | 100% | 42 | PMAT-001 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
 
-**Total**: 296 tests, 100% coverage, 552 statements covered
+**Total**: 444 tests, 99% coverage, 927 statements covered
 
 ---
 
