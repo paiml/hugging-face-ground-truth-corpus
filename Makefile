@@ -1,4 +1,4 @@
-.PHONY: setup lint format test test-fast test-unit test-doctest coverage coverage-check comply security check build clean
+.PHONY: setup lint format test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export
 
 # Setup
 setup:
@@ -46,6 +46,12 @@ check: lint coverage-check security
 # Build
 build:
 	uv build
+
+# Export corpus for alimentar distribution
+export:
+	uv run python scripts/export_corpus.py --output hf_gtc_corpus.parquet --src-dir src/hf_gtc
+	@echo "Corpus exported to hf_gtc_corpus.parquet"
+	@echo "Next: alimentar quality score hf_gtc_corpus.parquet"
 
 # Clean
 clean:
