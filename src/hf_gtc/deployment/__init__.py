@@ -67,6 +67,40 @@ from hf_gtc.deployment.compression import (
     validate_structured_pruning_config,
     validate_weight_sharing_config,
 )
+from hf_gtc.deployment.conversion import (
+    VALID_CONVERSION_PRECISIONS,
+    VALID_MODEL_FORMATS,
+    VALID_SHARDING_STRATEGIES,
+    ConversionConfig,
+    ConversionPrecision,
+    ConversionStats,
+    GGUFConversionConfig,
+    ModelFormat,
+    SafeTensorsConversionConfig,
+    ShardingStrategy,
+    calculate_precision_loss,
+    create_conversion_config,
+    create_conversion_stats,
+    create_gguf_conversion_config,
+    create_safetensors_conversion_config,
+    estimate_conversion_time,
+    estimate_converted_size,
+    format_conversion_stats,
+    get_conversion_config_dict,
+    get_conversion_precision,
+    get_gguf_conversion_config_dict,
+    get_model_format,
+    get_recommended_conversion_config,
+    get_safetensors_conversion_config_dict,
+    get_sharding_strategy,
+    list_conversion_precisions,
+    list_model_formats,
+    list_sharding_strategies,
+    validate_conversion_config,
+    validate_format_compatibility,
+    validate_gguf_conversion_config,
+    validate_safetensors_conversion_config,
+)
 from hf_gtc.deployment.gguf import (
     GGUFArchitecture,
     GGUFConfig,
@@ -210,28 +244,59 @@ from hf_gtc.deployment.safetensors import (
     validate_tensor_name,
 )
 from hf_gtc.deployment.serving import (
+    VALID_HEALTH_CHECK_TYPES,
+    VALID_LOAD_BALANCING,
+    VALID_SERVING_BACKENDS,
+    EndpointConfig,
+    HealthCheckType,
     HealthStatus,
     InferenceBackend,
     InferenceRequest,
     InferenceResponse,
+    LoadBalancing,
     ModelServer,
+    ScalingConfig,
     ServerConfig,
     ServerStatus,
+    ServingBackend,
+    ServingConfig,
+    ServingStats,
+    calculate_cost_per_request,
+    calculate_throughput_capacity,
     compute_server_metrics,
+    create_endpoint_config,
+    create_scaling_config,
     create_server,
+    create_serving_config,
+    estimate_latency,
     format_server_info,
+    format_serving_stats,
+    get_health_check_type,
     get_health_status,
     get_inference_backend,
+    get_load_balancing,
+    get_recommended_serving_config,
     get_server_status,
+    get_serving_backend,
+    list_health_check_types,
     list_inference_backends,
+    list_load_balancing_strategies,
     list_server_statuses,
+    list_serving_backends,
     process_batch,
     process_request,
     start_server,
     stop_server,
+    validate_endpoint_config,
+    validate_endpoint_health,
+    validate_health_check_type,
     validate_inference_backend,
+    validate_load_balancing,
+    validate_scaling_config,
     validate_server_config,
     validate_server_status,
+    validate_serving_backend,
+    validate_serving_config,
 )
 from hf_gtc.deployment.torchscript import (
     CompilationStats,
@@ -273,16 +338,22 @@ from hf_gtc.deployment.torchscript import (
 __all__: list[str] = [
     # Constants
     "DENSITY_VALUES",
+    "VALID_CONVERSION_PRECISIONS",
     "VALID_DECOMPOSITION_METHODS",
     "VALID_DTYPES",
     "VALID_EXECUTION_PROVIDERS",
     "VALID_FUSION_TYPES",
+    "VALID_HEALTH_CHECK_TYPES",
     "VALID_IMPORTANCE_METRICS",
+    "VALID_LOAD_BALANCING",
     "VALID_MERGE_METHODS",
+    "VALID_MODEL_FORMATS",
     "VALID_ONNX_OPSET_VERSIONS",
     "VALID_OPTIMIZATION_LEVELS",
     "VALID_PRUNING_METHODS",
     "VALID_PRUNING_SCOPES",
+    "VALID_SERVING_BACKENDS",
+    "VALID_SHARDING_STRATEGIES",
     "VALID_STRUCTURED_DIMS",
     "VALID_TENSOR_FORMATS",
     # Quantization
@@ -294,10 +365,16 @@ __all__: list[str] = [
     # Compression
     "CompressionConfig",
     "CompressionStats",
+    # Conversion
+    "ConversionConfig",
+    "ConversionPrecision",
+    "ConversionStats",
     # SafeTensors
     "DType",
     "DecompositionMethod",
     "DensityType",
+    # Serving
+    "EndpointConfig",
     # ONNX
     "ExecutionProvider",
     "ExportStats",
@@ -309,13 +386,14 @@ __all__: list[str] = [
     # GGUF
     "GGUFArchitecture",
     "GGUFConfig",
+    "GGUFConversionConfig",
     "GGUFEndian",
     "GGUFExportResult",
     "GGUFMetadata",
     "GGUFModelInfo",
     "GGUFQuantType",
     "GPTQConfig",
-    # Serving
+    "HealthCheckType",
     "HealthStatus",
     # Compression
     "ImportanceMetric",
@@ -324,6 +402,8 @@ __all__: list[str] = [
     "InferenceResponse",
     # Compression
     "LayerFusionConfig",
+    # Serving
+    "LoadBalancing",
     "LoadConfig",
     # Compression
     "LowRankConfig",
@@ -332,6 +412,8 @@ __all__: list[str] = [
     "MergeResult",
     # TorchScript
     "MobileConfig",
+    # Conversion
+    "ModelFormat",
     "ModelServer",
     "ModelSlice",
     # ONNX
@@ -359,11 +441,21 @@ __all__: list[str] = [
     "QuantizationType",
     # ONNX
     "RuntimeConfig",
+    # Conversion
+    "SafeTensorsConversionConfig",
     "SaveConfig",
+    # Serving
+    "ScalingConfig",
     # TorchScript
     "ScriptMode",
     "ServerConfig",
     "ServerStatus",
+    # Serving
+    "ServingBackend",
+    "ServingConfig",
+    "ServingStats",
+    # Conversion
+    "ShardingStrategy",
     "StructuredPruningConfig",
     "StructuredPruningDim",
     "TensorFormat",
@@ -375,6 +467,8 @@ __all__: list[str] = [
     "WeightSharingConfig",
     # Functions - Quantization
     "calculate_compression_ratio",
+    # Functions - Serving
+    "calculate_cost_per_request",
     # Compression - Functions
     "calculate_flops_reduction",
     "calculate_low_rank_params",
@@ -382,7 +476,11 @@ __all__: list[str] = [
     "calculate_memory_savings",
     # Functions - Merging
     "calculate_merged_parameter_count",
+    # Functions - Conversion
+    "calculate_precision_loss",
     "calculate_sparsity_at_step",
+    # Functions - Serving
+    "calculate_throughput_capacity",
     "calculate_weight_sharing_bits",
     # Functions - TorchScript
     "check_scriptable",
@@ -395,10 +493,17 @@ __all__: list[str] = [
     "create_compilation_stats",
     "create_compression_config",
     "create_compression_stats",
+    # Functions - Conversion
+    "create_conversion_config",
+    "create_conversion_stats",
+    # Functions - Serving
+    "create_endpoint_config",
     # Functions - ONNX
     "create_export_config",
     # Functions - GGUF
     "create_gguf_config",
+    # Functions - Conversion
+    "create_gguf_conversion_config",
     "create_gguf_export_result",
     "create_gguf_metadata",
     "create_gptq_config",
@@ -420,8 +525,14 @@ __all__: list[str] = [
     "create_quant_result",
     # Functions - ONNX
     "create_runtime_config",
+    # Functions - Conversion
+    "create_safetensors_conversion_config",
     "create_save_config",
+    # Functions - Serving
+    "create_scaling_config",
     "create_server",
+    # Functions - Serving
+    "create_serving_config",
     "create_structured_pruning_config",
     # Functions - TorchScript
     "create_torchscript_config",
@@ -429,8 +540,13 @@ __all__: list[str] = [
     "create_trace_config",
     "create_weight_sharing_config",
     "estimate_compressed_size",
+    # Functions - Conversion
+    "estimate_conversion_time",
+    "estimate_converted_size",
     "estimate_file_size",
     "estimate_gguf_size",
+    # Functions - Serving
+    "estimate_latency",
     "estimate_merge_time",
     "estimate_model_size",
     # Functions - ONNX
@@ -442,6 +558,8 @@ __all__: list[str] = [
     # Functions - TorchScript
     "format_compilation_stats",
     "format_compression_stats",
+    # Functions - Conversion
+    "format_conversion_stats",
     # Functions - ONNX
     "format_export_stats",
     "format_gguf_export_result",
@@ -450,11 +568,16 @@ __all__: list[str] = [
     "format_model_info",
     "format_quant_result",
     "format_server_info",
+    # Functions - Serving
+    "format_serving_stats",
     "format_size",
     # Functions - TorchScript
     "format_torchscript_info",
     "get_awq_dict",
     "get_calibration_method",
+    # Functions - Conversion
+    "get_conversion_config_dict",
+    "get_conversion_precision",
     "get_decomposition_method",
     "get_density_value",
     # Functions - ONNX
@@ -466,15 +589,23 @@ __all__: list[str] = [
     "get_fusion_type",
     "get_gguf_architecture",
     "get_gguf_config_dict",
+    # Functions - Conversion
+    "get_gguf_conversion_config_dict",
     "get_gguf_filename",
     "get_gguf_metadata_dict",
     "get_gguf_quant_type",
     "get_gptq_dict",
+    # Functions - Serving
+    "get_health_check_type",
     "get_health_status",
     "get_importance_metric",
     "get_inference_backend",
+    # Functions - Serving
+    "get_load_balancing",
     # Functions - TorchScript
     "get_mobile_config_dict",
+    # Functions - Conversion
+    "get_model_format",
     "get_model_loading_kwargs",
     # Functions - ONNX
     "get_opset_version",
@@ -493,23 +624,35 @@ __all__: list[str] = [
     "get_recommended_compression_config",
     # Functions - TorchScript
     "get_recommended_config",
+    # Functions - Conversion
+    "get_recommended_conversion_config",
     "get_recommended_dtype",
     "get_recommended_gguf_quant",
     "get_recommended_method",
     # Functions - ONNX
     "get_recommended_opset",
     "get_recommended_profile",
+    # Functions - Serving
+    "get_recommended_serving_config",
     # Functions - ONNX
     "get_runtime_session_options",
+    # Functions - Conversion
+    "get_safetensors_conversion_config_dict",
     # Functions - TorchScript
     "get_script_mode",
     "get_server_status",
+    # Functions - Serving
+    "get_serving_backend",
+    # Functions - Conversion
+    "get_sharding_strategy",
     "get_structured_pruning_dim",
     # Functions - TorchScript
     "get_torchscript_config_dict",
     "get_trace_config_dict",
     "linear_interpolate",
     "list_calibration_methods",
+    # Functions - Conversion
+    "list_conversion_precisions",
     "list_decomposition_methods",
     "list_dtypes",
     # Functions - ONNX
@@ -519,9 +662,15 @@ __all__: list[str] = [
     "list_fusion_types",
     "list_gguf_architectures",
     "list_gguf_quant_types",
+    # Functions - Serving
+    "list_health_check_types",
     "list_importance_metrics",
     "list_inference_backends",
+    # Functions - Serving
+    "list_load_balancing_strategies",
     "list_merge_methods",
+    # Functions - Conversion
+    "list_model_formats",
     # Functions - ONNX
     "list_opset_versions",
     # Functions - ONNX
@@ -536,6 +685,10 @@ __all__: list[str] = [
     # Functions - TorchScript
     "list_script_modes",
     "list_server_statuses",
+    # Functions - Serving
+    "list_serving_backends",
+    # Functions - Conversion
+    "list_sharding_strategies",
     "list_structured_pruning_dims",
     "list_tensor_formats",
     "process_batch",
@@ -546,13 +699,25 @@ __all__: list[str] = [
     "validate_calibration_config",
     "validate_calibration_method",
     "validate_compression_config",
+    # Functions - Conversion
+    "validate_conversion_config",
+    # Functions - Serving
+    "validate_endpoint_config",
+    "validate_endpoint_health",
     # Functions - ONNX
     "validate_export_config",
+    # Functions - Conversion
+    "validate_format_compatibility",
     "validate_gguf_architecture",
     "validate_gguf_config",
+    # Functions - Conversion
+    "validate_gguf_conversion_config",
     "validate_gguf_metadata",
     "validate_gguf_quant_type",
+    # Functions - Serving
+    "validate_health_check_type",
     "validate_inference_backend",
+    "validate_load_balancing",
     "validate_load_config",
     "validate_low_rank_config",
     "validate_merge_config",
@@ -567,9 +732,16 @@ __all__: list[str] = [
     "validate_quant_profile",
     # Functions - ONNX
     "validate_runtime_config",
+    # Functions - Conversion
+    "validate_safetensors_conversion_config",
     "validate_save_config",
+    # Functions - Serving
+    "validate_scaling_config",
     "validate_server_config",
     "validate_server_status",
+    # Functions - Serving
+    "validate_serving_backend",
+    "validate_serving_config",
     "validate_structured_pruning_config",
     "validate_tensor_name",
     # Functions - TorchScript

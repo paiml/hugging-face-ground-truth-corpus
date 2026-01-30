@@ -5,32 +5,120 @@ from __future__ import annotations
 import pytest
 
 from hf_gtc.evaluation.leaderboards import (
+    VALID_LEADERBOARD_TYPES,
+    VALID_RANKING_METHODS,
     Leaderboard,
     LeaderboardCategory,
     LeaderboardConfig,
     LeaderboardEntry,
+    LeaderboardStats,
+    LeaderboardType,
     ModelScore,
+    RankingMethod,
+    SubmissionConfig,
     SubmissionResult,
     SubmissionStatus,
     add_entry,
+    calculate_ranking,
     compare_entries,
+    compare_models,
     compute_average_score,
+    compute_elo_rating,
     compute_leaderboard_stats,
     create_leaderboard,
+    create_leaderboard_config,
+    create_leaderboard_entry,
+    create_leaderboard_stats,
     create_submission,
+    create_submission_config,
     filter_entries_by_size,
     find_entry_by_model,
     format_leaderboard,
+    format_leaderboard_stats,
+    format_submission,
     get_category,
+    get_leaderboard_type,
+    get_ranking_method,
+    get_recommended_leaderboard_config,
     get_score_by_metric,
     get_top_entries,
     list_categories,
+    list_leaderboard_types,
+    list_ranking_methods,
     list_submission_statuses,
     parse_submission_result,
     validate_category,
     validate_leaderboard_config,
+    validate_leaderboard_stats,
+    validate_leaderboard_type,
+    validate_ranking_method,
+    validate_submission,
+    validate_submission_config,
     validate_submission_status,
 )
+
+
+class TestLeaderboardType:
+    """Tests for LeaderboardType enum."""
+
+    def test_open_llm_value(self) -> None:
+        """Test OPEN_LLM value."""
+        assert LeaderboardType.OPEN_LLM.value == "open_llm"
+
+    def test_mteb_value(self) -> None:
+        """Test MTEB value."""
+        assert LeaderboardType.MTEB.value == "mteb"
+
+    def test_helm_value(self) -> None:
+        """Test HELM value."""
+        assert LeaderboardType.HELM.value == "helm"
+
+    def test_bigcode_value(self) -> None:
+        """Test BIGCODE value."""
+        assert LeaderboardType.BIGCODE.value == "bigcode"
+
+    def test_chatbot_arena_value(self) -> None:
+        """Test CHATBOT_ARENA value."""
+        assert LeaderboardType.CHATBOT_ARENA.value == "chatbot_arena"
+
+
+class TestRankingMethod:
+    """Tests for RankingMethod enum."""
+
+    def test_score_value(self) -> None:
+        """Test SCORE value."""
+        assert RankingMethod.SCORE.value == "score"
+
+    def test_elo_value(self) -> None:
+        """Test ELO value."""
+        assert RankingMethod.ELO.value == "elo"
+
+    def test_win_rate_value(self) -> None:
+        """Test WIN_RATE value."""
+        assert RankingMethod.WIN_RATE.value == "win_rate"
+
+    def test_weighted_value(self) -> None:
+        """Test WEIGHTED value."""
+        assert RankingMethod.WEIGHTED.value == "weighted"
+
+
+class TestValidFrozensets:
+    """Tests for VALID_* frozensets."""
+
+    def test_valid_leaderboard_types(self) -> None:
+        """Test VALID_LEADERBOARD_TYPES contains all enum values."""
+        assert "open_llm" in VALID_LEADERBOARD_TYPES
+        assert "mteb" in VALID_LEADERBOARD_TYPES
+        assert "helm" in VALID_LEADERBOARD_TYPES
+        assert "bigcode" in VALID_LEADERBOARD_TYPES
+        assert "chatbot_arena" in VALID_LEADERBOARD_TYPES
+
+    def test_valid_ranking_methods(self) -> None:
+        """Test VALID_RANKING_METHODS contains all enum values."""
+        assert "score" in VALID_RANKING_METHODS
+        assert "elo" in VALID_RANKING_METHODS
+        assert "win_rate" in VALID_RANKING_METHODS
+        assert "weighted" in VALID_RANKING_METHODS
 
 
 class TestLeaderboardCategory:
@@ -677,3 +765,644 @@ class TestComputeLeaderboardStats:
         """Test that None leaderboard raises ValueError."""
         with pytest.raises(ValueError, match="leaderboard cannot be None"):
             compute_leaderboard_stats(None)  # type: ignore[arg-type]
+
+
+class TestLeaderboardConfigExtended:
+    """Tests for extended LeaderboardConfig functionality."""
+
+    def test_new_default_values(self) -> None:
+        """Test new default configuration values."""
+        config = LeaderboardConfig(name="test")
+        assert config.leaderboard_type == LeaderboardType.OPEN_LLM
+        assert config.metrics == ()
+        assert config.ranking_method == RankingMethod.SCORE
+        assert config.higher_is_better is True
+
+    def test_custom_new_values(self) -> None:
+        """Test custom new configuration values."""
+        config = LeaderboardConfig(
+            name="custom",
+            leaderboard_type=LeaderboardType.CHATBOT_ARENA,
+            metrics=("elo", "win_rate"),
+            ranking_method=RankingMethod.ELO,
+            higher_is_better=True,
+        )
+        assert config.leaderboard_type == LeaderboardType.CHATBOT_ARENA
+        assert config.metrics == ("elo", "win_rate")
+        assert config.ranking_method == RankingMethod.ELO
+
+
+class TestSubmissionConfig:
+    """Tests for SubmissionConfig dataclass."""
+
+    def test_creation(self) -> None:
+        """Test creating SubmissionConfig instance."""
+        config = SubmissionConfig(model_name="meta-llama/Llama-2-7b")
+        assert config.model_name == "meta-llama/Llama-2-7b"
+
+    def test_default_values(self) -> None:
+        """Test default values."""
+        config = SubmissionConfig(model_name="test")
+        assert config.revision == "main"
+        assert config.precision == "float16"
+        assert config.num_few_shot == 0
+
+    def test_custom_values(self) -> None:
+        """Test custom values."""
+        config = SubmissionConfig(
+            model_name="test",
+            revision="v1.0",
+            precision="bfloat16",
+            num_few_shot=5,
+        )
+        assert config.revision == "v1.0"
+        assert config.precision == "bfloat16"
+        assert config.num_few_shot == 5
+
+    def test_frozen(self) -> None:
+        """Test that SubmissionConfig is immutable."""
+        config = SubmissionConfig(model_name="test")
+        with pytest.raises(AttributeError):
+            config.model_name = "new"  # type: ignore[misc]
+
+
+class TestLeaderboardStats:
+    """Tests for LeaderboardStats dataclass."""
+
+    def test_creation(self) -> None:
+        """Test creating LeaderboardStats instance."""
+        stats = LeaderboardStats(
+            total_models=100,
+            avg_score=0.65,
+            top_score=0.89,
+            last_updated="2024-01-15T12:00:00",
+        )
+        assert stats.total_models == 100
+        assert stats.avg_score == pytest.approx(0.65)
+        assert stats.top_score == pytest.approx(0.89)
+
+    def test_frozen(self) -> None:
+        """Test that LeaderboardStats is immutable."""
+        stats = LeaderboardStats(100, 0.65, 0.89, "2024-01-15")
+        with pytest.raises(AttributeError):
+            stats.total_models = 200  # type: ignore[misc]
+
+
+class TestListLeaderboardTypes:
+    """Tests for list_leaderboard_types function."""
+
+    def test_returns_list(self) -> None:
+        """Test that function returns a list."""
+        types = list_leaderboard_types()
+        assert isinstance(types, list)
+
+    def test_contains_expected_types(self) -> None:
+        """Test that list contains expected types."""
+        types = list_leaderboard_types()
+        assert "open_llm" in types
+        assert "mteb" in types
+        assert "chatbot_arena" in types
+
+    def test_is_sorted(self) -> None:
+        """Test that list is sorted."""
+        types = list_leaderboard_types()
+        assert types == sorted(types)
+
+
+class TestGetLeaderboardType:
+    """Tests for get_leaderboard_type function."""
+
+    def test_get_open_llm(self) -> None:
+        """Test getting OPEN_LLM type."""
+        result = get_leaderboard_type("open_llm")
+        assert result == LeaderboardType.OPEN_LLM
+
+    def test_get_chatbot_arena(self) -> None:
+        """Test getting CHATBOT_ARENA type."""
+        result = get_leaderboard_type("chatbot_arena")
+        assert result == LeaderboardType.CHATBOT_ARENA
+
+    def test_invalid_type_raises_error(self) -> None:
+        """Test that invalid type raises ValueError."""
+        with pytest.raises(ValueError, match="invalid leaderboard type"):
+            get_leaderboard_type("invalid")
+
+
+class TestValidateLeaderboardType:
+    """Tests for validate_leaderboard_type function."""
+
+    def test_valid_open_llm(self) -> None:
+        """Test validation of open_llm type."""
+        assert validate_leaderboard_type("open_llm") is True
+
+    def test_valid_mteb(self) -> None:
+        """Test validation of mteb type."""
+        assert validate_leaderboard_type("mteb") is True
+
+    def test_invalid_type(self) -> None:
+        """Test validation of invalid type."""
+        assert validate_leaderboard_type("invalid") is False
+
+    def test_empty_string(self) -> None:
+        """Test validation of empty string."""
+        assert validate_leaderboard_type("") is False
+
+
+class TestListRankingMethods:
+    """Tests for list_ranking_methods function."""
+
+    def test_returns_list(self) -> None:
+        """Test that function returns a list."""
+        methods = list_ranking_methods()
+        assert isinstance(methods, list)
+
+    def test_contains_expected_methods(self) -> None:
+        """Test that list contains expected methods."""
+        methods = list_ranking_methods()
+        assert "score" in methods
+        assert "elo" in methods
+        assert "win_rate" in methods
+
+    def test_is_sorted(self) -> None:
+        """Test that list is sorted."""
+        methods = list_ranking_methods()
+        assert methods == sorted(methods)
+
+
+class TestGetRankingMethod:
+    """Tests for get_ranking_method function."""
+
+    def test_get_score(self) -> None:
+        """Test getting SCORE method."""
+        result = get_ranking_method("score")
+        assert result == RankingMethod.SCORE
+
+    def test_get_elo(self) -> None:
+        """Test getting ELO method."""
+        result = get_ranking_method("elo")
+        assert result == RankingMethod.ELO
+
+    def test_invalid_method_raises_error(self) -> None:
+        """Test that invalid method raises ValueError."""
+        with pytest.raises(ValueError, match="invalid ranking method"):
+            get_ranking_method("invalid")
+
+
+class TestValidateRankingMethod:
+    """Tests for validate_ranking_method function."""
+
+    def test_valid_score(self) -> None:
+        """Test validation of score method."""
+        assert validate_ranking_method("score") is True
+
+    def test_valid_elo(self) -> None:
+        """Test validation of elo method."""
+        assert validate_ranking_method("elo") is True
+
+    def test_invalid_method(self) -> None:
+        """Test validation of invalid method."""
+        assert validate_ranking_method("invalid") is False
+
+    def test_empty_string(self) -> None:
+        """Test validation of empty string."""
+        assert validate_ranking_method("") is False
+
+
+class TestCreateLeaderboardConfig:
+    """Tests for create_leaderboard_config function."""
+
+    def test_creates_config(self) -> None:
+        """Test creating a leaderboard config."""
+        config = create_leaderboard_config("my-leaderboard")
+        assert config.name == "my-leaderboard"
+
+    def test_with_options(self) -> None:
+        """Test creating config with options."""
+        config = create_leaderboard_config(
+            "Open LLM",
+            leaderboard_type=LeaderboardType.OPEN_LLM,
+            metrics=("mmlu", "hellaswag"),
+            ranking_method=RankingMethod.WEIGHTED,
+        )
+        assert config.leaderboard_type == LeaderboardType.OPEN_LLM
+        assert config.metrics == ("mmlu", "hellaswag")
+
+    def test_empty_name_raises_error(self) -> None:
+        """Test that empty name raises ValueError."""
+        with pytest.raises(ValueError, match="name cannot be empty"):
+            create_leaderboard_config("")
+
+
+class TestCreateSubmissionConfig:
+    """Tests for create_submission_config function."""
+
+    def test_creates_config(self) -> None:
+        """Test creating a submission config."""
+        config = create_submission_config("meta-llama/Llama-2-7b")
+        assert config.model_name == "meta-llama/Llama-2-7b"
+
+    def test_with_options(self) -> None:
+        """Test creating config with options."""
+        config = create_submission_config(
+            "mistralai/Mistral-7B",
+            revision="v0.1",
+            precision="bfloat16",
+            num_few_shot=5,
+        )
+        assert config.revision == "v0.1"
+        assert config.num_few_shot == 5
+
+    def test_empty_model_name_raises_error(self) -> None:
+        """Test that empty model_name raises ValueError."""
+        with pytest.raises(ValueError, match="model_name cannot be empty"):
+            create_submission_config("")
+
+    def test_negative_few_shot_raises_error(self) -> None:
+        """Test that negative num_few_shot raises ValueError."""
+        with pytest.raises(ValueError, match="num_few_shot cannot be negative"):
+            create_submission_config("test", num_few_shot=-1)
+
+
+class TestCreateLeaderboardEntry:
+    """Tests for create_leaderboard_entry function."""
+
+    def test_creates_entry(self) -> None:
+        """Test creating a leaderboard entry."""
+        entry = create_leaderboard_entry(
+            "gpt-4",
+            {"accuracy": 0.95, "f1": 0.92},
+            1,
+            "2024-01-15",
+        )
+        assert entry.model_name == "gpt-4"
+        assert entry.rank == 1
+        assert len(entry.scores) == 2
+
+    def test_with_model_size(self) -> None:
+        """Test creating entry with model size."""
+        entry = create_leaderboard_entry(
+            "llama-7b",
+            {"mmlu": 0.65},
+            5,
+            "2024-01-10",
+            model_size=7000000000,
+        )
+        assert entry.model_size == 7000000000
+
+    def test_empty_model_name_raises_error(self) -> None:
+        """Test that empty model_name raises ValueError."""
+        with pytest.raises(ValueError, match="model_name cannot be empty"):
+            create_leaderboard_entry("", {}, 1, "2024-01-01")
+
+    def test_non_positive_rank_raises_error(self) -> None:
+        """Test that non-positive rank raises ValueError."""
+        with pytest.raises(ValueError, match="rank must be positive"):
+            create_leaderboard_entry("test", {}, 0, "2024-01-01")
+
+
+class TestValidateSubmissionConfig:
+    """Tests for validate_submission_config function."""
+
+    def test_valid_config(self) -> None:
+        """Test validation of valid config."""
+        config = SubmissionConfig(model_name="test-model")
+        validate_submission_config(config)  # Should not raise
+
+    def test_none_config_raises_error(self) -> None:
+        """Test that None config raises ValueError."""
+        with pytest.raises(ValueError, match="config cannot be None"):
+            validate_submission_config(None)  # type: ignore[arg-type]
+
+    def test_empty_model_name_raises_error(self) -> None:
+        """Test that empty model_name raises ValueError."""
+        config = SubmissionConfig(model_name="")
+        with pytest.raises(ValueError, match="model_name cannot be empty"):
+            validate_submission_config(config)
+
+    def test_negative_few_shot_raises_error(self) -> None:
+        """Test that negative num_few_shot raises ValueError."""
+        config = SubmissionConfig(model_name="test", num_few_shot=-1)
+        with pytest.raises(ValueError, match="num_few_shot cannot be negative"):
+            validate_submission_config(config)
+
+
+class TestValidateLeaderboardStats:
+    """Tests for validate_leaderboard_stats function."""
+
+    def test_valid_stats(self) -> None:
+        """Test validation of valid stats."""
+        stats = LeaderboardStats(100, 0.65, 0.89, "2024-01-15")
+        validate_leaderboard_stats(stats)  # Should not raise
+
+    def test_none_stats_raises_error(self) -> None:
+        """Test that None stats raises ValueError."""
+        with pytest.raises(ValueError, match="stats cannot be None"):
+            validate_leaderboard_stats(None)  # type: ignore[arg-type]
+
+    def test_negative_total_models_raises_error(self) -> None:
+        """Test that negative total_models raises ValueError."""
+        stats = LeaderboardStats(-1, 0.65, 0.89, "2024-01-15")
+        with pytest.raises(ValueError, match="total_models cannot be negative"):
+            validate_leaderboard_stats(stats)
+
+    def test_invalid_avg_score_raises_error(self) -> None:
+        """Test that invalid avg_score raises ValueError."""
+        stats = LeaderboardStats(100, 1.5, 0.89, "2024-01-15")
+        with pytest.raises(ValueError, match="avg_score must be between 0 and 1"):
+            validate_leaderboard_stats(stats)
+
+    def test_invalid_top_score_raises_error(self) -> None:
+        """Test that invalid top_score raises ValueError."""
+        stats = LeaderboardStats(100, 0.65, -0.1, "2024-01-15")
+        with pytest.raises(ValueError, match="top_score must be between 0 and 1"):
+            validate_leaderboard_stats(stats)
+
+
+class TestValidateSubmission:
+    """Tests for validate_submission function."""
+
+    def test_valid_submission(self) -> None:
+        """Test validation of valid submission."""
+        submission = {"model_name": "test", "model_path": "org/test"}
+        assert validate_submission(submission) is True
+
+    def test_missing_model_name(self) -> None:
+        """Test submission with missing model_name."""
+        submission = {"model_path": "org/test"}
+        assert validate_submission(submission) is False
+
+    def test_empty_model_name(self) -> None:
+        """Test submission with empty model_name."""
+        submission = {"model_name": "", "model_path": "org/test"}
+        assert validate_submission(submission) is False
+
+    def test_missing_model_path(self) -> None:
+        """Test submission with missing model_path."""
+        submission = {"model_name": "test"}
+        assert validate_submission(submission) is False
+
+    def test_none_submission_raises_error(self) -> None:
+        """Test that None submission raises ValueError."""
+        with pytest.raises(ValueError, match="submission cannot be None"):
+            validate_submission(None)  # type: ignore[arg-type]
+
+
+class TestCalculateRanking:
+    """Tests for calculate_ranking function."""
+
+    def test_ranks_by_score(self) -> None:
+        """Test ranking entries by score."""
+        e1 = LeaderboardEntry("m1", 0, [ModelScore("a", 0.8)], "2024-01-01")
+        e2 = LeaderboardEntry("m2", 0, [ModelScore("a", 0.9)], "2024-01-01")
+        ranked = calculate_ranking([e1, e2])
+        assert ranked[0].model_name == "m2"
+        assert ranked[0].rank == 1
+        assert ranked[1].model_name == "m1"
+        assert ranked[1].rank == 2
+
+    def test_lower_is_better(self) -> None:
+        """Test ranking when lower is better."""
+        e1 = LeaderboardEntry("m1", 0, [ModelScore("loss", 0.1)], "2024-01-01")
+        e2 = LeaderboardEntry("m2", 0, [ModelScore("loss", 0.2)], "2024-01-01")
+        ranked = calculate_ranking([e1, e2], higher_is_better=False)
+        assert ranked[0].model_name == "m1"
+
+    def test_empty_entries(self) -> None:
+        """Test with empty entries list."""
+        ranked = calculate_ranking([])
+        assert ranked == []
+
+    def test_none_entries_raises_error(self) -> None:
+        """Test that None entries raises ValueError."""
+        with pytest.raises(ValueError, match="entries cannot be None"):
+            calculate_ranking(None)  # type: ignore[arg-type]
+
+
+class TestComputeEloRating:
+    """Tests for compute_elo_rating function."""
+
+    def test_win_against_equal(self) -> None:
+        """Test winning against equal opponent."""
+        new_rating = compute_elo_rating(1500.0, 1500.0, 1.0)
+        assert new_rating > 1500.0
+
+    def test_loss_against_equal(self) -> None:
+        """Test losing against equal opponent."""
+        new_rating = compute_elo_rating(1500.0, 1500.0, 0.0)
+        assert new_rating < 1500.0
+
+    def test_draw_against_equal(self) -> None:
+        """Test drawing against equal opponent."""
+        new_rating = compute_elo_rating(1500.0, 1500.0, 0.5)
+        assert new_rating == pytest.approx(1500.0)
+
+    def test_win_against_stronger(self) -> None:
+        """Test winning against stronger opponent."""
+        new_rating = compute_elo_rating(1400.0, 1600.0, 1.0)
+        gain = new_rating - 1400.0
+        assert gain > 16.0  # More than half of k_factor
+
+    def test_custom_k_factor(self) -> None:
+        """Test with custom k_factor."""
+        new_rating = compute_elo_rating(1500.0, 1500.0, 1.0, k_factor=16.0)
+        assert new_rating == pytest.approx(1508.0)
+
+    def test_invalid_outcome_raises_error(self) -> None:
+        """Test that invalid outcome raises ValueError."""
+        with pytest.raises(ValueError, match="outcome must be between 0 and 1"):
+            compute_elo_rating(1500.0, 1500.0, 1.5)
+
+    def test_invalid_k_factor_raises_error(self) -> None:
+        """Test that invalid k_factor raises ValueError."""
+        with pytest.raises(ValueError, match="k_factor must be positive"):
+            compute_elo_rating(1500.0, 1500.0, 1.0, k_factor=-1.0)
+
+
+class TestFormatSubmission:
+    """Tests for format_submission function."""
+
+    def test_formats_submission(self) -> None:
+        """Test formatting submission config."""
+        config = SubmissionConfig(
+            model_name="meta-llama/Llama-2-7b",
+            revision="main",
+            precision="float16",
+            num_few_shot=5,
+        )
+        formatted = format_submission(config)
+        assert "meta-llama/Llama-2-7b" in formatted
+        assert "float16" in formatted
+        assert "5" in formatted
+
+    def test_none_config_raises_error(self) -> None:
+        """Test that None config raises ValueError."""
+        with pytest.raises(ValueError, match="submission_config cannot be None"):
+            format_submission(None)  # type: ignore[arg-type]
+
+
+class TestCompareModels:
+    """Tests for compare_models function."""
+
+    def test_compares_models(self) -> None:
+        """Test comparing two models."""
+        e1 = LeaderboardEntry("m1", 1, [ModelScore("acc", 0.9)], "2024-01-01")
+        e2 = LeaderboardEntry("m2", 2, [ModelScore("acc", 0.85)], "2024-01-02")
+        cmp = compare_models(e1, e2)
+        assert cmp["winner"] == "m1"
+        assert cmp["rank_difference"] == -1
+        assert cmp["score_difference"] > 0
+
+    def test_with_specific_metrics(self) -> None:
+        """Test comparing with specific metrics."""
+        e1 = LeaderboardEntry(
+            "m1", 1, [ModelScore("acc", 0.9), ModelScore("f1", 0.85)], "2024-01-01"
+        )
+        e2 = LeaderboardEntry(
+            "m2", 2, [ModelScore("acc", 0.85), ModelScore("f1", 0.9)], "2024-01-02"
+        )
+        cmp = compare_models(e1, e2, metrics=["acc", "f1"])
+        assert "acc" in cmp["per_metric"]
+        assert "f1" in cmp["per_metric"]
+        assert cmp["per_metric"]["acc"]["winner"] == "m1"
+        assert cmp["per_metric"]["f1"]["winner"] == "m2"
+
+    def test_tie(self) -> None:
+        """Test when models have equal scores."""
+        e1 = LeaderboardEntry("m1", 1, [ModelScore("acc", 0.9)], "2024-01-01")
+        e2 = LeaderboardEntry("m2", 2, [ModelScore("acc", 0.9)], "2024-01-02")
+        cmp = compare_models(e1, e2)
+        assert cmp["winner"] == "tie"
+
+    def test_second_model_wins(self) -> None:
+        """Test when second model has higher score."""
+        e1 = LeaderboardEntry("m1", 1, [ModelScore("acc", 0.8)], "2024-01-01")
+        e2 = LeaderboardEntry("m2", 2, [ModelScore("acc", 0.9)], "2024-01-02")
+        cmp = compare_models(e1, e2)
+        assert cmp["winner"] == "m2"
+
+    def test_none_model_a_raises_error(self) -> None:
+        """Test that None model_a raises ValueError."""
+        e2 = LeaderboardEntry("m2", 2, [], "2024-01-01")
+        with pytest.raises(ValueError, match="model_a cannot be None"):
+            compare_models(None, e2)  # type: ignore[arg-type]
+
+    def test_none_model_b_raises_error(self) -> None:
+        """Test that None model_b raises ValueError."""
+        e1 = LeaderboardEntry("m1", 1, [], "2024-01-01")
+        with pytest.raises(ValueError, match="model_b cannot be None"):
+            compare_models(e1, None)  # type: ignore[arg-type]
+
+
+class TestFormatLeaderboardStats:
+    """Tests for format_leaderboard_stats function."""
+
+    def test_formats_stats(self) -> None:
+        """Test formatting leaderboard stats."""
+        stats = LeaderboardStats(
+            total_models=100,
+            avg_score=0.65,
+            top_score=0.89,
+            last_updated="2024-01-15T12:00:00",
+        )
+        formatted = format_leaderboard_stats(stats)
+        assert "100" in formatted
+        assert "0.65" in formatted
+        assert "0.89" in formatted
+
+    def test_none_stats_raises_error(self) -> None:
+        """Test that None stats raises ValueError."""
+        with pytest.raises(ValueError, match="stats cannot be None"):
+            format_leaderboard_stats(None)  # type: ignore[arg-type]
+
+
+class TestGetRecommendedLeaderboardConfig:
+    """Tests for get_recommended_leaderboard_config function."""
+
+    def test_llm_config(self) -> None:
+        """Test config for LLM models."""
+        config = get_recommended_leaderboard_config("llm")
+        assert config["leaderboard_type"] == LeaderboardType.OPEN_LLM
+
+    def test_embedding_config(self) -> None:
+        """Test config for embedding models."""
+        config = get_recommended_leaderboard_config("embedding")
+        assert config["leaderboard_type"] == LeaderboardType.MTEB
+
+    def test_code_config(self) -> None:
+        """Test config for code models."""
+        config = get_recommended_leaderboard_config("code")
+        assert config["leaderboard_type"] == LeaderboardType.BIGCODE
+
+    def test_chat_config(self) -> None:
+        """Test config for chat models."""
+        config = get_recommended_leaderboard_config("chat")
+        assert config["leaderboard_type"] == LeaderboardType.CHATBOT_ARENA
+        assert config["ranking_method"] == RankingMethod.ELO
+
+    def test_with_task_type_zero_shot(self) -> None:
+        """Test config with zero_shot task type."""
+        config = get_recommended_leaderboard_config("llm", task_type="zero_shot")
+        assert config["num_few_shot"] == 0
+
+    def test_with_task_type_few_shot(self) -> None:
+        """Test config with few_shot task type."""
+        config = get_recommended_leaderboard_config("llm", task_type="few_shot")
+        assert config["num_few_shot"] == 5
+
+    def test_with_task_type_arena(self) -> None:
+        """Test config with arena task type."""
+        config = get_recommended_leaderboard_config("llm", task_type="arena")
+        assert config["leaderboard_type"] == LeaderboardType.CHATBOT_ARENA
+        assert config["ranking_method"] == RankingMethod.ELO
+
+    def test_empty_model_type_raises_error(self) -> None:
+        """Test that empty model_type raises ValueError."""
+        with pytest.raises(ValueError, match="model_type cannot be empty"):
+            get_recommended_leaderboard_config("")
+
+    def test_none_model_type_raises_error(self) -> None:
+        """Test that None model_type raises ValueError."""
+        with pytest.raises(ValueError, match="model_type cannot be None"):
+            get_recommended_leaderboard_config(None)  # type: ignore[arg-type]
+
+
+class TestCreateLeaderboardStats:
+    """Tests for create_leaderboard_stats function."""
+
+    def test_creates_stats(self) -> None:
+        """Test creating leaderboard stats."""
+        config = LeaderboardConfig(name="test")
+        board = create_leaderboard(config)
+        entry = LeaderboardEntry("m1", 1, [ModelScore("a", 0.8)], "2024-01-01")
+        add_entry(board, entry)
+        stats = create_leaderboard_stats(board)
+        assert stats.total_models == 1
+        assert stats.avg_score == pytest.approx(0.8)
+        assert stats.top_score == pytest.approx(0.8)
+
+    def test_empty_leaderboard(self) -> None:
+        """Test with empty leaderboard."""
+        config = LeaderboardConfig(name="test")
+        board = create_leaderboard(config)
+        stats = create_leaderboard_stats(board)
+        assert stats.total_models == 0
+        assert stats.avg_score == pytest.approx(0.0)
+        assert stats.top_score == pytest.approx(0.0)
+
+    def test_multiple_entries(self) -> None:
+        """Test with multiple entries."""
+        config = LeaderboardConfig(name="test")
+        board = create_leaderboard(config)
+        e1 = LeaderboardEntry("m1", 1, [ModelScore("a", 0.8)], "2024-01-01")
+        e2 = LeaderboardEntry("m2", 2, [ModelScore("a", 0.9)], "2024-01-02")
+        add_entry(board, e1)
+        add_entry(board, e2)
+        stats = create_leaderboard_stats(board)
+        assert stats.total_models == 2
+        assert stats.avg_score == pytest.approx(0.85)
+        assert stats.top_score == pytest.approx(0.9)
+
+    def test_none_leaderboard_raises_error(self) -> None:
+        """Test that None leaderboard raises ValueError."""
+        with pytest.raises(ValueError, match="leaderboard cannot be None"):
+            create_leaderboard_stats(None)  # type: ignore[arg-type]
