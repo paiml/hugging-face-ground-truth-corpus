@@ -58,7 +58,15 @@ Thumbs.db
 *.pt
 *.pth
 
+# PMAT work files (large contract JSONs)
+.pmat-work/
+
 # Generated artifacts
 coverage.json
 *.parquet
 docs/api/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig

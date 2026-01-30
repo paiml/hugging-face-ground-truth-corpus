@@ -8,12 +8,16 @@ on:
 
 env:
   UV_SYSTEM_PYTHON: 1
-  PYTHON_VERSION: "3.11"
 
 jobs:
   quality-gates:
-    name: Quality Gates (Jidoka)
-    runs-on: ubuntu-latest
+    name: Quality Gates (Jidoka) - Python ${{ matrix.python-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +26,18 @@ jobs:
         with:
           version: "latest"
 
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-${{ matrix.python-version }}-
+
       - name: Set up Python
-        run: uv python install ${{ env.PYTHON_VERSION }}
+        run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: uv sync --extra dev
@@ -36,10 +50,21 @@ jobs:
       - name: Gate 2 - Format (ruff)
         run: uv run ruff format --check src/ tests/
 
-      # Gate 3: Security
-      - name: Gate 3 - Security (bandit)
+      # Gate 3: Type Check
+      - name: Gate 3 - Type Check (ty)
+        run: uv run ty check src/
+
+      # Gate 4: Security
+      - name: Gate 4 - Security (bandit)
         run: uv run bandit -r src/ -ll
 
-      # Gate 4: Tests + Coverage (95%)
-      - name: Gate 4 - Tests + Coverage
+      # Gate 5: Tests + Coverage (95%)
+      - name: Gate 5 - Tests + Coverage
         run: uv run pytest --cov-fail-under=95
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/

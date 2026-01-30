@@ -1,0 +1,29 @@
+[gates]
+min_test_coverage = 95
+max_cyclomatic_complexity = 30
+max_cognitive_complexity = 25
+max_satd_comments = 5
+require_docstrings = true
+require_type_hints = true
+
+[lint]
+tool = "ruff"
+fail_on_warning = true
+
+[format]
+tool = "ruff"
+line_length = 88
+
+[security]
+tool = "bandit"
+severity_level = "medium"
+
+[testing]
+tool = "pytest"
+min_coverage = 95
+require_hypothesis = true
+require_doctests = true
+
+[ci]
+require_passing = true
+require_coverage_report = true

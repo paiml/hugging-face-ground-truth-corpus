@@ -1,26 +1,43 @@
-# HuggingFace Ground Truth Corpus
-
 <div align="center">
+
+<h1>HuggingFace Ground Truth Corpus</h1>
 
 <img src="docs/assets/hero.svg" alt="HuggingFace Ground Truth Corpus" width="800"/>
 
 [![CI](https://github.com/paiml/hugging-face-ground-truth-corpus/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/hugging-face-ground-truth-corpus/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/paiml/hugging-face-ground-truth-corpus)
+[![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)](https://github.com/paiml/hugging-face-ground-truth-corpus)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org)
 [![uv](https://img.shields.io/badge/uv-package%20manager-blueviolet)](https://github.com/astral-sh/uv)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Production-ready ML recipes with 95%+ test coverage**
+**Production-ready ML recipes with 98%+ test coverage across 16,000+ tests**
 
 </div>
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Modules](#modules)
+- [Usage](#usage)
+- [Development](#development)
+- [Quality Gates](#quality-gates-jidoka)
+- [Architecture](#architecture)
+- [Querying from Batuta / Aprender](#querying-from-batuta--aprender)
+- [Contributing](#contributing)
+- [References](#references)
+- [License](#license)
 
 ## Overview
 
 A curated collection of **production-ready Python recipes** for HuggingFace ML workflows, built with the highest engineering standards:
 
-- **95%+ Test Coverage** enforced via pytest
+- **98%+ Test Coverage** enforced via pytest (16,000+ tests)
 - **Property-Based Testing** with Hypothesis
 - **Zero Linting Violations** via ruff
+- **Type Safety** enforced via ty type checker
+- **Security Scanning** via bandit
 - **Toyota Production System** quality methodology
 - **Popperian Falsification** test philosophy
 
@@ -58,113 +75,21 @@ clean_text = preprocess_text("  HELLO   WORLD  ")
 
 ## Modules
 
-| Module | Description |
-|--------|-------------|
-| `hf_gtc.hub` | HuggingFace Hub search and discovery |
-| `hf_gtc.inference` | Device management and pipelines |
-| `hf_gtc.preprocessing` | Text preprocessing and tokenization |
-| `hf_gtc.training` | Fine-tuning utilities |
-| `hf_gtc.evaluation` | Metrics and evaluation |
-| `hf_gtc.deployment` | Model optimization |
-
-## Development
-
-```bash
-# Run tests with coverage
-uv run pytest --cov-fail-under=95
-
-# Lint
-uv run ruff check src/ tests/
-
-# Format
-uv run ruff format src/ tests/
-
-# Security scan
-uv run bandit -r src/ -ll
-```
-
-## Quality Gates (Jidoka)
-
-All PRs must pass:
-
-1. **Gate 1** - Lint (ruff check)
-2. **Gate 2** - Format (ruff format --check)
-3. **Gate 3** - Security (bandit)
-4. **Gate 4** - Tests + Coverage (95% minimum)
-
-## Architecture
-
-```
-src/hf_gtc/
-├── hub/           # HuggingFace Hub integration
-│   └── search.py  # Model/dataset search
-├── inference/     # Inference utilities
-│   ├── device.py  # GPU/CPU device management
-│   └── pipelines.py
-├── preprocessing/ # Data preprocessing
-│   └── tokenization.py
-├── training/      # Training recipes
-│   └── fine_tuning.py
-├── evaluation/    # Metrics
-└── deployment/    # Optimization
-```
-
-## Querying from Batuta / Aprender
-
-This corpus serves as **ground truth** for the Sovereign AI Stack. Query recipes and get Rust equivalents:
-
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  YOUR QUESTION   │────▶│  BATUTA ORACLE   │────▶│  RUST SOLUTION   │
-│  "tokenize text" │     │  (RAG search)    │     │  via candle      │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
-```
-
-### From Batuta (Oracle Queries)
-
-```bash
-# Natural language query
-batuta oracle "How do I tokenize text for BERT?"
-# Returns: hf_gtc/preprocessing/tokenization.py + candle equivalent
-
-# Query with Rust cross-reference
-batuta oracle --rust-source candle "attention mechanism"
-
-# Query by tag
-batuta oracle --tag training --tag memory-efficient
-```
-
-### From Aprender (Rust ML)
-
-```rust
-// Python recipe in hf_gtc:
-//   from hf_gtc.preprocessing import preprocess_text
-//   result = preprocess_text("  HELLO  ")  # "hello"
-
-// Equivalent Rust (via Depyler transpilation):
-let result = preprocess_text("  HELLO  ");  // "hello"
-```
-
-### Depyler Transpilation
-
-Qualified recipes (MQS ≥ 85) can be transpiled to Rust:
-
-```bash
-# Transpile Python recipes to Rust
-depyler transpile src/hf_gtc/ --output rust_output/ --verify
-
-# Verify semantic equivalence against candle
-depyler verify --python src/hf_gtc/preprocessing/ --rust candle-core/
-```
-
-See [docs/specifications/hf-ground-truth-corpus.md](docs/specifications/hf-ground-truth-corpus.md) for full integration details.
-
-## Rust Ground Truth
-
-This project cross-references HuggingFace's Rust implementations for validation:
-
-- **[candle](https://github.com/huggingface/candle)** - Tensor operations
-- **[safetensors](https://github.com/huggingface/safetensors)** - Safe serialization
+| Category | Module | Description |
+|----------|--------|-------------|
+| **Hub** | `hf_gtc.hub` | Model/dataset search, Spaces API, model cards, versioning, datasets, telemetry |
+| **Inference** | `hf_gtc.inference` | Pipelines, device management, caching, context extension, quantization, embeddings, streaming, engines, memory, hardware, speculative/continuous batching, KV cache |
+| **Preprocessing** | `hf_gtc.preprocessing` | Tokenization, augmentation, synthetic data, filtering, sampling, vocabulary, curation, pipeline |
+| **Training** | `hf_gtc.training` | Fine-tuning, LoRA/QLoRA, DPO, PPO, pruning, NAS, hyperopt, active/meta/multi-task learning, optimizers, schedulers, gradient, parallelism, mixed precision, checkpointing, merging, losses, collators, dynamics, reproducibility, debugging |
+| **Evaluation** | `hf_gtc.evaluation` | Metrics (BLEU/ROUGE/BERTScore), benchmarks, calibration, editing, profiling, leaderboards, comparison, harness, bias detection, robustness |
+| **Generation** | `hf_gtc.generation` | Prompting, tool use, structured output, chat, constraints |
+| **Deployment** | `hf_gtc.deployment` | ONNX, TFLite, TorchScript, GGUF, SafeTensors, compression, serving, conversion, cost |
+| **RAG** | `hf_gtc.rag` | Vectorstore, chunking, reranking, hybrid search, evaluation |
+| **Models** | `hf_gtc.models` | Attention, positional encodings, normalization, activations, architectures, layers, analysis |
+| **Safety** | `hf_gtc.safety` | Guardrails, watermarking, privacy |
+| **Multimodal** | `hf_gtc.multimodal` | Video, document processing |
+| **Audio** | `hf_gtc.audio` | Music generation |
+| **Agents** | `hf_gtc.agents` | Memory, planning |
 
 ## Usage
 
@@ -227,21 +152,121 @@ config = get_quantization_config("int8")
 size_mb = estimate_model_size(num_parameters=7_000_000_000, quantization_type="int4")
 ```
 
+## Development
+
+```bash
+make setup          # Install dependencies + pre-commit
+make lint           # Run ruff linter + formatter check
+make typecheck      # Run ty type checker
+make test           # Full suite with coverage
+make test-fast      # Quick unit run, no coverage
+make coverage       # Generate HTML coverage report
+make security       # Run bandit security scan
+make check          # Full quality gates (lint + typecheck + coverage + security)
+```
+
+## Quality Gates (Jidoka)
+
+All commits must pass:
+
+1. **Gate 1** - Lint (ruff check)
+2. **Gate 2** - Format (ruff format --check)
+3. **Gate 3** - Type Check (ty check)
+4. **Gate 4** - Security (bandit)
+5. **Gate 5** - Coverage (95% minimum)
+
+## Architecture
+
+```
+src/hf_gtc/
+├── agents/        # Agent memory and planning
+├── audio/         # Music generation
+├── deployment/    # ONNX, TFLite, TorchScript, GGUF, serving, cost
+├── evaluation/    # Metrics, benchmarks, calibration, comparison
+├── generation/    # Prompting, tools, structured output, constraints
+├── hub/           # Search, model cards, versioning, datasets, telemetry
+├── inference/     # Pipelines, caching, quantization, engines, hardware
+├── models/        # Attention, positional, normalization, activations
+├── multimodal/    # Video, document processing
+├── preprocessing/ # Tokenization, augmentation, filtering, pipeline
+├── rag/           # Vectorstore, chunking, reranking, evaluation
+├── safety/        # Guardrails, watermarking, privacy
+└── training/      # Fine-tuning, LoRA, DPO, PPO, optimizers, schedulers
+```
+
+## Querying from Batuta / Aprender
+
+This corpus serves as **ground truth** for the Sovereign AI Stack. Query recipes and get Rust equivalents:
+
+```
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  YOUR QUESTION   │────>│  BATUTA ORACLE   │────>│  RUST SOLUTION   │
+│  "tokenize text" │     │  (RAG search)    │     │  via candle      │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+```
+
+### From Batuta (Oracle Queries)
+
+```bash
+# Natural language query
+batuta oracle "How do I tokenize text for BERT?"
+# Returns: hf_gtc/preprocessing/tokenization.py + candle equivalent
+
+# Query with Rust cross-reference
+batuta oracle --rust-source candle "attention mechanism"
+
+# Query by tag
+batuta oracle --tag training --tag memory-efficient
+```
+
+### From Aprender (Rust ML)
+
+```rust
+// Python recipe in hf_gtc:
+//   from hf_gtc.preprocessing import preprocess_text
+//   result = preprocess_text("  HELLO  ")  # "hello"
+
+// Equivalent Rust (via Depyler transpilation):
+let result = preprocess_text("  HELLO  ");  // "hello"
+```
+
+### Depyler Transpilation
+
+Qualified recipes (MQS >= 85) can be transpiled to Rust:
+
+```bash
+# Transpile Python recipes to Rust
+depyler transpile src/hf_gtc/ --output rust_output/ --verify
+
+# Verify semantic equivalence against candle
+depyler verify --python src/hf_gtc/preprocessing/ --rust candle-core/
+```
+
+See [docs/specifications/hf-ground-truth-corpus.md](docs/specifications/hf-ground-truth-corpus.md) for full integration details.
+
+## Rust Ground Truth
+
+This project cross-references HuggingFace's Rust implementations for validation:
+
+- **[candle](https://github.com/huggingface/candle)** - Tensor operations
+- **[safetensors](https://github.com/huggingface/safetensors)** - Safe serialization
+
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feat/my-feature`
-3. Write tests first (TDD)
+3. Write failing tests first (TDD)
 4. Implement the feature
 5. Ensure all quality gates pass: `make check`
 6. Submit a pull request
 
 ### Quality Requirements
 
-- 95% minimum test coverage
+- 95% minimum coverage
 - Zero ruff violations
 - All doctests must pass
-- Property-based tests for pure functions
+- Property-based validation for pure functions
+- Type checker must pass
 
 ## References
 
