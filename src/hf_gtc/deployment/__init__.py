@@ -101,6 +101,41 @@ from hf_gtc.deployment.conversion import (
     validate_gguf_conversion_config,
     validate_safetensors_conversion_config,
 )
+from hf_gtc.deployment.cost import (
+    VALID_CLOUD_PROVIDERS,
+    VALID_INSTANCE_TYPES,
+    VALID_PRICING_MODELS,
+    CloudProvider,
+    CostEstimate,
+    CostStats,
+    InstanceConfig,
+    InstanceType,
+    PricingConfig,
+    PricingModel,
+    calculate_cost_per_token,
+    compare_providers,
+    create_cost_estimate,
+    create_instance_config,
+    create_pricing_config,
+    estimate_inference_cost,
+    estimate_training_cost,
+    format_cost_stats,
+    get_cloud_provider,
+    get_instance_type,
+    get_pricing_model,
+    get_recommended_cost_config,
+    list_cloud_providers,
+    list_instance_types,
+    list_pricing_models,
+    optimize_instance_selection,
+    validate_cloud_provider,
+    validate_cost_estimate,
+    validate_cost_stats,
+    validate_instance_config,
+    validate_instance_type,
+    validate_pricing_config,
+    validate_pricing_model,
+)
 from hf_gtc.deployment.gguf import (
     GGUFArchitecture,
     GGUFConfig,
@@ -338,6 +373,7 @@ from hf_gtc.deployment.torchscript import (
 __all__: list[str] = [
     # Constants
     "DENSITY_VALUES",
+    "VALID_CLOUD_PROVIDERS",
     "VALID_CONVERSION_PRECISIONS",
     "VALID_DECOMPOSITION_METHODS",
     "VALID_DTYPES",
@@ -345,11 +381,13 @@ __all__: list[str] = [
     "VALID_FUSION_TYPES",
     "VALID_HEALTH_CHECK_TYPES",
     "VALID_IMPORTANCE_METRICS",
+    "VALID_INSTANCE_TYPES",
     "VALID_LOAD_BALANCING",
     "VALID_MERGE_METHODS",
     "VALID_MODEL_FORMATS",
     "VALID_ONNX_OPSET_VERSIONS",
     "VALID_OPTIMIZATION_LEVELS",
+    "VALID_PRICING_MODELS",
     "VALID_PRUNING_METHODS",
     "VALID_PRUNING_SCOPES",
     "VALID_SERVING_BACKENDS",
@@ -360,6 +398,8 @@ __all__: list[str] = [
     "AWQConfig",
     "CalibrationConfig",
     "CalibrationMethod",
+    # Cost
+    "CloudProvider",
     # TorchScript
     "CompilationStats",
     # Compression
@@ -369,6 +409,8 @@ __all__: list[str] = [
     "ConversionConfig",
     "ConversionPrecision",
     "ConversionStats",
+    "CostEstimate",
+    "CostStats",
     # SafeTensors
     "DType",
     "DecompositionMethod",
@@ -400,6 +442,8 @@ __all__: list[str] = [
     "InferenceBackend",
     "InferenceRequest",
     "InferenceResponse",
+    "InstanceConfig",
+    "InstanceType",
     # Compression
     "LayerFusionConfig",
     # Serving
@@ -428,6 +472,8 @@ __all__: list[str] = [
     "OptimizationResult",
     # TorchScript
     "OptimizeFor",
+    "PricingConfig",
+    "PricingModel",
     # Compression - Classes
     "PruningConfig",
     "PruningMethod",
@@ -469,6 +515,8 @@ __all__: list[str] = [
     "calculate_compression_ratio",
     # Functions - Serving
     "calculate_cost_per_request",
+    # Functions - Cost
+    "calculate_cost_per_token",
     # Compression - Functions
     "calculate_flops_reduction",
     "calculate_low_rank_params",
@@ -484,6 +532,7 @@ __all__: list[str] = [
     "calculate_weight_sharing_bits",
     # Functions - TorchScript
     "check_scriptable",
+    "compare_providers",
     "compute_compression_ratio",
     # Functions - Serving
     "compute_server_metrics",
@@ -496,6 +545,7 @@ __all__: list[str] = [
     # Functions - Conversion
     "create_conversion_config",
     "create_conversion_stats",
+    "create_cost_estimate",
     # Functions - Serving
     "create_endpoint_config",
     # Functions - ONNX
@@ -507,6 +557,7 @@ __all__: list[str] = [
     "create_gguf_export_result",
     "create_gguf_metadata",
     "create_gptq_config",
+    "create_instance_config",
     "create_layer_fusion_config",
     "create_load_config",
     "create_low_rank_config",
@@ -519,6 +570,7 @@ __all__: list[str] = [
     "create_optimization_config",
     # Functions - ONNX
     "create_optimize_config",
+    "create_pricing_config",
     "create_pruning_config",
     "create_pruning_schedule",
     "create_quant_profile",
@@ -545,6 +597,7 @@ __all__: list[str] = [
     "estimate_converted_size",
     "estimate_file_size",
     "estimate_gguf_size",
+    "estimate_inference_cost",
     # Functions - Serving
     "estimate_latency",
     "estimate_merge_time",
@@ -555,11 +608,13 @@ __all__: list[str] = [
     # Functions - TorchScript
     "estimate_script_size",
     "estimate_speedup_from_sparsity",
+    "estimate_training_cost",
     # Functions - TorchScript
     "format_compilation_stats",
     "format_compression_stats",
     # Functions - Conversion
     "format_conversion_stats",
+    "format_cost_stats",
     # Functions - ONNX
     "format_export_stats",
     "format_gguf_export_result",
@@ -575,6 +630,7 @@ __all__: list[str] = [
     "format_torchscript_info",
     "get_awq_dict",
     "get_calibration_method",
+    "get_cloud_provider",
     # Functions - Conversion
     "get_conversion_config_dict",
     "get_conversion_precision",
@@ -600,6 +656,7 @@ __all__: list[str] = [
     "get_health_status",
     "get_importance_metric",
     "get_inference_backend",
+    "get_instance_type",
     # Functions - Serving
     "get_load_balancing",
     # Functions - TorchScript
@@ -616,6 +673,7 @@ __all__: list[str] = [
     "get_optimization_result",
     # Functions - TorchScript
     "get_optimize_for",
+    "get_pricing_model",
     "get_pruning_method",
     "get_pruning_scope",
     "get_quant_granularity",
@@ -626,6 +684,7 @@ __all__: list[str] = [
     "get_recommended_config",
     # Functions - Conversion
     "get_recommended_conversion_config",
+    "get_recommended_cost_config",
     "get_recommended_dtype",
     "get_recommended_gguf_quant",
     "get_recommended_method",
@@ -651,6 +710,7 @@ __all__: list[str] = [
     "get_trace_config_dict",
     "linear_interpolate",
     "list_calibration_methods",
+    "list_cloud_providers",
     # Functions - Conversion
     "list_conversion_precisions",
     "list_decomposition_methods",
@@ -666,6 +726,7 @@ __all__: list[str] = [
     "list_health_check_types",
     "list_importance_metrics",
     "list_inference_backends",
+    "list_instance_types",
     # Functions - Serving
     "list_load_balancing_strategies",
     "list_merge_methods",
@@ -677,6 +738,7 @@ __all__: list[str] = [
     "list_optimization_levels",
     # Functions - TorchScript
     "list_optimize_for_options",
+    "list_pricing_models",
     "list_pruning_methods",
     "list_pruning_scopes",
     "list_quant_granularities",
@@ -691,6 +753,7 @@ __all__: list[str] = [
     "list_sharding_strategies",
     "list_structured_pruning_dims",
     "list_tensor_formats",
+    "optimize_instance_selection",
     "process_batch",
     "process_request",
     "slerp",
@@ -698,9 +761,12 @@ __all__: list[str] = [
     "stop_server",
     "validate_calibration_config",
     "validate_calibration_method",
+    "validate_cloud_provider",
     "validate_compression_config",
     # Functions - Conversion
     "validate_conversion_config",
+    "validate_cost_estimate",
+    "validate_cost_stats",
     # Functions - Serving
     "validate_endpoint_config",
     "validate_endpoint_health",
@@ -717,6 +783,8 @@ __all__: list[str] = [
     # Functions - Serving
     "validate_health_check_type",
     "validate_inference_backend",
+    "validate_instance_config",
+    "validate_instance_type",
     "validate_load_balancing",
     "validate_load_config",
     "validate_low_rank_config",
@@ -726,6 +794,8 @@ __all__: list[str] = [
     "validate_model_slice",
     # Functions - TorchScript
     "validate_optimization_config",
+    "validate_pricing_config",
+    "validate_pricing_model",
     "validate_pruning_config",
     "validate_quant_granularity",
     "validate_quant_method",

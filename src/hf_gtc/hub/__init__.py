@@ -3,7 +3,7 @@
 This module provides utilities for searching, parsing, and interacting with
 the HuggingFace Hub API, including models, datasets, Spaces, Collections,
 Model Registry operations, Experiment Tracking, Model Card Generation,
-Dataset Management, and Model Versioning.
+Dataset Management, Model Versioning, and Telemetry.
 
 Examples:
     >>> from hf_gtc.hub import search_models, parse_model_card, search_spaces
@@ -29,6 +29,11 @@ Examples:
     >>> from hf_gtc.hub import create_version_info, parse_version
     >>> callable(create_version_info) and callable(parse_version)
     True
+    >>> from hf_gtc.hub import create_log_config, LogLevel
+    >>> callable(create_log_config)
+    True
+    >>> LogLevel.INFO.value
+    'info'
 """
 
 from __future__ import annotations
@@ -219,6 +224,45 @@ from hf_gtc.hub.spaces import (
     validate_hardware,
     validate_sdk,
 )
+from hf_gtc.hub.telemetry import (
+    VALID_EXPORT_FORMATS,
+    VALID_LOG_LEVELS,
+    VALID_METRIC_TYPES,
+    ExportFormat,
+    LogConfig,
+    LogLevel,
+    MetricType,
+    MetricValue,
+    TelemetryConfig,
+    TelemetryStats,
+    aggregate_metrics,
+    calculate_percentiles,
+    create_log_config,
+    create_telemetry_config,
+    export_telemetry,
+    format_log_message,
+    format_telemetry_stats,
+    get_export_format,
+    get_log_level,
+    get_metric_type,
+    get_recommended_telemetry_config,
+    list_export_formats,
+    list_log_levels,
+    list_metric_types,
+    record_metric,
+    validate_log_config,
+    validate_telemetry_config,
+    validate_telemetry_stats,
+)
+from hf_gtc.hub.telemetry import (
+    MetricConfig as TelemetryMetricConfig,
+)
+from hf_gtc.hub.telemetry import (
+    create_metric_config as create_telemetry_metric_config,
+)
+from hf_gtc.hub.telemetry import (
+    validate_metric_config as validate_telemetry_metric_config,
+)
 from hf_gtc.hub.versioning import (
     VALID_CHANGE_TYPES,
     VALID_DIFF_TYPES,
@@ -265,11 +309,16 @@ __all__: list[str] = [
     # Versioning
     "VALID_CHANGE_TYPES",
     "VALID_DIFF_TYPES",
+    # Telemetry
+    "VALID_EXPORT_FORMATS",
     # Datasets
     "VALID_FORMATS",
     # Collections
     "VALID_ITEM_TYPES",
     "VALID_LICENSE_TYPES",
+    # Telemetry
+    "VALID_LOG_LEVELS",
+    "VALID_METRIC_TYPES",
     "VALID_MODEL_TASKS",
     "VALID_SORT_OPTIONS",
     "VALID_SPLITS",
@@ -303,9 +352,16 @@ __all__: list[str] = [
     "ExperimentRun",
     "ExperimentStats",
     "ExperimentStatus",
+    # Telemetry
+    "ExportFormat",
     "LicenseType",
+    "LogConfig",
+    "LogLevel",
     "MetricAggregation",
     "MetricConfig",
+    # Telemetry
+    "MetricType",
+    "MetricValue",
     # Cards
     "ModelCard",
     "ModelCardConfig",
@@ -327,6 +383,10 @@ __all__: list[str] = [
     "SpaceStage",
     "SplitType",
     "StreamingMode",
+    # Telemetry
+    "TelemetryConfig",
+    "TelemetryMetricConfig",
+    "TelemetryStats",
     "TrackingConfig",
     "TrainingDetails",
     "TransitionAction",
@@ -338,11 +398,14 @@ __all__: list[str] = [
     "VersionScheme",
     "VersionStats",
     "VersioningScheme",
+    # Telemetry
+    "aggregate_metrics",
     "calculate_collection_score",
     "calculate_completeness",
     "calculate_dataset_hash",
     "calculate_experiment_stats",
     "calculate_model_diff",
+    "calculate_percentiles",
     "clear_registry",
     "compare_dataset_schemas",
     "compare_runs",
@@ -359,6 +422,7 @@ __all__: list[str] = [
     "create_evaluation_results",
     "create_experiment_config",
     "create_experiment_run",
+    "create_log_config",
     "create_metric_config",
     "create_model_card_config",
     "create_model_diff",
@@ -366,6 +430,8 @@ __all__: list[str] = [
     "create_model_version",
     "create_registry_config",
     "create_registry_stats",
+    "create_telemetry_config",
+    "create_telemetry_metric_config",
     "create_training_details",
     "create_transition_request",
     "create_upload_config",
@@ -373,13 +439,16 @@ __all__: list[str] = [
     "create_version_info",
     "create_version_stats",
     "estimate_download_size",
+    "export_telemetry",
     "extract_metadata_from_model",
     "extract_model_description",
     "format_collection_slug",
     "format_dataset_stats",
     "format_experiment_summary",
+    "format_log_message",
     "format_model_card_stats",
     "format_registry_stats",
+    "format_telemetry_stats",
     "format_version",
     "format_version_stats",
     "generate_model_card",
@@ -389,15 +458,19 @@ __all__: list[str] = [
     "get_card_section",
     "get_change_type",
     "get_diff_type",
+    "get_export_format",
     "get_format",
     "get_item_type",
     "get_license_type",
+    "get_log_level",
+    "get_metric_type",
     "get_model_card",
     "get_model_task",
     "get_model_version",
     "get_recommended_dataset_config",
     "get_recommended_model_card_config",
     "get_recommended_registry_config",
+    "get_recommended_telemetry_config",
     "get_recommended_tracking_config",
     "get_recommended_version_config",
     "get_space_info",
@@ -416,10 +489,13 @@ __all__: list[str] = [
     "list_card_sections",
     "list_change_types",
     "list_diff_types",
+    "list_export_formats",
     "list_formats",
     "list_hardware_tiers",
     "list_item_types",
     "list_license_types",
+    "list_log_levels",
+    "list_metric_types",
     "list_model_card_sections",
     "list_model_tasks",
     "list_model_versions",
@@ -437,6 +513,7 @@ __all__: list[str] = [
     "log_metric",
     "parse_model_card",
     "parse_version",
+    "record_metric",
     "register_model",
     "rollback_version",
     # Search
@@ -456,6 +533,7 @@ __all__: list[str] = [
     "validate_experiment_config",
     "validate_experiment_run",
     "validate_hardware",
+    "validate_log_config",
     "validate_metric_config",
     "validate_model_card",
     "validate_model_card_config",
@@ -465,6 +543,9 @@ __all__: list[str] = [
     "validate_registry_config",
     "validate_registry_stats",
     "validate_sdk",
+    "validate_telemetry_config",
+    "validate_telemetry_metric_config",
+    "validate_telemetry_stats",
     "validate_training_details",
     "validate_transition_request",
     "validate_upload_config",

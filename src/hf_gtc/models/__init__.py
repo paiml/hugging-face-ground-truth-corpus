@@ -35,6 +35,11 @@ Examples:
     >>> config = create_transformer_config(num_layers=12, hidden_size=768)
     >>> config.num_layers
     12
+
+    >>> from hf_gtc.models import AnalysisType, analyze_parameters
+    >>> stats = analyze_parameters(num_layers=12, hidden_size=768, num_heads=12)
+    >>> stats.total_params > 100_000_000
+    True
 """
 
 from __future__ import annotations
@@ -70,6 +75,38 @@ from hf_gtc.models.activations import (
     validate_activation_stats,
     validate_gelu_config,
     validate_swiglu_config,
+)
+from hf_gtc.models.analysis import (
+    VALID_ANALYSIS_TYPES,
+    VALID_STATISTIC_TYPES,
+    VALID_VISUALIZATION_TYPES,
+    AnalysisConfig,
+    AnalysisType,
+    LayerAnalysis,
+    ModelAnalysis,
+    ParameterStats,
+    StatisticType,
+    VisualizationType,
+    analyze_parameters,
+    compare_model_architectures,
+    compute_layer_statistics,
+    create_analysis_config,
+    create_layer_analysis,
+    create_model_analysis,
+    create_parameter_stats,
+    estimate_model_flops,
+    format_analysis_report,
+    get_analysis_type,
+    get_recommended_analysis_config,
+    get_statistic_type,
+    get_visualization_type,
+    list_analysis_types,
+    list_statistic_types,
+    list_visualization_types,
+    validate_analysis_config,
+    validate_layer_analysis,
+    validate_model_analysis,
+    validate_parameter_stats,
 )
 from hf_gtc.models.architectures import (
     VALID_ARCHITECTURE_TYPES,
@@ -243,6 +280,8 @@ from hf_gtc.models.positional import (
 __all__: list[str] = [
     # Activation Constants
     "VALID_ACTIVATION_TYPES",
+    # Analysis Constants
+    "VALID_ANALYSIS_TYPES",
     # Architecture Constants
     "VALID_ARCHITECTURE_TYPES",
     # Attention Constants
@@ -266,6 +305,8 @@ __all__: list[str] = [
     "VALID_POSITIONAL_TYPES",
     "VALID_PROJECTION_TYPES",
     "VALID_ROPE_SCALINGS",
+    "VALID_STATISTIC_TYPES",
+    "VALID_VISUALIZATION_TYPES",
     # Positional Dataclasses
     "ALiBiConfig",
     # Activation Dataclasses
@@ -273,6 +314,10 @@ __all__: list[str] = [
     "ActivationStats",
     # Activation Enums
     "ActivationType",
+    # Analysis Dataclasses
+    "AnalysisConfig",
+    # Analysis Enums
+    "AnalysisType",
     # Architecture Dataclasses
     "ArchitectureStats",
     # Architecture Enums
@@ -306,17 +351,23 @@ __all__: list[str] = [
     "GroupedQueryConfig",
     # Positional Enums
     "InterpolationType",
+    # Analysis Dataclasses (continued)
+    "LayerAnalysis",
     "LayerConfig",
     "LayerNormConfig",
     "LayerStats",
     "LayerType",
     "MLPConfig",
+    # Analysis Dataclasses (continued)
+    "ModelAnalysis",
     # Model Family Enums
     "ModelFamily",
     "NormConfig",
     "NormPosition",
     "NormStats",
     "NormType",
+    # Analysis Dataclasses (continued)
+    "ParameterStats",
     "PositionalConfig",
     "PositionalType",
     "ProjectionType",
@@ -324,9 +375,15 @@ __all__: list[str] = [
     "RoPEConfig",
     "RoPEScaling",
     "SinusoidalConfig",
+    # Analysis Enums (continued)
+    "StatisticType",
     "SwiGLUConfig",
     # Transformer Config Dataclass
     "TransformerConfig",
+    # Analysis Enums (continued)
+    "VisualizationType",
+    # Analysis Core functions
+    "analyze_parameters",
     # Activation Calculation functions
     "calculate_activation_memory",
     # Positional Calculation functions
@@ -349,12 +406,18 @@ __all__: list[str] = [
     "compare_architectures",
     # Layer Compare functions
     "compare_layer_configs",
+    # Analysis Compare functions
+    "compare_model_architectures",
     "compare_norm_stability",
+    # Analysis Layer Statistics
+    "compute_layer_statistics",
     # Activation Factory functions
     "create_activation_config",
     "create_activation_stats",
     # Positional Factory functions
     "create_alibi_config",
+    # Analysis Factory functions
+    "create_analysis_config",
     # Attention Factory functions
     "create_attention_config",
     "create_attention_stats",
@@ -371,10 +434,16 @@ __all__: list[str] = [
     "create_gelu_config",
     "create_group_norm_config",
     "create_grouped_query_config",
+    # Analysis Factory functions (continued)
+    "create_layer_analysis",
     "create_layer_config",
     "create_layer_norm_config",
     "create_mlp_config",
+    # Analysis Factory functions (continued)
+    "create_model_analysis",
     "create_norm_config",
+    # Analysis Factory functions (continued)
+    "create_parameter_stats",
     "create_positional_config",
     "create_rms_norm_config",
     "create_rope_config",
@@ -388,10 +457,14 @@ __all__: list[str] = [
     "estimate_layer_flops",
     # Architecture Memory Estimation
     "estimate_memory_footprint",
+    # Analysis FLOPs Estimation
+    "estimate_model_flops",
     "estimate_norm_memory",
     "estimate_position_memory",
     # Activation Format functions
     "format_activation_stats",
+    # Analysis Report function
+    "format_analysis_report",
     # Architecture Format functions
     "format_architecture_stats",
     # Attention Format functions
@@ -404,6 +477,8 @@ __all__: list[str] = [
     "format_positional_stats",
     # Activation Getter functions
     "get_activation_type",
+    # Analysis Getter functions
+    "get_analysis_type",
     # Architecture Getter functions
     "get_architecture_type",
     # Attention Getter functions
@@ -430,6 +505,8 @@ __all__: list[str] = [
     "get_positional_type",
     "get_projection_type",
     "get_recommended_activation_config",
+    # Analysis Recommended Config functions
+    "get_recommended_analysis_config",
     # Architecture Recommended Config functions
     "get_recommended_architecture_config",
     "get_recommended_attention_config",
@@ -438,8 +515,13 @@ __all__: list[str] = [
     "get_recommended_norm_config",
     "get_recommended_positional_config",
     "get_rope_scaling",
+    # Analysis Getter functions (continued)
+    "get_statistic_type",
+    "get_visualization_type",
     # Activation List functions
     "list_activation_types",
+    # Analysis List functions
+    "list_analysis_types",
     # Architecture List functions
     "list_architecture_types",
     # Attention List functions
@@ -463,6 +545,9 @@ __all__: list[str] = [
     "list_positional_types",
     "list_projection_types",
     "list_rope_scalings",
+    # Analysis List functions (continued)
+    "list_statistic_types",
+    "list_visualization_types",
     "select_attention_implementation",
     "select_eps_for_dtype",
     # Activation Validation functions
@@ -470,6 +555,8 @@ __all__: list[str] = [
     "validate_activation_stats",
     # Positional Validation functions
     "validate_alibi_config",
+    # Analysis Validation functions
+    "validate_analysis_config",
     # Architecture Validation functions
     "validate_architecture_stats",
     # Attention Validation functions
@@ -486,11 +573,17 @@ __all__: list[str] = [
     "validate_gelu_config",
     "validate_group_norm_config",
     "validate_grouped_query_config",
+    # Analysis Validation functions (continued)
+    "validate_layer_analysis",
     "validate_layer_config",
     "validate_layer_norm_config",
     "validate_layer_stats",
     "validate_mlp_config",
+    # Analysis Validation functions (continued)
+    "validate_model_analysis",
     "validate_norm_config",
+    # Analysis Validation functions (continued)
+    "validate_parameter_stats",
     "validate_positional_config",
     "validate_rms_norm_config",
     "validate_rope_config",

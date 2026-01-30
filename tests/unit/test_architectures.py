@@ -931,7 +931,7 @@ class TestPropertyBasedTests:
 
     @given(
         st.integers(min_value=1, max_value=100),
-        st.integers(min_value=64, max_value=4096).filter(lambda x: x % 64 == 0),
+        st.integers(min_value=1, max_value=64).map(lambda x: x * 64),
         st.integers(min_value=1, max_value=64),
     )
     @settings(max_examples=20)
@@ -952,7 +952,7 @@ class TestPropertyBasedTests:
     @given(
         st.integers(min_value=1, max_value=32),
         st.integers(min_value=1, max_value=4096),
-        st.integers(min_value=64, max_value=4096).filter(lambda x: x % 64 == 0),
+        st.integers(min_value=1, max_value=64).map(lambda x: x * 64),
     )
     @settings(max_examples=20)
     def test_hidden_states_shape_valid(
@@ -967,7 +967,7 @@ class TestPropertyBasedTests:
 
     @given(
         st.integers(min_value=1, max_value=50),
-        st.integers(min_value=128, max_value=4096).filter(lambda x: x % 64 == 0),
+        st.integers(min_value=2, max_value=64).map(lambda x: x * 64),
     )
     @settings(max_examples=20)
     def test_memory_footprint_positive(self, num_layers: int, hidden_size: int) -> None:
