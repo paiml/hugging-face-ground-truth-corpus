@@ -141,11 +141,11 @@ roadmap:
   github_issue: null
   item_type: task
   title: Implement dataset streaming module (preprocessing/streaming.py)
-  status: inprogress
+  status: completed
   priority: medium
   assigned_to: null
   created: 2026-01-30T11:35:58Z
-  updated: 2026-01-30T11:36:00Z
+  updated: 2026-01-30T13:17:48Z
   spec: null
   acceptance_criteria: []
   phases: []
