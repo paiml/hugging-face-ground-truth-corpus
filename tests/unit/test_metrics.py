@@ -255,7 +255,9 @@ class TestComputeMeanLoss:
     def test_mean_in_range(self, losses: list[float]) -> None:
         """Test that mean is within the range of inputs."""
         result = compute_mean_loss(losses)
-        assert min(losses) <= result <= max(losses)
+        # Use small epsilon for floating point comparison
+        eps = 1e-10
+        assert min(losses) - eps <= result <= max(losses) + eps
 
 
 class TestCreateComputeMetricsFn:

@@ -36,3 +36,37 @@ roadmap:
   estimated_effort: null
   labels: []
   notes: null
+- id: PMAT-003
+  github_issue: null
+  item_type: task
+  title: Implement PEFT/LoRA fine-tuning module
+  status: inprogress
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T11:04:58Z
+  updated: 2026-01-30T11:05:05.730850965+00:00
+  spec: null
+  acceptance_criteria:
+  - Add hf_gtc.training.lora with LoRA config and PEFT integration
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null
+- id: PMAT-004
+  github_issue: null
+  item_type: task
+  title: Implement dataset utilities module
+  status: planned
+  priority: medium
+  assigned_to: null
+  created: 2026-01-30T11:05:00Z
+  updated: 2026-01-30T11:05:00Z
+  spec: null
+  acceptance_criteria:
+  - Add hf_gtc.preprocessing.datasets with dataset loading and splitting
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null
