@@ -18,9 +18,9 @@ Examples:
 from __future__ import annotations
 
 from hf_gtc.preprocessing.augmentation import (
+    AugmentationType,
     AugmentConfig,
     AugmentResult,
-    AugmentationType,
     augment_batch,
     augment_text,
     chain_augmentations,

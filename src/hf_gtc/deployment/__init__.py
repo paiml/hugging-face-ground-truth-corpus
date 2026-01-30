@@ -12,17 +12,6 @@ Examples:
 
 from __future__ import annotations
 
-from hf_gtc.deployment.optimization import (
-    OptimizationResult,
-    QuantizationConfig,
-    QuantizationType,
-    calculate_compression_ratio,
-    estimate_model_size,
-    get_model_loading_kwargs,
-    get_optimization_result,
-    get_quantization_config,
-    list_quantization_types,
-)
 from hf_gtc.deployment.gguf import (
     GGUFArchitecture,
     GGUFConfig,
@@ -49,6 +38,17 @@ from hf_gtc.deployment.gguf import (
     validate_gguf_config,
     validate_gguf_metadata,
     validate_gguf_quant_type,
+)
+from hf_gtc.deployment.optimization import (
+    OptimizationResult,
+    QuantizationConfig,
+    QuantizationType,
+    calculate_compression_ratio,
+    estimate_model_size,
+    get_model_loading_kwargs,
+    get_optimization_result,
+    get_quantization_config,
+    list_quantization_types,
 )
 from hf_gtc.deployment.quantization import (
     AWQConfig,

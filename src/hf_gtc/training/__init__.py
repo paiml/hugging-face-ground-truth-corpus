@@ -50,10 +50,10 @@ from hf_gtc.training.lora import (
 from hf_gtc.training.qlora import (
     ComputeType,
     MemoryEstimate,
-    QuantConfig,
-    QuantType,
     QLoRAConfig,
     QLoRATrainingConfig,
+    QuantConfig,
+    QuantType,
     calculate_qlora_trainable_params,
     create_qlora_config,
     create_qlora_training_config,
