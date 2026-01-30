@@ -1,7 +1,8 @@
 """Preprocessing recipes for HuggingFace data pipelines.
 
 This module provides utilities for text preprocessing,
-tokenization, data streaming, data augmentation, and tokenizer training.
+tokenization, data streaming, data augmentation, tokenizer training,
+and data quality assessment.
 
 Examples:
     >>> from hf_gtc.preprocessing import preprocess_text, StreamConfig, AugmentConfig
@@ -13,6 +14,9 @@ Examples:
     >>> aug_config = AugmentConfig(probability=0.2)
     >>> aug_config.probability
     0.2
+    >>> from hf_gtc.preprocessing import DeduplicationMethod
+    >>> DeduplicationMethod.EXACT_HASH.value
+    'exact_hash'
 """
 
 from __future__ import annotations
@@ -44,6 +48,37 @@ from hf_gtc.preprocessing.datasets import (
     rename_columns,
     sample_dataset,
     select_columns,
+)
+from hf_gtc.preprocessing.quality import (
+    VALID_DEDUPLICATION_METHODS,
+    VALID_FILTER_STRATEGIES,
+    VALID_QUALITY_METRICS,
+    ContaminationConfig,
+    DeduplicationConfig,
+    DeduplicationMethod,
+    FilterStrategy,
+    QualityFilterConfig,
+    QualityMetric,
+    QualityStats,
+    calculate_perplexity_score,
+    calculate_text_quality_score,
+    check_contamination,
+    compute_quality_stats,
+    create_contamination_config,
+    create_deduplication_config,
+    create_quality_filter_config,
+    detect_duplicates,
+    format_quality_stats,
+    get_deduplication_method,
+    get_filter_strategy,
+    get_quality_metric,
+    get_recommended_quality_config,
+    list_deduplication_methods,
+    list_filter_strategies,
+    list_quality_metrics,
+    validate_contamination_config,
+    validate_deduplication_config,
+    validate_quality_filter_config,
 )
 from hf_gtc.preprocessing.streaming import (
     ShuffleMode,
@@ -96,15 +131,25 @@ from hf_gtc.preprocessing.tokenizer_training import (
 
 __all__: list[str] = [
     "VALID_ALGORITHMS",
+    "VALID_DEDUPLICATION_METHODS",
+    "VALID_FILTER_STRATEGIES",
     "VALID_NORMALIZERS",
     "VALID_PRE_TOKENIZERS",
+    "VALID_QUALITY_METRICS",
     "AugmentConfig",
     "AugmentResult",
     "AugmentationType",
     "BPEConfig",
+    "ContaminationConfig",
     "DatasetInfo",
+    "DeduplicationConfig",
+    "DeduplicationMethod",
+    "FilterStrategy",
     "PreTokenizerConfig",
     "PreTokenizerType",
+    "QualityFilterConfig",
+    "QualityMetric",
+    "QualityStats",
     "ShuffleMode",
     "StreamConfig",
     "StreamProgress",
@@ -116,28 +161,44 @@ __all__: list[str] = [
     "augment_batch",
     "augment_text",
     "calculate_compression_ratio",
+    "calculate_perplexity_score",
+    "calculate_text_quality_score",
     "chain_augmentations",
+    "check_contamination",
     "compute_augmentation_stats",
+    "compute_quality_stats",
     "compute_stream_stats",
     "create_augmenter",
     "create_bpe_config",
+    "create_contamination_config",
+    "create_deduplication_config",
     "create_pre_tokenizer_config",
     "create_preprocessing_function",
+    "create_quality_filter_config",
     "create_stream_iterator",
     "create_train_test_split",
     "create_train_val_test_split",
     "create_training_corpus_config",
     "create_unigram_config",
     "create_wordpiece_config",
+    "detect_duplicates",
     "estimate_vocab_coverage",
     "filter_by_length",
     "filter_stream",
+    "format_quality_stats",
     "get_augmentation_type",
     "get_dataset_info",
+    "get_deduplication_method",
+    "get_filter_strategy",
+    "get_quality_metric",
     "get_recommended_algorithm",
+    "get_recommended_quality_config",
     "get_tokenizer_algorithm",
     "list_augmentation_types",
+    "list_deduplication_methods",
+    "list_filter_strategies",
     "list_pre_tokenizers",
+    "list_quality_metrics",
     "list_shuffle_modes",
     "list_tokenizer_algorithms",
     "map_stream",
@@ -157,6 +218,9 @@ __all__: list[str] = [
     "validate_augment_config",
     "validate_augmentation_type",
     "validate_bpe_config",
+    "validate_contamination_config",
+    "validate_deduplication_config",
+    "validate_quality_filter_config",
     "validate_shuffle_mode",
     "validate_stream_config",
     "validate_unigram_config",
