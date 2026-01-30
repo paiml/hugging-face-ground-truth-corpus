@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.12.0
-**Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
+**Version**: 2.13.0
+**Status**: IMPLEMENTATION COMPLETE - FULLY TYPED
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -867,7 +867,7 @@ cd ../safetensors && cargo test
 |------|---------|---------|---------------|
 | `uv` | Package management | ≥0.5.0 | `pyproject.toml` |
 | `ruff` | Linting + formatting | ≥0.8.0 | `pyproject.toml` |
-| `ty` | Type checking | ≥0.1.0 | `pyproject.toml` |
+| `ty` | Type checking | ≥0.0.14 | `pyproject.toml` |
 | `pytest` | Testing | ≥8.0.0 | `pyproject.toml` |
 | `pytest-cov` | Coverage | ≥6.0.0 | `pyproject.toml` |
 | `bandit` | Security | ≥1.8.0 | `.bandit` |
@@ -895,7 +895,7 @@ ignore = []
 [tool.ruff.lint.isort]
 known-first-party = ["hf_gtc"]
 
-[tool.ty]
+[tool.ty.environment]
 python-version = "3.11"
 
 [tool.pytest.ini_options]
@@ -1145,10 +1145,11 @@ The qualification pipeline transforms Python recipes into Depyler-qualified grou
 
 ```bash
 # Makefile targets
-make lint       # ruff check + ty check
+make lint       # ruff check + ruff format --check
+make typecheck  # ty check src/
 make test       # pytest with coverage
-make comply     # pmat comply check --strict
 make security   # bandit -ll
+make check      # lint + typecheck + test + security (all gates)
 ```
 
 **Gate Requirements**:
@@ -2238,6 +2239,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.10.1 | 2026-01-30 | Claude Code | **Doctest Fixes**: Fixed 7 failing doctests - generator validation (force iteration with `next()`), float precision (use `round()`), random seed behavior, invalid test values. All 339 doctests now pass. |
 | 2.11.0 | 2026-01-30 | Claude Code | **Security Hardening**: Fixed B104 (ServerConfig default host 0.0.0.0 → 127.0.0.1), fixed B615 (added revision parameter for dataset version pinning). All bandit security checks now pass. |
 | 2.12.0 | 2026-01-30 | Claude Code | **alimentar Integration**: Fixed alimentar GH-013 (nested Arrow types support). Quality score now passes at 85% (C grade). Exported corpus validates successfully. |
+| 2.13.0 | 2026-01-30 | Claude Code | **ty Type Checker Integration**: Added ty≥0.0.14 to quality gates. Fixed 9 type errors (Callable types, attribute access, deprecated API). 100% type coverage enforced via `make typecheck`. Updated Trainer API to use `processing_class` parameter. |
 
 ---
 
