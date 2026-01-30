@@ -14,10 +14,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+
+# Generic type variables for streaming functions
+T = TypeVar("T")
+U = TypeVar("U")
 
 
 class ShuffleMode(Enum):
@@ -171,11 +175,11 @@ def validate_stream_config(config: StreamConfig) -> None:
 
 
 def create_stream_iterator(
-    items: Iterator[Any],
+    items: Iterator[T],
     *,
     batch_size: int = 1000,
     drop_last: bool = False,
-) -> Iterator[list[Any]]:
+) -> Iterator[list[T]]:
     """Create a batched iterator from a stream of items.
 
     Args:
@@ -216,7 +220,7 @@ def create_stream_iterator(
         msg = f"batch_size must be positive, got {batch_size}"
         raise ValueError(msg)
 
-    batch: list[Any] = []
+    batch: list[T] = []
     for item in items:
         batch.append(item)
         if len(batch) >= batch_size:
@@ -327,9 +331,9 @@ def stream_batches(
 
 
 def map_stream(
-    items: Iterator[Any],
-    fn: Callable[[Any], Any],
-) -> Iterator[Any]:
+    items: Iterator[T],
+    fn: Callable[[T], U],
+) -> Iterator[U]:
     """Apply a function to each item in a stream.
 
     Args:
@@ -373,9 +377,9 @@ def map_stream(
 
 
 def filter_stream(
-    items: Iterator[Any],
-    predicate: Callable[[Any], bool],
-) -> Iterator[Any]:
+    items: Iterator[T],
+    predicate: Callable[[T], bool],
+) -> Iterator[T]:
     """Filter items from a stream based on a predicate.
 
     Args:
@@ -419,7 +423,7 @@ def filter_stream(
             yield item
 
 
-def take_stream(items: Iterator[Any], n: int) -> Iterator[Any]:
+def take_stream(items: Iterator[T], n: int) -> Iterator[T]:
     """Take the first n items from a stream.
 
     Args:
@@ -467,7 +471,7 @@ def take_stream(items: Iterator[Any], n: int) -> Iterator[Any]:
         yield item
 
 
-def skip_stream(items: Iterator[Any], n: int) -> Iterator[Any]:
+def skip_stream(items: Iterator[T], n: int) -> Iterator[T]:
     """Skip the first n items from a stream.
 
     Args:

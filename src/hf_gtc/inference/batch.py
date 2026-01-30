@@ -14,10 +14,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+
+# Generic type variable for batch operations
+T = TypeVar("T")
 
 
 class PaddingStrategy(Enum):
@@ -173,9 +176,9 @@ def validate_batch_config(config: BatchConfig) -> None:
 
 
 def create_batches(
-    items: Sequence[Any],
+    items: Sequence[T],
     batch_size: int,
-) -> Iterator[list[Any]]:
+) -> Iterator[list[T]]:
     """Split items into batches of specified size.
 
     Args:
