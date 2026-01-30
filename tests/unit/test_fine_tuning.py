@@ -221,7 +221,7 @@ class TestCreateTrainingArgs:
 class TestCreateTrainer:
     """Tests for create_trainer function."""
 
-    @patch("transformers.Trainer", autospec=True)
+    @patch("hf_gtc.training.fine_tuning._HFTrainer")
     def test_creates_trainer(self, mock_trainer_cls: MagicMock) -> None:
         """Test successful creation of Trainer."""
         model = MagicMock()
@@ -233,7 +233,7 @@ class TestCreateTrainer:
         mock_trainer_cls.assert_called_once()
         assert trainer is not None
 
-    @patch("transformers.Trainer", autospec=True)
+    @patch("hf_gtc.training.fine_tuning._HFTrainer")
     def test_passes_all_parameters(self, mock_trainer_cls: MagicMock) -> None:
         """Test all parameters are passed to Trainer."""
         model = MagicMock()

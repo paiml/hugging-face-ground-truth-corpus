@@ -15,6 +15,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from transformers import Trainer as _HFTrainer
+from transformers import TrainingArguments as _TrainingArguments
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -163,8 +166,6 @@ def create_training_args(
         Traceback (most recent call last):
         ValueError: output_dir cannot be empty
     """
-    from transformers import TrainingArguments
-
     config = TrainingConfig(
         output_dir=output_dir,
         num_epochs=num_epochs,
@@ -179,7 +180,7 @@ def create_training_args(
     )
     validate_training_config(config)
 
-    return TrainingArguments(
+    return _TrainingArguments(
         output_dir=config.output_dir,
         num_train_epochs=config.num_epochs,
         per_device_train_batch_size=config.batch_size,
@@ -230,8 +231,6 @@ def create_trainer(
         >>> trainer is not None
         True
     """
-    from transformers import Trainer as HFTrainer
-
     if model is None:
         msg = "model cannot be None"
         raise ValueError(msg)
@@ -240,7 +239,7 @@ def create_trainer(
         msg = "train_dataset cannot be None"
         raise ValueError(msg)
 
-    return HFTrainer(
+    return _HFTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
