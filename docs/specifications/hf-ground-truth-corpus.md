@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 1.7.0
+**Version**: 1.8.0
 **Status**: IMPLEMENTATION IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-011
+**PMAT Tickets**: PMAT-001 through PMAT-012
 
 ---
 
@@ -29,8 +29,9 @@
 | `hf_gtc.evaluation.metrics` | COMPLETE | 100% | 42 | PMAT-001 |
 | `hf_gtc.evaluation.benchmarks` | COMPLETE | 99% | 72 | PMAT-011 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
+| `hf_gtc.deployment.serving` | COMPLETE | 100% | 79 | PMAT-012 |
 
-**Total**: 728 tests, 99% coverage, 1552 statements covered
+**Total**: 807 tests, 99% coverage, 1730 statements covered
 
 ---
 
@@ -1999,6 +2000,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 1.5.0 | 2026-01-30 | Claude Code | Added preprocessing.streaming module for dataset streaming utilities, 578 tests, 99% coverage |
 | 1.6.0 | 2026-01-30 | Claude Code | Added preprocessing.augmentation module for text augmentation, 656 tests, 99% coverage |
 | 1.7.0 | 2026-01-30 | Claude Code | Added evaluation.benchmarks module for performance benchmarking, 728 tests, 99% coverage |
+| 1.8.0 | 2026-01-30 | Claude Code | Added deployment.serving module for model serving utilities, 807 tests, 99% coverage |
 
 ---
 
