@@ -1,0 +1,38 @@
+roadmap_version: '1.0'
+github_enabled: true
+github_repo: paiml/hugging-face-ground-truth-corpus
+roadmap:
+- id: PMAT-001
+  github_issue: null
+  item_type: task
+  title: Implement evaluation metrics module
+  status: inprogress
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T10:57:47Z
+  updated: 2026-01-30T10:57:52.717099525+00:00
+  spec: null
+  acceptance_criteria:
+  - Add hf_gtc.evaluation.metrics with accuracy, f1, perplexity metrics
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null
+- id: PMAT-002
+  github_issue: null
+  item_type: task
+  title: Implement deployment optimization module
+  status: planned
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T10:57:48Z
+  updated: 2026-01-30T10:57:48Z
+  spec: null
+  acceptance_criteria:
+  - Add hf_gtc.deployment.optimization with quantization and model optimization
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null

@@ -6,4 +6,26 @@ and evaluating model performance.
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from hf_gtc.evaluation.metrics import (
+    ClassificationMetrics,
+    compute_accuracy,
+    compute_classification_metrics,
+    compute_f1,
+    compute_mean_loss,
+    compute_perplexity,
+    compute_precision,
+    compute_recall,
+    create_compute_metrics_fn,
+)
+
+__all__: list[str] = [
+    "ClassificationMetrics",
+    "compute_accuracy",
+    "compute_classification_metrics",
+    "compute_f1",
+    "compute_mean_loss",
+    "compute_perplexity",
+    "compute_precision",
+    "compute_recall",
+    "create_compute_metrics_fn",
+]
