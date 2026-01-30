@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.8.0
+**Version**: 2.8.1
 **Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -613,6 +613,20 @@ cd ../realizar && cargo test
 ### 4.6 alimentar Dataset Distribution
 
 **alimentar** (`../alimentar`) is the Sovereign AI Stack's pure Rust data loading and distribution library. It provides native HuggingFace Hub upload support for publishing the HF-GTC corpus as a dataset.
+
+> **POLICY: Sovereign Stack Exclusivity**
+>
+> All HuggingFace Hub publishing operations MUST use **alimentar** (Sovereign AI Stack).
+> The following are **PROHIBITED** for dataset distribution:
+>
+> - Python `huggingface_hub` library
+> - Python `datasets` library push methods
+> - Direct Hub API calls from Python
+> - Any non-Sovereign Stack tooling
+>
+> **Rationale**: Sovereign AI Stack provides provenance tracking, validation,
+> and integration with trueno/aprender/realizar that Python tooling cannot guarantee.
+> This ensures end-to-end Rust-native data lineage from source to deployment.
 
 #### 4.6.1 Dataset Publishing Pipeline
 
@@ -2192,6 +2206,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.6.0 | 2026-01-30 | Claude Code | **P1 Partial**: F-007 Any elimination (85→53, 38% reduction). Added TypeVar to streaming.py and batch.py for generic functions. |
 | 2.7.0 | 2026-01-30 | Claude Code | **Remediation Complete**: Updated test counts (1214→1258), F-005 mitigated via adversarial tests, F-007 complete (remaining Any at API boundaries). |
 | 2.8.0 | 2026-01-30 | Claude Code | **Distribution Ready**: Added Section 4.6 alimentar dataset distribution pipeline. Corpus can now be published to HuggingFace Hub via alimentar. |
+| 2.8.1 | 2026-01-30 | Claude Code | **Policy Addition**: Added Sovereign Stack Exclusivity policy. ONLY alimentar permitted for HuggingFace Hub publishing. Python tooling prohibited. |
 
 ---
 
