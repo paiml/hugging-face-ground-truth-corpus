@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.3.0
-**Status**: IMPLEMENTATION COMPLETE
+**Version**: 2.4.0
+**Status**: IMPLEMENTATION COMPLETE - RED TEAM AUDIT COMPLETE
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -62,6 +62,9 @@ The methodology combines **Toyota Production System** (TPS) manufacturing princi
 10. [CI/CD Integration](#10-cicd-integration)
 11. [Popperian Falsification QA Checklist](#11-popperian-falsification-qa-checklist)
 12. [References](#12-references)
+13. [Appendix A: Glossary](#appendix-a-glossary)
+14. [Appendix B: Version History](#appendix-b-version-history)
+15. [Appendix C: Red Team Audit Results](#appendix-c-red-team-audit-results)
 
 ---
 
@@ -2011,6 +2014,95 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.1.0 | 2026-01-30 | Claude Code | Added training.qlora module for QLoRA quantized fine-tuning, 1069 tests, 99% coverage |
 | 2.2.0 | 2026-01-30 | Claude Code | Added deployment.quantization module for model quantization (GPTQ, AWQ), 1148 tests, 99% coverage |
 | 2.3.0 | 2026-01-30 | Claude Code | Added deployment.gguf module for GGUF export, 1214 tests, 98% coverage. **Implementation complete.** |
+| 2.4.0 | 2026-01-30 | Claude Code | **Red Team Audit**: Popperian falsification analysis. 4/5 claims falsified (F-001, F-002, F-005, F-007). Added Appendix C with findings and remediation matrix. |
+
+---
+
+## Appendix C: Red Team Audit Results
+
+Following the Popperian falsification methodology defined in Section 11, a comprehensive Red Team audit was conducted to attempt refutation of specification claims.
+
+### C.1 Audit Summary
+
+| Attack Vector | Target Claim | Verdict | Severity |
+|---------------|--------------|---------|----------|
+| F-001: Float Drift | Numeric precision ε=1e-6 | **FALSIFIED** | HIGH |
+| F-002: Tokenization | Unicode edge case handling | **FALSIFIED** | CRITICAL |
+| F-004: TODO Leak | No SATD markers | CORROBORATED | N/A |
+| F-005: Coverage Gaming | 95% coverage meaningful | **FALSIFIED** | HIGH |
+| F-007: Dynamic Trap | Depyler qualification ≥80% | **FALSIFIED** | CRITICAL |
+
+### C.2 Detailed Findings
+
+#### F-001: Floating Point Drift
+
+**Falsification Evidence**:
+- 137 direct float equality comparisons in test suite (`assert x == 0.85`)
+- Source code uses `== 0.0` and `== 1.0` at `augmentation.py:188,191,372`
+
+**Impact**: Non-deterministic test failures across platforms.
+
+**Remediation**: Replace with `pytest.approx()` and `math.isclose()`.
+
+#### F-002: Tokenization Mismatch (Unicode)
+
+**Falsification Evidence**:
+- NFC vs NFD normalization produces different tokenization
+- `preprocess_text("caf\u00e9")` ≠ `preprocess_text("cafe\u0301")`
+- Bidirectional overrides (U+202E) preserved (security risk)
+- Null bytes preserved (injection risk)
+
+**Impact**: Cross-platform semantic divergence, security vulnerabilities.
+
+**Remediation**: Mandatory NFC normalization, strip control characters.
+
+#### F-004: TODO Leak (CORROBORATED)
+
+**Attempt**: Grep for SATD markers (TODO, FIXME, HACK, XXX).
+
+**Result**: Zero markers found. Claim survives refutation.
+
+#### F-005: Coverage Gaming
+
+**Falsification Evidence**:
+- 98% line coverage reported
+- ~78.6% of tests have weak or no assertions
+- Pattern: `assert result is not None` (existence, not correctness)
+
+**Impact**: Coverage metric misleading; mutation testing would expose gaps.
+
+**Remediation**: Implement mutation testing, require ≥2 meaningful assertions per test.
+
+#### F-007: Dynamic Trap
+
+**Falsification Evidence**:
+- 85 occurrences of `Any` type across 18 modules
+- Extensive use of `**kwargs`, generators, dynamic attributes
+- Incompatible with static transpilation requirements
+
+**Impact**: Depyler qualification rate likely <50%, not ≥80%.
+
+**Remediation**: Replace `Any` with concrete/protocol types, explicit parameters.
+
+### C.3 Remediation Priority Matrix
+
+| Priority | Issue | Effort | Blocking |
+|----------|-------|--------|----------|
+| P0 | F-001 Float comparisons | Low | CI stability |
+| P0 | F-002 Unicode normalization | Medium | Cross-platform |
+| P1 | F-005 Assertion quality | High | Quality assurance |
+| P1 | F-007 Any type elimination | High | Depyler pipeline |
+
+### C.4 Popperian Assessment
+
+Per Popper's *Logic of Scientific Discovery*: the specification has **higher epistemic value** post-audit because:
+
+1. Falsifiable claims were tested adversarially
+2. Four claims were successfully falsified with concrete evidence
+3. One claim (F-004) survived refutation, increasing confidence
+4. Remediation targets are specific and measurable
+
+The specification is not "proven correct" but has achieved **partial corroboration** through survival of systematic refutation attempts.
 
 ---
 
