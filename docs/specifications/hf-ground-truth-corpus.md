@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 **Status**: IMPLEMENTATION IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-009
+**PMAT Tickets**: PMAT-001 through PMAT-010
 
 ---
 
@@ -22,13 +22,14 @@
 | `hf_gtc.preprocessing.tokenization` | COMPLETE | 100% | 27 | - |
 | `hf_gtc.preprocessing.datasets` | COMPLETE | 100% | 41 | PMAT-004 |
 | `hf_gtc.preprocessing.streaming` | COMPLETE | 99% | 70 | PMAT-009 |
+| `hf_gtc.preprocessing.augmentation` | COMPLETE | 99% | 78 | PMAT-010 |
 | `hf_gtc.training.fine_tuning` | COMPLETE | 100% | 40 | - |
 | `hf_gtc.training.lora` | COMPLETE | 100% | 50 | PMAT-003 |
 | `hf_gtc.training.callbacks` | COMPLETE | 99% | 54 | PMAT-006 |
 | `hf_gtc.evaluation.metrics` | COMPLETE | 100% | 42 | PMAT-001 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
 
-**Total**: 578 tests, 99% coverage, 1167 statements covered
+**Total**: 656 tests, 99% coverage, 1354 statements covered
 
 ---
 
@@ -1995,6 +1996,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 1.3.0 | 2026-01-30 | Claude Code | Added hub.spaces module, 508 tests, 99% coverage |
 | 1.4.0 | 2026-01-30 | Claude Code | **Major**: Added Sovereign AI Stack conversion pipeline (Section 4.5, Stages 7-9). Final production target now includes trueno, aprender, realizar integration |
 | 1.5.0 | 2026-01-30 | Claude Code | Added preprocessing.streaming module for dataset streaming utilities, 578 tests, 99% coverage |
+| 1.6.0 | 2026-01-30 | Claude Code | Added preprocessing.augmentation module for text augmentation, 656 tests, 99% coverage |
 
 ---
 
