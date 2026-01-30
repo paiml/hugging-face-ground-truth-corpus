@@ -49,15 +49,17 @@ class TaskType(Enum):
 VALID_TASK_TYPES = frozenset(t.value for t in TaskType)
 
 # Default target modules for common architectures
-DEFAULT_TARGET_MODULES = frozenset({
-    "q_proj",
-    "k_proj",
-    "v_proj",
-    "o_proj",
-    "gate_proj",
-    "up_proj",
-    "down_proj",
-})
+DEFAULT_TARGET_MODULES = frozenset(
+    {
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -119,7 +121,9 @@ def validate_lora_config(
     Examples:
         >>> validate_lora_config(8, 16, 0.1, "none")  # No error
 
-        >>> validate_lora_config(0, 16, 0.1, "none")  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> validate_lora_config(  # doctest: +IGNORE_EXCEPTION_DETAIL
+        ...     0, 16, 0.1, "none"
+        ... )
         Traceback (most recent call last):
         ValueError: r must be positive
     """
@@ -228,6 +232,9 @@ def get_peft_config(lora_config: LoRAConfig) -> Any:
         TaskType.FEATURE_EXTRACTION: PeftTaskType.FEATURE_EXTRACTION,
     }
 
+    modules_to_save = (
+        list(lora_config.modules_to_save) if lora_config.modules_to_save else None
+    )
     return PeftLoraConfig(
         r=lora_config.r,
         lora_alpha=lora_config.lora_alpha,
@@ -235,7 +242,7 @@ def get_peft_config(lora_config: LoRAConfig) -> Any:
         target_modules=list(lora_config.target_modules),
         task_type=task_type_map[lora_config.task_type],
         bias=lora_config.bias,
-        modules_to_save=list(lora_config.modules_to_save) if lora_config.modules_to_save else None,
+        modules_to_save=modules_to_save,
     )
 
 
@@ -265,7 +272,9 @@ def estimate_lora_parameters(
         >>> estimate_lora_parameters(7_000_000_000, r=16, num_target_modules=7)
         917504
 
-        >>> estimate_lora_parameters(0, r=8, num_target_modules=7)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> estimate_lora_parameters(  # doctest: +IGNORE_EXCEPTION_DETAIL
+        ...     0, r=8, num_target_modules=7
+        ... )
         Traceback (most recent call last):
         ValueError: base_model_params must be positive
     """

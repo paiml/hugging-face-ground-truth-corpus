@@ -111,7 +111,7 @@ def get_quantization_config(
     """Get quantization configuration for a given type.
 
     Args:
-        quantization_type: Type of quantization ("int8", "int4", "fp16", "bf16", "none").
+        quantization_type: Type of quantization (int8/int4/fp16/bf16/none).
         device_map: Device placement strategy. Defaults to "auto".
 
     Returns:
@@ -140,7 +140,10 @@ def get_quantization_config(
         ValueError: quantization_type must be one of...
     """
     if quantization_type not in VALID_QUANTIZATION_TYPES:
-        msg = f"quantization_type must be one of {VALID_QUANTIZATION_TYPES}, got '{quantization_type}'"
+        msg = (
+            f"quantization_type must be one of {VALID_QUANTIZATION_TYPES}, "
+            f"got '{quantization_type}'"
+        )
         raise ValueError(msg)
 
     qtype = QuantizationType(quantization_type)
@@ -205,14 +208,14 @@ def estimate_model_size(
         ValueError: If quantization_type is not valid.
 
     Examples:
-        >>> estimate_model_size(1_000_000_000, "none")
-        4000.0
-        >>> estimate_model_size(1_000_000_000, "fp16")
-        2000.0
-        >>> estimate_model_size(1_000_000_000, "int8")
-        1000.0
-        >>> estimate_model_size(1_000_000_000, "int4")
-        500.0
+        >>> round(estimate_model_size(1_000_000_000, "none"), 1)
+        3814.7
+        >>> round(estimate_model_size(1_000_000_000, "fp16"), 1)
+        1907.3
+        >>> round(estimate_model_size(1_000_000_000, "int8"), 1)
+        953.7
+        >>> round(estimate_model_size(1_000_000_000, "int4"), 1)
+        476.8
 
         >>> estimate_model_size(0)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -223,7 +226,10 @@ def estimate_model_size(
         raise ValueError(msg)
 
     if quantization_type not in VALID_QUANTIZATION_TYPES:
-        msg = f"quantization_type must be one of {VALID_QUANTIZATION_TYPES}, got '{quantization_type}'"
+        msg = (
+            f"quantization_type must be one of {VALID_QUANTIZATION_TYPES}, "
+            f"got '{quantization_type}'"
+        )
         raise ValueError(msg)
 
     # Bytes per parameter based on quantization type
@@ -295,10 +301,10 @@ def get_optimization_result(
 
     Examples:
         >>> result = get_optimization_result(1_000_000_000, "int8")
-        >>> result.original_size_mb
-        4000.0
-        >>> result.optimized_size_mb
-        1000.0
+        >>> round(result.original_size_mb, 1)
+        3814.7
+        >>> round(result.optimized_size_mb, 1)
+        953.7
         >>> result.compression_ratio
         4.0
     """

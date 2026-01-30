@@ -4,8 +4,12 @@ This module provides functions for loading, splitting, and processing
 datasets using the HuggingFace datasets library.
 
 Examples:
+    >>> from datasets import Dataset
     >>> from hf_gtc.preprocessing.datasets import create_train_test_split
-    >>> train, test = create_train_test_split(dataset, test_size=0.2)
+    >>> ds = Dataset.from_dict({"text": ["a", "b", "c", "d", "e"]})
+    >>> train, test = create_train_test_split(ds, test_size=0.2, seed=42)
+    >>> len(train) + len(test) == 5
+    True
 """
 
 from __future__ import annotations
@@ -150,7 +154,9 @@ def create_train_val_test_split(
     Examples:
         >>> from datasets import Dataset
         >>> ds = Dataset.from_dict({"text": list(range(100))})
-        >>> train, val, test = create_train_val_test_split(ds, test_size=0.1, validation_size=0.1)
+        >>> train, val, test = create_train_val_test_split(
+        ...     ds, test_size=0.1, validation_size=0.1
+        ... )
         >>> len(train) + len(val) + len(test) == 100
         True
     """
@@ -180,7 +186,9 @@ def create_train_val_test_split(
     return split2["train"], split2["test"], test_dataset
 
 
-def get_dataset_info(dataset: Dataset | DatasetDict, name: str = "dataset") -> DatasetInfo:
+def get_dataset_info(
+    dataset: Dataset | DatasetDict, name: str = "dataset"
+) -> DatasetInfo:
     """Get information about a dataset.
 
     Args:
@@ -306,7 +314,10 @@ def rename_columns(
     existing_columns = set(dataset.column_names)
     for old_name in column_mapping:
         if old_name not in existing_columns:
-            msg = f"Column '{old_name}' not found in dataset. Available: {existing_columns}"
+            msg = (
+                f"Column '{old_name}' not found in dataset. "
+                f"Available: {existing_columns}"
+            )
             raise ValueError(msg)
 
     return dataset.rename_columns(column_mapping)
@@ -346,7 +357,9 @@ def filter_by_length(
         raise ValueError(msg)
 
     if column not in dataset.column_names:
-        msg = f"Column '{column}' not found in dataset. Available: {dataset.column_names}"
+        msg = (
+            f"Column '{column}' not found in dataset. Available: {dataset.column_names}"
+        )
         raise ValueError(msg)
 
     if min_length is None and max_length is None:
@@ -357,9 +370,7 @@ def filter_by_length(
         length = len(example[column])
         if min_length is not None and length < min_length:
             return False
-        if max_length is not None and length > max_length:
-            return False
-        return True
+        return not (max_length is not None and length > max_length)
 
     return dataset.filter(filter_fn)
 

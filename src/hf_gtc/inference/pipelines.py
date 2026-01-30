@@ -21,35 +21,37 @@ if TYPE_CHECKING:
 
 
 # Supported pipeline tasks (subset of transformers pipeline tasks)
-SUPPORTED_TASKS: frozenset[str] = frozenset({
-    "audio-classification",
-    "automatic-speech-recognition",
-    "depth-estimation",
-    "document-question-answering",
-    "feature-extraction",
-    "fill-mask",
-    "image-classification",
-    "image-feature-extraction",
-    "image-segmentation",
-    "image-to-text",
-    "mask-generation",
-    "ner",
-    "object-detection",
-    "question-answering",
-    "sentiment-analysis",
-    "summarization",
-    "table-question-answering",
-    "text-classification",
-    "text-generation",
-    "text2text-generation",
-    "token-classification",
-    "translation",
-    "video-classification",
-    "visual-question-answering",
-    "zero-shot-classification",
-    "zero-shot-image-classification",
-    "zero-shot-object-detection",
-})
+SUPPORTED_TASKS: frozenset[str] = frozenset(
+    {
+        "audio-classification",
+        "automatic-speech-recognition",
+        "depth-estimation",
+        "document-question-answering",
+        "feature-extraction",
+        "fill-mask",
+        "image-classification",
+        "image-feature-extraction",
+        "image-segmentation",
+        "image-to-text",
+        "mask-generation",
+        "ner",
+        "object-detection",
+        "question-answering",
+        "sentiment-analysis",
+        "summarization",
+        "table-question-answering",
+        "text-classification",
+        "text-generation",
+        "text2text-generation",
+        "token-classification",
+        "translation",
+        "video-classification",
+        "visual-question-answering",
+        "zero-shot-classification",
+        "zero-shot-image-classification",
+        "zero-shot-object-detection",
+    }
+)
 
 
 def list_supported_tasks() -> list[str]:

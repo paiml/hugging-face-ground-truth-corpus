@@ -81,10 +81,13 @@ def compute_accuracy(
         raise ValueError(msg)
 
     if len(predictions) != len(labels):
-        msg = f"predictions and labels must have the same length, got {len(predictions)} and {len(labels)}"
+        msg = (
+            f"predictions and labels must have the same length, "
+            f"got {len(predictions)} and {len(labels)}"
+        )
         raise ValueError(msg)
 
-    correct = sum(p == l for p, l in zip(predictions, labels, strict=True))
+    correct = sum(pred == lbl for pred, lbl in zip(predictions, labels, strict=True))
     return correct / len(predictions)
 
 
@@ -123,12 +126,15 @@ def compute_precision(
         raise ValueError(msg)
 
     if len(predictions) != len(labels):
-        msg = f"predictions and labels must have the same length, got {len(predictions)} and {len(labels)}"
+        msg = (
+            f"predictions and labels must have the same length, "
+            f"got {len(predictions)} and {len(labels)}"
+        )
         raise ValueError(msg)
 
     true_positives = sum(
-        p == positive_label and l == positive_label
-        for p, l in zip(predictions, labels, strict=True)
+        pred == positive_label and lbl == positive_label
+        for pred, lbl in zip(predictions, labels, strict=True)
     )
     predicted_positives = sum(p == positive_label for p in predictions)
 
@@ -173,14 +179,17 @@ def compute_recall(
         raise ValueError(msg)
 
     if len(predictions) != len(labels):
-        msg = f"predictions and labels must have the same length, got {len(predictions)} and {len(labels)}"
+        msg = (
+            f"predictions and labels must have the same length, "
+            f"got {len(predictions)} and {len(labels)}"
+        )
         raise ValueError(msg)
 
     true_positives = sum(
-        p == positive_label and l == positive_label
-        for p, l in zip(predictions, labels, strict=True)
+        pred == positive_label and lbl == positive_label
+        for pred, lbl in zip(predictions, labels, strict=True)
     )
-    actual_positives = sum(l == positive_label for l in labels)
+    actual_positives = sum(lbl == positive_label for lbl in labels)
 
     if actual_positives == 0:
         return 0.0

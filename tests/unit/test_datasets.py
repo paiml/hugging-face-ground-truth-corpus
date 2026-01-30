@@ -21,18 +21,22 @@ from hf_gtc.preprocessing.datasets import (
 @pytest.fixture
 def sample_dataset_fixture() -> Dataset:
     """Create a sample dataset for testing."""
-    return Dataset.from_dict({
-        "text": ["hello", "world", "foo", "bar", "baz"] * 20,
-        "label": [0, 1, 0, 1, 0] * 20,
-    })
+    return Dataset.from_dict(
+        {
+            "text": ["hello", "world", "foo", "bar", "baz"] * 20,
+            "label": [0, 1, 0, 1, 0] * 20,
+        }
+    )
 
 
 @pytest.fixture
 def text_length_dataset() -> Dataset:
     """Create a dataset with varying text lengths."""
-    return Dataset.from_dict({
-        "text": ["a", "ab", "abc", "abcd", "abcde"],
-    })
+    return Dataset.from_dict(
+        {
+            "text": ["a", "ab", "abc", "abcd", "abcde"],
+        }
+    )
 
 
 class TestDatasetInfo:
@@ -73,7 +77,7 @@ class TestValidateSplitSizes:
 
     def test_sizes_sum_over_one_raises_error(self) -> None:
         """Test that sizes summing over 1.0 raises ValueError."""
-        with pytest.raises(ValueError, match="must sum to <= 1.0"):
+        with pytest.raises(ValueError, match=r"must sum to <= 1\.0"):
             validate_split_sizes(0.8, 0.3, None)
 
     def test_zero_size_raises_error(self) -> None:
@@ -88,7 +92,7 @@ class TestValidateSplitSizes:
 
     def test_size_equals_one_raises_error(self) -> None:
         """Test that size of 1.0 raises ValueError."""
-        with pytest.raises(ValueError, match="must be less than 1.0"):
+        with pytest.raises(ValueError, match=r"must be less than 1\.0"):
             validate_split_sizes(1.0, None, None)
 
 
@@ -103,7 +107,7 @@ class TestCreateTrainTestSplit:
 
     def test_split_proportions(self, sample_dataset_fixture: Dataset) -> None:
         """Test that split proportions are approximately correct."""
-        train, test = create_train_test_split(sample_dataset_fixture, test_size=0.2)
+        _train, test = create_train_test_split(sample_dataset_fixture, test_size=0.2)
         test_ratio = len(test) / len(sample_dataset_fixture)
         assert 0.15 <= test_ratio <= 0.25  # Allow some variance
 
@@ -128,7 +132,9 @@ class TestCreateTrainTestSplit:
         with pytest.raises(ValueError, match="dataset cannot be None"):
             create_train_test_split(None, test_size=0.2)  # type: ignore[arg-type]
 
-    def test_invalid_test_size_raises_error(self, sample_dataset_fixture: Dataset) -> None:
+    def test_invalid_test_size_raises_error(
+        self, sample_dataset_fixture: Dataset
+    ) -> None:
         """Test that invalid test_size raises ValueError."""
         with pytest.raises(ValueError, match="must be positive"):
             create_train_test_split(sample_dataset_fixture, test_size=0)
@@ -147,7 +153,7 @@ class TestCreateTrainValTestSplit:
 
     def test_split_proportions(self, sample_dataset_fixture: Dataset) -> None:
         """Test that split proportions are approximately correct."""
-        train, val, test = create_train_val_test_split(
+        _train, val, test = create_train_val_test_split(
             sample_dataset_fixture, test_size=0.1, validation_size=0.1
         )
         total = len(sample_dataset_fixture)
@@ -175,10 +181,12 @@ class TestGetDatasetInfo:
         """Test getting info from DatasetDict."""
         from datasets import DatasetDict
 
-        ds_dict = DatasetDict({
-            "train": sample_dataset_fixture,
-            "test": sample_dataset_fixture.select(range(20)),
-        })
+        ds_dict = DatasetDict(
+            {
+                "train": sample_dataset_fixture,
+                "test": sample_dataset_fixture.select(range(20)),
+            }
+        )
         info = get_dataset_info(ds_dict, "test_dict")
         assert info.name == "test_dict"
         assert info.num_rows == 120  # 100 + 20
