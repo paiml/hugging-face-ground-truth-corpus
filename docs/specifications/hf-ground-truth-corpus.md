@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: IMPLEMENTATION IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -285,11 +285,15 @@ HF-GTC leverages existing production Rust implementations as **authoritative gro
 │  • Validated against Tier 1 when available                          │
 │  → Semantic equivalence via doctest comparison                      │
 │                                                                     │
-│  TIER 3: SOVEREIGN STACK MAPPING                                    │
-│  ════════════════════════════════                                   │
-│  • aprender, trueno, realizar, alimentar                            │
-│  • May diverge from HF API for performance                          │
-│  → Functional equivalence, not API equivalence                      │
+│  TIER 3: SOVEREIGN STACK DEPLOYMENT                                 │
+│  ═══════════════════════════════════                                │
+│  • trueno (SIMD tensor ops) ← candle-core                           │
+│  • aprender (training) ← candle-nn                                  │
+│  • realizar (inference) ← candle-transformers                       │
+│  • alimentar (data) ← datasets/tokenizers                           │
+│  → Production-optimized, SIMD-accelerated implementations           │
+│                                                                     │
+│  FINAL OUTPUT: ../trueno, ../aprender, ../realizar                  │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -449,7 +453,151 @@ Each HF-GTC recipe category maps to specific Rust ground truth sources:
 | `deployment/quantization.py` | `candle-core/quantized/` | — | Quantized inference parity |
 | `deployment/gguf.py` | `candle-core/quantized/gguf.rs` | — | GGUF format compatibility |
 
-### 4.5 Batuta Oracle Rust Queries
+### 4.5 Sovereign AI Stack Deployment
+
+The **final production target** for all qualified recipes is the Sovereign AI Stack. After validation against candle/safetensors, code is converted to optimized implementations in:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│              SOVEREIGN AI STACK CONVERSION PIPELINE                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  STAGE A: Candle/SafeTensors Validation                             │
+│  ───────────────────────────────────────                            │
+│  Python → Depyler → Rust ─┬─▶ candle cross-validation              │
+│                           └─▶ safetensors round-trip               │
+│                                                                     │
+│  STAGE B: Sovereign Stack Conversion                                │
+│  ───────────────────────────────────────                            │
+│  candle-core     ───────▶  ../trueno    (SIMD tensor operations)   │
+│  candle-nn       ───────▶  ../aprender  (training primitives)      │
+│  candle-transformers ───▶  ../realizar  (inference serving)        │
+│  datasets/tokenizers ───▶  ../alimentar (data pipelines)           │
+│                                                                     │
+│  STAGE C: Production Integration                                    │
+│  ───────────────────────────────────────                            │
+│  ../trueno + ../aprender + ../realizar = Sovereign AI Runtime      │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### 4.5.1 Candle-to-Sovereign Mapping
+
+| Candle Source | Sovereign Target | Purpose | Conversion Notes |
+|---------------|------------------|---------|------------------|
+| `candle-core/tensor.rs` | `trueno/src/tensor/` | Tensor operations | SIMD-accelerated, AVX-512/NEON |
+| `candle-core/dtype.rs` | `trueno/src/dtype/` | Data types | BF16, FP8 optimizations |
+| `candle-core/device.rs` | `trueno/src/device/` | Device abstraction | Unified CPU/GPU/TPU |
+| `candle-core/quantized/` | `trueno/src/quantized/` | Quantization | GGUF/GGML native |
+| `candle-nn/linear.rs` | `aprender/src/layers/` | Dense layers | Fused operations |
+| `candle-nn/optim.rs` | `aprender/src/optim/` | Optimizers | AdamW, LAMB, etc. |
+| `candle-nn/var_builder.rs` | `aprender/src/checkpoint/` | Weight management | Streaming checkpoints |
+| `candle-transformers/` | `realizar/src/models/` | Model serving | Production inference |
+
+#### 4.5.2 trueno Integration
+
+**trueno** provides the SIMD-accelerated tensor foundation:
+
+```rust
+// trueno tensor operations (../trueno/src/lib.rs)
+use trueno::{Tensor, Device, DType};
+
+// Equivalent to candle-core::Tensor
+let tensor = Tensor::zeros(&[batch, seq_len, hidden], DType::BF16, Device::Cuda(0))?;
+
+// SIMD-optimized matmul (AVX-512, NEON, WASM SIMD)
+let output = tensor.matmul(&weights)?;
+```
+
+**Location**: `../trueno` (local workspace reference)
+
+**Validation**:
+```bash
+# Verify numeric equivalence with candle
+cd ../trueno && cargo test --features candle-compat
+# Compares trueno operations against candle reference implementations
+```
+
+#### 4.5.3 aprender Integration
+
+**aprender** provides training primitives built on trueno:
+
+```rust
+// aprender training loop (../aprender/src/trainer.rs)
+use aprender::{Trainer, TrainerConfig};
+use trueno::Tensor;
+
+let config = TrainerConfig::builder()
+    .learning_rate(1e-4)
+    .warmup_steps(100)
+    .build();
+
+let mut trainer = Trainer::new(model, optimizer, config);
+trainer.train(&dataset)?;
+```
+
+**Location**: `../aprender` (local workspace reference)
+
+**Mapping from HF-GTC**:
+| HF-GTC Module | aprender Equivalent |
+|---------------|---------------------|
+| `training/fine_tuning.py` | `aprender::finetune` |
+| `training/lora.py` | `aprender::peft::LoraConfig` |
+| `training/callbacks.py` | `aprender::callbacks` |
+
+#### 4.5.4 realizar Integration
+
+**realizar** provides production inference serving:
+
+```rust
+// realizar inference server (../realizar/src/server.rs)
+use realizar::{InferenceServer, ModelConfig};
+
+let server = InferenceServer::builder()
+    .model_path("model.safetensors")
+    .device(Device::Cuda(0))
+    .batch_size(32)
+    .build()?;
+
+server.serve("0.0.0.0:8080").await?;
+```
+
+**Location**: `../realizar` (local workspace reference)
+
+**Mapping from HF-GTC**:
+| HF-GTC Module | realizar Equivalent |
+|---------------|---------------------|
+| `inference/pipelines.py` | `realizar::pipeline` |
+| `inference/batch.py` | `realizar::batching` |
+| `deployment/serving.py` | `realizar::server` |
+| `deployment/quantization.py` | `realizar::quantize` |
+
+#### 4.5.5 Full Conversion Workflow
+
+```bash
+# Step 1: Qualify recipe against candle/safetensors
+depyler qualify --recipe src/hf_gtc/inference/pipelines.py \
+  --candle-ref ../candle/candle-transformers/src/models/bert.rs
+
+# Step 2: Convert to trueno primitives
+sovereign-convert --input rust_output/inference/pipelines.rs \
+  --target trueno --output ../trueno/src/generated/
+
+# Step 3: Integrate with aprender (if training recipe)
+sovereign-convert --input rust_output/training/lora.rs \
+  --target aprender --output ../aprender/src/generated/
+
+# Step 4: Integrate with realizar (if inference recipe)
+sovereign-convert --input rust_output/inference/pipelines.rs \
+  --target realizar --output ../realizar/src/generated/
+
+# Step 5: Validate full stack integration
+cd ../trueno && cargo test
+cd ../aprender && cargo test
+cd ../realizar && cargo test
+```
+
+### 4.6 Batuta Oracle Rust Queries
 
 The Batuta oracle supports querying Rust ground truth sources:
 
@@ -736,8 +884,32 @@ The qualification pipeline transforms Python recipes into Depyler-qualified grou
 │                     QUALIFICATION RESULT                            │
 │  ════════════════════════════════════════════════════════════════  │
 │                                                                     │
-│    MQS ≥ 85  →  QUALIFIED  →  Production Ready                     │
+│    MQS ≥ 85  →  QUALIFIED  →  Proceed to Sovereign Stack           │
 │    MQS < 85  →  REJECTED   →  Requires remediation                 │
+│                                                                     │
+│  ════════════════════════════════════════════════════════════════  │
+│                                                                     │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐             │
+│  │   STAGE 7   │    │   STAGE 8   │    │   STAGE 9   │             │
+│  │   Candle    │───▶│  Sovereign  │───▶│ Production  │             │
+│  │  Validate   │    │  Convert    │    │   Deploy    │             │
+│  └─────────────┘    └─────────────┘    └─────────────┘             │
+│        │                  │                  │                      │
+│        ▼                  ▼                  ▼                      │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐             │
+│  │ • candle    │    │ • trueno    │    │ • cargo     │             │
+│  │   cross-val │    │ • aprender  │    │   publish   │             │
+│  │ • safetensor│    │ • realizar  │    │ • integrate │             │
+│  │   round-trip│    │ • alimentar │    │ • benchmark │             │
+│  └─────────────┘    └─────────────┘    └─────────────┘             │
+│                                                                     │
+│  ════════════════════════════════════════════════════════════════  │
+│                   SOVEREIGN STACK OUTPUT                            │
+│  ════════════════════════════════════════════════════════════════  │
+│                                                                     │
+│    ../trueno    →  SIMD tensor operations (production)             │
+│    ../aprender  →  Training primitives (production)                │
+│    ../realizar  →  Inference serving (production)                  │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -872,7 +1044,85 @@ f(x) = 100 × (log(1 + 9x) / log(10))
 
 #### Stage 6: Oracle Registration
 
-Register qualified recipes in Batuta oracle (see Section 7).
+Register qualified recipes in Batuta oracle (see Section 8).
+
+#### Stage 7: Candle/SafeTensors Validation
+
+Cross-validate against HuggingFace Rust implementations:
+
+```bash
+# Validate tensor operations against candle-core
+depyler validate --rust-ref ../candle/candle-core \
+  --recipe rust_output/inference/batch.rs \
+  --tolerance 1e-6
+
+# Validate SafeTensors round-trip
+depyler validate-safetensors \
+  --python-output /tmp/model.safetensors \
+  --rust-reader ../safetensors \
+  --rust-writer ../safetensors
+```
+
+**Validation Checks**:
+- Numeric equivalence with candle (ε=1e-6)
+- SafeTensors round-trip (Python → Rust → Python)
+- Forward pass output matching
+- Device detection parity
+
+#### Stage 8: Sovereign Stack Conversion
+
+Convert validated Rust code to Sovereign AI Stack components:
+
+```bash
+# Convert tensor operations to trueno
+sovereign-convert \
+  --input rust_output/ \
+  --target trueno \
+  --output ../trueno/src/generated/hf_gtc/
+
+# Convert training code to aprender
+sovereign-convert \
+  --input rust_output/training/ \
+  --target aprender \
+  --output ../aprender/src/generated/hf_gtc/
+
+# Convert inference code to realizar
+sovereign-convert \
+  --input rust_output/inference/ \
+  --target realizar \
+  --output ../realizar/src/generated/hf_gtc/
+```
+
+**Conversion Requirements**:
+- Map candle-core operations to trueno equivalents
+- Ensure SIMD optimizations are preserved
+- Maintain numeric precision guarantees
+- Generate appropriate tests for each target
+
+#### Stage 9: Production Deployment
+
+Final integration and deployment to Sovereign AI Stack:
+
+```bash
+# Run full test suite on all targets
+cd ../trueno && cargo test --features hf-gtc
+cd ../aprender && cargo test --features hf-gtc
+cd ../realizar && cargo test --features hf-gtc
+
+# Benchmark performance regression
+cd ../trueno && cargo bench --features hf-gtc
+cd ../aprender && cargo bench --features hf-gtc
+cd ../realizar && cargo bench --features hf-gtc
+
+# Publish to crates.io (if applicable)
+cd ../trueno && cargo publish --dry-run
+```
+
+**Deployment Criteria**:
+- All tests pass in trueno, aprender, realizar
+- No performance regressions (< 5% slowdown)
+- Documentation generated and updated
+- Changelog updated with HF-GTC references
 
 ### 7.3 STOP-THE-LINE Protocol
 
@@ -1740,6 +1990,9 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 |---------|------|--------|---------|
 | 1.0.0-draft | 2026-01-30 | Claude Code | Initial draft |
 | 1.1.0-draft | 2026-01-30 | Claude Code | Added Section 4: Rust Ground Truth Sources (candle, safetensors integration), Section 11.9: Rust Ground Truth Falsification checklist, expanded references |
+| 1.2.0 | 2026-01-30 | Claude Code | Implementation progress: hub.cards, training.callbacks, inference.batch modules |
+| 1.3.0 | 2026-01-30 | Claude Code | Added hub.spaces module, 508 tests, 99% coverage |
+| 1.4.0 | 2026-01-30 | Claude Code | **Major**: Added Sovereign AI Stack conversion pipeline (Section 4.5, Stages 7-9). Final production target now includes trueno, aprender, realizar integration |
 
 ---
 

@@ -137,3 +137,35 @@ roadmap:
   estimated_effort: null
   labels: []
   notes: null
+- id: PMAT-009
+  github_issue: null
+  item_type: task
+  title: Implement dataset streaming module (preprocessing/streaming.py)
+  status: inprogress
+  priority: medium
+  assigned_to: null
+  created: 2026-01-30T11:35:58Z
+  updated: 2026-01-30T11:36:00Z
+  spec: null
+  acceptance_criteria: []
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null
+- id: PMAT-010
+  github_issue: null
+  item_type: task
+  title: Add Sovereign AI Stack conversion pipeline to spec
+  status: completed
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T11:39:37Z
+  updated: 2026-01-30T11:39:42Z
+  spec: null
+  acceptance_criteria: []
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null
