@@ -398,9 +398,9 @@ def get_optimal_batch_size(
         ValueError: If memory_fraction is not in (0, 1].
 
     Examples:
-        >>> get_optimal_batch_size(1000.0, 512, 768, 4)
+        >>> get_optimal_batch_size(30.0, 512, 768, 4)
         16
-        >>> get_optimal_batch_size(100.0, 512, 768, 4)
+        >>> get_optimal_batch_size(1.0, 512, 768, 4)
         1
 
         >>> get_optimal_batch_size(0, 512)  # doctest: +IGNORE_EXCEPTION_DETAIL

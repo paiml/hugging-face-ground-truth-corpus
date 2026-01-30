@@ -228,7 +228,7 @@ def validate_quant_profile(profile: QuantProfile) -> None:
         Traceback (most recent call last):
         ValueError: profile cannot be None
 
-        >>> bad = QuantProfile(bits=3)
+        >>> bad = QuantProfile(bits=5)
         >>> validate_quant_profile(bad)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ValueError: bits must be 2, 3, 4, or 8

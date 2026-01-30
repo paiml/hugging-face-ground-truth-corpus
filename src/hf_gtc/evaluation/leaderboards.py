@@ -404,7 +404,7 @@ def compute_average_score(entry: LeaderboardEntry) -> float:
     Examples:
         >>> scores = [ModelScore("a", 0.8), ModelScore("b", 0.9)]
         >>> entry = LeaderboardEntry("model", 1, scores, "2024-01-01")
-        >>> compute_average_score(entry)
+        >>> round(compute_average_score(entry), 2)
         0.85
 
         >>> empty_entry = LeaderboardEntry("model", 1, [], "2024-01-01")

@@ -254,11 +254,11 @@ def stream_dataset(
         ValueError: If split is empty.
 
     Examples:
-        >>> stream_dataset("")  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> next(stream_dataset(""))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ValueError: dataset_name cannot be empty
 
-        >>> stream_dataset("test", split="")  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> next(stream_dataset("test", split=""))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ValueError: split cannot be empty
     """
@@ -311,7 +311,7 @@ def stream_batches(
         ValueError: If dataset_name is empty.
 
     Examples:
-        >>> stream_batches("")  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> next(stream_batches(""))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ValueError: dataset_name cannot be empty
     """

@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.10.0
+**Version**: 2.10.1
 **Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -36,8 +36,9 @@
 | `hf_gtc.deployment.serving` | COMPLETE | 100% | 79 | PMAT-012 |
 | `hf_gtc.deployment.quantization` | COMPLETE | 96% | 79 | PMAT-016 |
 | `hf_gtc.deployment.gguf` | COMPLETE | 93% | 66 | PMAT-017 |
+| `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 1258 tests, 98.46% coverage, 2726 statements
+**Total**: 1305 tests (1258 core + 47 export), 98.46% coverage, 2726 statements
 
 ---
 
@@ -2234,6 +2235,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.8.1 | 2026-01-30 | Claude Code | **Policy Addition**: Added Sovereign Stack Exclusivity policy. ONLY alimentar permitted for HuggingFace Hub publishing. Python tooling prohibited. |
 | 2.9.0 | 2026-01-30 | Claude Code | **Implementation Requirements**: Added Section 4.6.1 with explicit TODO table for export tooling. Fixed section numbering (4.6.1-4.6.7). Clarified that export script, tests, Makefile target, and dataset card are TODO items. |
 | 2.10.0 | 2026-01-30 | Claude Code | **Export Tooling Complete**: Implemented `scripts/export_corpus.py` (228 functions, 1262 doctests extracted), `tests/unit/test_export_corpus.py` (47 tests), `make export` target, and `scripts/dataset_card.md` template. |
+| 2.10.1 | 2026-01-30 | Claude Code | **Doctest Fixes**: Fixed 7 failing doctests - generator validation (force iteration with `next()`), float precision (use `round()`), random seed behavior, invalid test values. All 339 doctests now pass. |
 
 ---
 

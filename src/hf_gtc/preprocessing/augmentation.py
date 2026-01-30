@@ -277,7 +277,7 @@ def random_insert(
     Examples:
         >>> rng = random.Random(42)
         >>> random_insert(["hello", "world"], ["new"], 1, rng=rng)
-        ['hello', 'new', 'world']
+        ['new', 'hello', 'world']
 
         >>> random_insert(["a"], [], 5, rng=rng)
         ['a']

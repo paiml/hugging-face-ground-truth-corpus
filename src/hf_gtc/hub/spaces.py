@@ -311,7 +311,7 @@ def iter_spaces(
         >>> hasattr(it, '__iter__') and hasattr(it, '__next__')
         True
 
-        >>> iter_spaces(sdk="invalid")  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> next(iter_spaces(sdk="invalid"))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ValueError: sdk must be one of ...
     """
