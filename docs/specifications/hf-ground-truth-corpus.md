@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.1.0
+**Version**: 2.2.0
 **Status**: IMPLEMENTATION IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-015
+**PMAT Tickets**: PMAT-001 through PMAT-016
 
 ---
 
@@ -33,8 +33,9 @@
 | `hf_gtc.evaluation.leaderboards` | COMPLETE | 99% | 87 | PMAT-013 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
 | `hf_gtc.deployment.serving` | COMPLETE | 100% | 79 | PMAT-012 |
+| `hf_gtc.deployment.quantization` | COMPLETE | 95% | 79 | PMAT-016 |
 
-**Total**: 1069 tests, 99% coverage, 2318 statements covered
+**Total**: 1148 tests, 99% coverage, 2524 statements covered
 
 ---
 
@@ -2007,6 +2008,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 1.9.0 | 2026-01-30 | Claude Code | Added evaluation.leaderboards module for HuggingFace leaderboard integration, 894 tests, 99% coverage |
 | 2.0.0 | 2026-01-30 | Claude Code | Added training.trainer module for trainer management utilities, 994 tests, 99% coverage |
 | 2.1.0 | 2026-01-30 | Claude Code | Added training.qlora module for QLoRA quantized fine-tuning, 1069 tests, 99% coverage |
+| 2.2.0 | 2026-01-30 | Claude Code | Added deployment.quantization module for model quantization (GPTQ, AWQ), 1148 tests, 99% coverage |
 
 ---
 
