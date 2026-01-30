@@ -57,11 +57,11 @@ roadmap:
   github_issue: null
   item_type: task
   title: Implement dataset utilities module
-  status: planned
+  status: inprogress
   priority: medium
   assigned_to: null
   created: 2026-01-30T11:05:00Z
-  updated: 2026-01-30T11:05:00Z
+  updated: 2026-01-30T11:08:06.929273249+00:00
   spec: null
   acceptance_criteria:
   - Add hf_gtc.preprocessing.datasets with dataset loading and splitting

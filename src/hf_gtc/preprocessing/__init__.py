@@ -11,6 +11,16 @@ Examples:
 
 from __future__ import annotations
 
+from hf_gtc.preprocessing.datasets import (
+    DatasetInfo,
+    create_train_test_split,
+    create_train_val_test_split,
+    filter_by_length,
+    get_dataset_info,
+    rename_columns,
+    sample_dataset,
+    select_columns,
+)
 from hf_gtc.preprocessing.tokenization import (
     create_preprocessing_function,
     preprocess_text,
@@ -18,7 +28,15 @@ from hf_gtc.preprocessing.tokenization import (
 )
 
 __all__ = [
+    "DatasetInfo",
     "create_preprocessing_function",
+    "create_train_test_split",
+    "create_train_val_test_split",
+    "filter_by_length",
+    "get_dataset_info",
     "preprocess_text",
+    "rename_columns",
+    "sample_dataset",
+    "select_columns",
     "tokenize_batch",
 ]
