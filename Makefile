@@ -1,4 +1,4 @@
-.PHONY: setup lint format typecheck test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export
+.PHONY: setup lint format typecheck test test-fast test-unit test-doctest coverage coverage-check comply security check build clean export docs
 
 # Setup
 setup:
@@ -50,6 +50,11 @@ check: lint typecheck coverage-check security
 # Build
 build:
 	uv build
+
+# Generate API documentation
+docs:
+	uv run pdoc -o docs/api src/hf_gtc
+	@echo "API documentation generated in docs/api/"
 
 # Export corpus for alimentar distribution
 export:
