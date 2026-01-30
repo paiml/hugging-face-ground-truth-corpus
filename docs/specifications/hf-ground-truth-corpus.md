@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.5.0
-**Status**: IMPLEMENTATION COMPLETE - P0 REMEDIATION COMPLETE
+**Version**: 2.6.0
+**Status**: IMPLEMENTATION COMPLETE - P0 REMEDIATION COMPLETE - P1 IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -2016,6 +2016,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.3.0 | 2026-01-30 | Claude Code | Added deployment.gguf module for GGUF export, 1214 tests, 98% coverage. **Implementation complete.** |
 | 2.4.0 | 2026-01-30 | Claude Code | **Red Team Audit**: Popperian falsification analysis. 4/5 claims falsified (F-001, F-002, F-005, F-007). Added Appendix C with findings and remediation matrix. |
 | 2.5.0 | 2026-01-30 | Claude Code | **P0 Remediation**: F-001 (126 float comparisons → pytest.approx), F-002 (NFC normalization added to preprocess_text). All adversarial tests pass. |
+| 2.6.0 | 2026-01-30 | Claude Code | **P1 Partial**: F-007 Any elimination (85→53, 38% reduction). Added TypeVar to streaming.py and batch.py for generic functions. |
 
 ---
 
@@ -2092,7 +2093,7 @@ Following the Popperian falsification methodology defined in Section 11, a compr
 | P0 | F-001 Float comparisons | Low | CI stability | **COMPLETE** |
 | P0 | F-002 Unicode normalization | Medium | Cross-platform | **COMPLETE** |
 | P1 | F-005 Assertion quality | High | Quality assurance | Pending |
-| P1 | F-007 Any type elimination | High | Depyler pipeline | Pending |
+| P1 | F-007 Any type elimination | High | Depyler pipeline | **PARTIAL** (85→53) |
 
 ### C.4 Remediation Details
 
@@ -2108,6 +2109,16 @@ Following the Popperian falsification methodology defined in Section 11, a compr
 - New parameter: `unicode_normalize=True` (default enabled)
 - NFC and NFD inputs now produce identical outputs
 - All 44 adversarial Unicode tests pass
+
+#### F-007 Remediation (PARTIAL)
+
+- Reduced `Any` occurrences from 85 to 53 (38% reduction)
+- Added `TypeVar` to `streaming.py`: T, U for generic iterators
+- Updated: `create_stream_iterator`, `map_stream`, `filter_stream`,
+  `take_stream`, `skip_stream`
+- Added `TypeVar` to `batch.py`: T for `create_batches`
+- Remaining 22 direct `Any` types are at HuggingFace/PyTorch API boundaries
+- Remaining 31 `dict[str, Any]` are for metadata/config dictionaries
 
 ### C.5 Popperian Assessment
 
