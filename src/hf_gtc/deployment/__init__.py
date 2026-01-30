@@ -59,6 +59,36 @@ from hf_gtc.deployment.merging import (
     validate_merge_config,
     validate_model_slice,
 )
+from hf_gtc.deployment.onnx import (
+    VALID_EXECUTION_PROVIDERS,
+    VALID_ONNX_OPSET_VERSIONS,
+    VALID_OPTIMIZATION_LEVELS,
+    ExecutionProvider,
+    ExportStats,
+    ONNXExportConfig,
+    ONNXModelInfo,
+    ONNXOpset,
+    ONNXOptimizeConfig,
+    OptimizationLevel,
+    RuntimeConfig,
+    create_export_config,
+    create_optimize_config,
+    create_runtime_config,
+    estimate_onnx_model_size,
+    format_export_stats,
+    format_model_info,
+    get_execution_provider,
+    get_export_config_dict,
+    get_opset_version,
+    get_optimization_level,
+    get_recommended_opset,
+    get_runtime_session_options,
+    list_execution_providers,
+    list_opset_versions,
+    list_optimization_levels,
+    validate_export_config,
+    validate_runtime_config,
+)
 from hf_gtc.deployment.optimization import (
     OptimizationResult,
     QuantizationConfig,
@@ -148,21 +178,67 @@ from hf_gtc.deployment.serving import (
     validate_server_config,
     validate_server_status,
 )
+from hf_gtc.deployment.torchscript import (
+    CompilationStats,
+    FreezeMode,
+    MobileConfig,
+    OptimizationConfig,
+    OptimizeFor,
+    ScriptMode,
+    TorchScriptConfig,
+    TorchScriptInfo,
+    TraceConfig,
+    check_scriptable,
+    create_compilation_stats,
+    create_mobile_config,
+    create_optimization_config,
+    create_torchscript_config,
+    create_torchscript_info,
+    create_trace_config,
+    estimate_script_size,
+    format_compilation_stats,
+    format_torchscript_info,
+    get_freeze_mode,
+    get_mobile_config_dict,
+    get_optimization_config_dict,
+    get_optimize_for,
+    get_recommended_config,
+    get_script_mode,
+    get_torchscript_config_dict,
+    get_trace_config_dict,
+    list_freeze_modes,
+    list_optimize_for_options,
+    list_script_modes,
+    validate_mobile_config,
+    validate_optimization_config,
+    validate_torchscript_config,
+    validate_trace_config,
+)
 
 __all__: list[str] = [
-    # Merging
+    # Constants
     "DENSITY_VALUES",
     "VALID_DTYPES",
+    "VALID_EXECUTION_PROVIDERS",
     "VALID_MERGE_METHODS",
+    "VALID_ONNX_OPSET_VERSIONS",
+    "VALID_OPTIMIZATION_LEVELS",
     "VALID_TENSOR_FORMATS",
     # Quantization
     "AWQConfig",
     "CalibrationConfig",
     "CalibrationMethod",
+    # TorchScript
+    "CompilationStats",
     # SafeTensors
     "DType",
     "DensityType",
+    # ONNX
+    "ExecutionProvider",
+    "ExportStats",
     "FileInfo",
+    # TorchScript
+    "FreezeMode",
     # GGUF
     "GGUFArchitecture",
     "GGUFConfig",
@@ -181,31 +257,58 @@ __all__: list[str] = [
     "MergeConfig",
     "MergeMethod",
     "MergeResult",
+    # TorchScript
+    "MobileConfig",
     "ModelServer",
     "ModelSlice",
+    # ONNX
+    "ONNXExportConfig",
+    "ONNXModelInfo",
+    "ONNXOpset",
+    "ONNXOptimizeConfig",
+    # TorchScript
+    "OptimizationConfig",
+    # ONNX
+    "OptimizationLevel",
     "OptimizationResult",
+    # TorchScript
+    "OptimizeFor",
     "QuantGranularity",
     "QuantMethod",
     "QuantProfile",
     "QuantResult",
     "QuantizationConfig",
     "QuantizationType",
+    # ONNX
+    "RuntimeConfig",
     "SaveConfig",
+    # TorchScript
+    "ScriptMode",
     "ServerConfig",
     "ServerStatus",
     "TensorFormat",
     "TensorInfo",
+    # TorchScript
+    "TorchScriptConfig",
+    "TorchScriptInfo",
+    "TraceConfig",
     # Functions - Quantization
     "calculate_compression_ratio",
     # Functions - SafeTensors
     "calculate_memory_savings",
     # Functions - Merging
     "calculate_merged_parameter_count",
+    # Functions - TorchScript
+    "check_scriptable",
     "compute_compression_ratio",
     # Functions - Serving
     "compute_server_metrics",
     "create_awq_config",
     "create_calibration_config",
+    # Functions - TorchScript
+    "create_compilation_stats",
+    # Functions - ONNX
+    "create_export_config",
     # Functions - GGUF
     "create_gguf_config",
     "create_gguf_export_result",
@@ -214,24 +317,54 @@ __all__: list[str] = [
     "create_load_config",
     "create_merge_config",
     "create_metadata",
+    # Functions - TorchScript
+    "create_mobile_config",
     "create_model_slice",
+    # Functions - TorchScript
+    "create_optimization_config",
+    # Functions - ONNX
+    "create_optimize_config",
     "create_quant_profile",
     "create_quant_result",
+    # Functions - ONNX
+    "create_runtime_config",
     "create_save_config",
     "create_server",
+    # Functions - TorchScript
+    "create_torchscript_config",
+    "create_torchscript_info",
+    "create_trace_config",
     "estimate_file_size",
     "estimate_gguf_size",
     "estimate_merge_time",
     "estimate_model_size",
+    # Functions - ONNX
+    "estimate_onnx_model_size",
     "estimate_quantized_size",
+    # Functions - TorchScript
+    "estimate_script_size",
+    # Functions - TorchScript
+    "format_compilation_stats",
+    # Functions - ONNX
+    "format_export_stats",
     "format_gguf_export_result",
     "format_gguf_model_info",
+    # Functions - ONNX
+    "format_model_info",
     "format_quant_result",
     "format_server_info",
     "format_size",
+    # Functions - TorchScript
+    "format_torchscript_info",
     "get_awq_dict",
     "get_calibration_method",
     "get_density_value",
+    # Functions - ONNX
+    "get_execution_provider",
+    # Functions - ONNX
+    "get_export_config_dict",
+    # Functions - TorchScript
+    "get_freeze_mode",
     "get_gguf_architecture",
     "get_gguf_config_dict",
     "get_gguf_filename",
@@ -240,26 +373,59 @@ __all__: list[str] = [
     "get_gptq_dict",
     "get_health_status",
     "get_inference_backend",
+    # Functions - TorchScript
+    "get_mobile_config_dict",
     "get_model_loading_kwargs",
+    # Functions - ONNX
+    "get_opset_version",
+    # Functions - TorchScript
+    "get_optimization_config_dict",
+    # Functions - ONNX
+    "get_optimization_level",
     "get_optimization_result",
+    # Functions - TorchScript
+    "get_optimize_for",
     "get_quant_granularity",
     "get_quant_method",
     "get_quantization_config",
+    # Functions - TorchScript
+    "get_recommended_config",
     "get_recommended_dtype",
     "get_recommended_gguf_quant",
     "get_recommended_method",
+    # Functions - ONNX
+    "get_recommended_opset",
     "get_recommended_profile",
+    # Functions - ONNX
+    "get_runtime_session_options",
+    # Functions - TorchScript
+    "get_script_mode",
     "get_server_status",
+    # Functions - TorchScript
+    "get_torchscript_config_dict",
+    "get_trace_config_dict",
     "linear_interpolate",
     "list_calibration_methods",
     "list_dtypes",
+    # Functions - ONNX
+    "list_execution_providers",
+    # Functions - TorchScript
+    "list_freeze_modes",
     "list_gguf_architectures",
     "list_gguf_quant_types",
     "list_inference_backends",
     "list_merge_methods",
+    # Functions - ONNX
+    "list_opset_versions",
+    # Functions - ONNX
+    "list_optimization_levels",
+    # Functions - TorchScript
+    "list_optimize_for_options",
     "list_quant_granularities",
     "list_quant_methods",
     "list_quantization_types",
+    # Functions - TorchScript
+    "list_script_modes",
     "list_server_statuses",
     "list_tensor_formats",
     "process_batch",
@@ -269,6 +435,8 @@ __all__: list[str] = [
     "stop_server",
     "validate_calibration_config",
     "validate_calibration_method",
+    # Functions - ONNX
+    "validate_export_config",
     "validate_gguf_architecture",
     "validate_gguf_config",
     "validate_gguf_metadata",
@@ -276,12 +444,21 @@ __all__: list[str] = [
     "validate_inference_backend",
     "validate_load_config",
     "validate_merge_config",
+    # Functions - TorchScript
+    "validate_mobile_config",
     "validate_model_slice",
+    # Functions - TorchScript
+    "validate_optimization_config",
     "validate_quant_granularity",
     "validate_quant_method",
     "validate_quant_profile",
+    # Functions - ONNX
+    "validate_runtime_config",
     "validate_save_config",
     "validate_server_config",
     "validate_server_status",
     "validate_tensor_name",
+    # Functions - TorchScript
+    "validate_torchscript_config",
+    "validate_trace_config",
 ]

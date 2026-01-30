@@ -1,7 +1,7 @@
 """Agent and tool use recipes for HuggingFace models.
 
 This module provides utilities for building agents with tool use
-capabilities, including ReAct patterns and function calling.
+capabilities, including ReAct patterns, function calling, and memory management.
 
 Examples:
     >>> from hf_gtc.agents import ToolDefinition, ToolType
@@ -13,10 +13,68 @@ Examples:
     ... )
     >>> tool.name
     'calculator'
+
+    >>> from hf_gtc.agents import create_buffer_config, MemoryType
+    >>> config = create_buffer_config(max_messages=100)
+    >>> config.max_messages
+    100
 """
 
 from __future__ import annotations
 
+from hf_gtc.agents.memory import (
+    VALID_MEMORY_TYPES,
+    BufferConfig,
+    ConversationMessage,
+    EntityConfig,
+    MemoryConfig,
+    MemoryStats,
+    MemoryType,
+    SummaryConfig,
+    WindowConfig,
+    calculate_memory_size_bytes,
+    calculate_window_messages,
+    create_buffer_config,
+    create_conversation_message,
+    create_entity_config,
+    create_memory_config,
+    create_memory_stats,
+    create_summary_config,
+    create_window_config,
+    estimate_memory_tokens,
+    format_memory_stats,
+    get_memory_type,
+    get_recommended_buffer_config,
+    list_memory_types,
+    validate_buffer_config,
+    validate_entity_config,
+    validate_memory_config,
+    validate_summary_config,
+    validate_window_config,
+)
+from hf_gtc.agents.planning import (
+    VALID_PLANNING_STRATEGIES,
+    VALID_TASK_STATUSES,
+    ExecutionPlan,
+    PlanConfig,
+    PlanningStats,
+    PlanningStrategy,
+    PlanStep,
+    TaskNode,
+    TaskStatus,
+    calculate_plan_progress,
+    create_execution_plan,
+    create_plan_config,
+    create_plan_step,
+    create_task_node,
+    estimate_plan_complexity,
+    get_planning_strategy,
+    get_task_status,
+    list_planning_strategies,
+    list_task_statuses,
+    validate_plan_config,
+    validate_task_node,
+)
 from hf_gtc.agents.tools import (
     VALID_TOOL_TYPES,
     AgentConfig,
@@ -41,24 +99,73 @@ from hf_gtc.agents.tools import (
 )
 
 __all__: list[str] = [
+    "VALID_MEMORY_TYPES",
+    "VALID_PLANNING_STRATEGIES",
+    "VALID_TASK_STATUSES",
     "VALID_TOOL_TYPES",
     "AgentConfig",
     "AgentState",
     "AgentStep",
+    "BufferConfig",
+    "ConversationMessage",
+    "EntityConfig",
+    "ExecutionPlan",
+    "MemoryConfig",
+    "MemoryStats",
+    "MemoryType",
+    "PlanConfig",
+    "PlanStep",
+    "PlanningStats",
+    "PlanningStrategy",
     "ReActConfig",
+    "SummaryConfig",
+    "TaskNode",
+    "TaskStatus",
     "ToolCall",
     "ToolDefinition",
     "ToolResult",
     "ToolType",
+    "WindowConfig",
+    "calculate_memory_size_bytes",
+    "calculate_plan_progress",
+    "calculate_window_messages",
     "create_agent_config",
+    "create_buffer_config",
+    "create_conversation_message",
+    "create_entity_config",
+    "create_execution_plan",
+    "create_memory_config",
+    "create_memory_stats",
+    "create_plan_config",
+    "create_plan_step",
     "create_react_config",
+    "create_summary_config",
+    "create_task_node",
     "create_tool_call",
     "create_tool_definition",
     "create_tool_result",
+    "create_window_config",
+    "estimate_memory_tokens",
+    "estimate_plan_complexity",
+    "format_memory_stats",
     "format_tool_for_prompt",
+    "get_memory_type",
+    "get_planning_strategy",
+    "get_recommended_buffer_config",
+    "get_task_status",
     "get_tool_type",
+    "list_memory_types",
+    "list_planning_strategies",
+    "list_task_statuses",
     "list_tool_types",
     "parse_tool_call",
     "validate_agent_config",
+    "validate_buffer_config",
+    "validate_entity_config",
+    "validate_memory_config",
+    "validate_plan_config",
+    "validate_summary_config",
+    "validate_task_node",
     "validate_tool_definition",
+    "validate_window_config",
 ]

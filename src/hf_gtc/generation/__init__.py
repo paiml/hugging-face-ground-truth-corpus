@@ -1,21 +1,48 @@
 """Generation utilities for image, video, and text generation.
 
 This module provides utilities for working with diffusion models
-including Stable Diffusion, SDXL, and text generation sampling.
+including Stable Diffusion, SDXL, text generation sampling, and chat.
 
 Examples:
-    >>> from hf_gtc.generation import diffusers, sampling
+    >>> from hf_gtc.generation import diffusers, sampling, chat
     >>> config = diffusers.create_generation_config(num_inference_steps=20)
     >>> config.num_inference_steps
     20
     >>> samp = sampling.create_sampling_config(temperature=0.7)
     >>> samp.temperature
     0.7
+    >>> msg = chat.create_chat_message("user", "Hello!")
+    >>> msg.content
+    'Hello!'
 """
 
 from __future__ import annotations
 
-from hf_gtc.generation import diffusers
+from hf_gtc.generation import chat, diffusers
+from hf_gtc.generation.chat import (
+    VALID_MESSAGE_ROLES,
+    VALID_TEMPLATE_FORMATS,
+    VALID_TRUNCATION_STRATEGIES,
+    ChatConfig,
+    ChatMessage,
+    ChatStats,
+    ChatTemplateFormat,
+    ConversationConfig,
+    MessageRole,
+    TemplateConfig,
+    count_conversation_tokens,
+    create_chat_config,
+    create_chat_message,
+    create_conversation_config,
+    create_template_config,
+    format_chat_prompt,
+    get_message_role,
+    get_template_format,
+    list_message_roles,
+    list_template_formats,
+    validate_chat_config,
+    validate_chat_message,
+)
 from hf_gtc.generation.sampling import (
     VALID_STOP_CRITERIA,
     VALID_STRATEGIES,
@@ -39,28 +66,105 @@ from hf_gtc.generation.sampling import (
     validate_generation_constraints,
     validate_sampling_config,
 )
+from hf_gtc.generation.structured import (
+    VALID_OUTPUT_FORMATS,
+    VALID_SCHEMA_TYPES,
+    ChoicesConfig,
+    GrammarConfig,
+    JSONSchemaConfig,
+    OutputFormat,
+    SchemaType,
+    StructuredConfig,
+    ValidationResult,
+    create_choices_config,
+    create_grammar_config,
+    create_json_schema_config,
+    create_structured_config,
+    create_validation_result,
+    estimate_structured_tokens,
+    format_validation_result,
+    get_output_format,
+    get_recommended_structured_config,
+    get_schema_type,
+    list_output_formats,
+    list_schema_types,
+    validate_choices_config,
+    validate_grammar_config,
+    validate_json_output,
+    validate_json_schema_config,
+    validate_structured_config,
+)
 
 __all__: list[str] = [
+    "VALID_MESSAGE_ROLES",
+    "VALID_OUTPUT_FORMATS",
+    "VALID_SCHEMA_TYPES",
     "VALID_STOP_CRITERIA",
     "VALID_STRATEGIES",
+    "VALID_TEMPLATE_FORMATS",
+    "VALID_TRUNCATION_STRATEGIES",
     "BeamSearchConfig",
+    "ChatConfig",
+    "ChatMessage",
+    "ChatStats",
+    "ChatTemplateFormat",
+    "ChoicesConfig",
     "ContrastiveConfig",
+    "ConversationConfig",
     "GenerationConstraints",
+    "GrammarConfig",
+    "JSONSchemaConfig",
+    "MessageRole",
+    "OutputFormat",
     "SamplingConfig",
     "SamplingStrategy",
+    "SchemaType",
     "StoppingCriteria",
+    "StructuredConfig",
+    "TemplateConfig",
+    "ValidationResult",
     "calculate_effective_vocab_size",
+    "chat",
+    "count_conversation_tokens",
     "create_beam_search_config",
+    "create_chat_config",
+    "create_chat_message",
+    "create_choices_config",
     "create_contrastive_config",
+    "create_conversation_config",
     "create_generation_constraints",
+    "create_grammar_config",
+    "create_json_schema_config",
     "create_sampling_config",
     "create_stopping_criteria",
+    "create_structured_config",
+    "create_template_config",
+    "create_validation_result",
     "diffusers",
     "estimate_generation_memory",
+    "estimate_structured_tokens",
+    "format_chat_prompt",
+    "format_validation_result",
+    "get_message_role",
+    "get_output_format",
     "get_recommended_config",
+    "get_recommended_structured_config",
     "get_sampling_strategy",
+    "get_schema_type",
+    "get_template_format",
+    "list_message_roles",
+    "list_output_formats",
     "list_sampling_strategies",
+    "list_schema_types",
+    "list_template_formats",
     "validate_beam_search_config",
+    "validate_chat_config",
+    "validate_chat_message",
+    "validate_choices_config",
     "validate_generation_constraints",
+    "validate_grammar_config",
+    "validate_json_output",
+    "validate_json_schema_config",
     "validate_sampling_config",
+    "validate_structured_config",
 ]

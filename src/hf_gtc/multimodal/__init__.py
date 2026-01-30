@@ -1,17 +1,80 @@
 """Multimodal recipes for HuggingFace models.
 
 This module provides utilities for vision-language models,
-image processing, and multimodal inference.
+image processing, video processing, document understanding, and multimodal inference.
 
 Examples:
-    >>> from hf_gtc.multimodal import ImageConfig, VisionModelType
-    >>> config = ImageConfig(width=224, height=224)
+    >>> from hf_gtc.multimodal import create_image_config
+    >>> config = create_image_config(width=224, height=224)
     >>> config.width
     224
+
+    >>> from hf_gtc.multimodal import create_video_config
+    >>> video_cfg = create_video_config(model_type="videomae", num_frames=16)
+    >>> video_cfg.num_frames
+    16
+
+    >>> from hf_gtc.multimodal import create_document_config
+    >>> doc_cfg = create_document_config(model_type="layoutlmv3")
+    >>> doc_cfg.model_type
+    <DocumentModelType.LAYOUTLMV3: 'layoutlmv3'>
 """
 
 from __future__ import annotations
 
+from hf_gtc.multimodal.document import (
+    BoundingBoxConfig,
+    DocumentConfig,
+    DocumentModelType,
+    DocumentProcessingConfig,
+    DocumentStats,
+    DocumentTask,
+    OCRBackend,
+    OCRConfig,
+    create_bounding_box_config,
+    create_document_config,
+    create_document_processing_config,
+    create_ocr_config,
+    estimate_document_tokens,
+    get_default_document_config,
+    get_default_ocr_config,
+    get_document_model_type,
+    get_document_task,
+    get_ocr_backend,
+    list_document_model_types,
+    list_document_tasks,
+    list_ocr_backends,
+    normalize_bounding_box,
+    validate_document_config,
+    validate_ocr_config,
+)
+from hf_gtc.multimodal.video import (
+    FrameConfig,
+    FrameSamplingStrategy,
+    VideoClassificationConfig,
+    VideoConfig,
+    VideoModelType,
+    VideoProcessingConfig,
+    VideoStats,
+    VideoTask,
+    calculate_frame_indices,
+    create_frame_config,
+    create_video_classification_config,
+    create_video_config,
+    create_video_processing_config,
+    create_video_stats,
+    estimate_video_memory,
+    format_video_duration,
+    get_recommended_video_config,
+    get_sampling_strategy,
+    get_video_model_type,
+    get_video_task,
+    list_sampling_strategies,
+    list_video_model_types,
+    list_video_tasks,
+    validate_frame_config,
+    validate_video_config,
+)
 from hf_gtc.multimodal.vision import (
     ImageConfig,
     ImageInput,
@@ -41,29 +104,81 @@ from hf_gtc.multimodal.vision import (
 )
 
 __all__: list[str] = [
+    # Document
+    "BoundingBoxConfig",
+    "DocumentConfig",
+    "DocumentModelType",
+    "DocumentProcessingConfig",
+    "DocumentStats",
+    "DocumentTask",
+    # Video
+    "FrameConfig",
+    "FrameSamplingStrategy",
+    # Vision
     "ImageConfig",
     "ImageInput",
     "ImageProcessor",
     "ModalityType",
     "MultimodalConfig",
     "MultimodalInput",
+    "OCRBackend",
+    "OCRConfig",
+    "VideoClassificationConfig",
+    "VideoConfig",
+    "VideoModelType",
+    "VideoProcessingConfig",
+    "VideoStats",
+    "VideoTask",
     "VisionEncoderConfig",
     "VisionModelType",
+    "calculate_frame_indices",
     "calculate_image_tokens",
     "calculate_patch_count",
+    "create_bounding_box_config",
+    "create_document_config",
+    "create_document_processing_config",
+    "create_frame_config",
     "create_image_config",
     "create_image_input",
     "create_multimodal_config",
+    "create_ocr_config",
+    "create_video_classification_config",
+    "create_video_config",
+    "create_video_processing_config",
+    "create_video_stats",
     "create_vision_encoder_config",
+    "estimate_document_tokens",
     "estimate_multimodal_memory",
+    "estimate_video_memory",
     "format_image_size",
+    "format_video_duration",
+    "get_default_document_config",
     "get_default_image_size",
+    "get_default_ocr_config",
+    "get_document_model_type",
+    "get_document_task",
     "get_modality_type",
+    "get_ocr_backend",
     "get_recommended_processor",
+    "get_recommended_video_config",
+    "get_sampling_strategy",
+    "get_video_model_type",
+    "get_video_task",
     "get_vision_model_type",
+    "list_document_model_types",
+    "list_document_tasks",
     "list_modality_types",
+    "list_ocr_backends",
+    "list_sampling_strategies",
+    "list_video_model_types",
+    "list_video_tasks",
     "list_vision_model_types",
+    "normalize_bounding_box",
+    "validate_document_config",
+    "validate_frame_config",
     "validate_image_config",
     "validate_image_dimensions",
     "validate_multimodal_config",
+    "validate_ocr_config",
+    "validate_video_config",
 ]

@@ -1,7 +1,7 @@
 """Audio processing recipes for HuggingFace models.
 
 This module provides utilities for speech-to-text, text-to-speech,
-and audio processing.
+music generation, and audio processing.
 
 Examples:
     >>> from hf_gtc.audio import WhisperConfig, AudioFormat
@@ -17,6 +17,33 @@ Examples:
 
 from __future__ import annotations
 
+from hf_gtc.audio.music import (
+    QUALITY_BITRATES,
+    VALID_AUDIO_QUALITIES,
+    VALID_MUSIC_GENRES,
+    VALID_MUSIC_MODEL_TYPES,
+    AudioOutputConfig,
+    AudioQuality,
+    MelodyConfig,
+    MusicConditioningConfig,
+    MusicGenConfig,
+    MusicGenerationStats,
+    MusicGenre,
+    MusicModelType,
+    calculate_audio_file_size,
+    create_audio_output_config,
+    create_music_conditioning_config,
+    create_music_gen_config,
+    estimate_generation_time,
+    get_audio_quality,
+    get_music_genre,
+    get_music_model_type,
+    list_audio_qualities,
+    list_music_genres,
+    list_music_model_types,
+    validate_melody_config,
+    validate_music_gen_config,
+)
 from hf_gtc.audio.speech import (
     VALID_AUDIO_FORMATS,
     VALID_LANGUAGES,
@@ -49,32 +76,57 @@ from hf_gtc.audio.speech import (
 )
 
 __all__: list[str] = [
+    "QUALITY_BITRATES",
     "VALID_AUDIO_FORMATS",
+    "VALID_AUDIO_QUALITIES",
     "VALID_LANGUAGES",
+    "VALID_MUSIC_GENRES",
+    "VALID_MUSIC_MODEL_TYPES",
     "VALID_TASKS",
     "VALID_WHISPER_SIZES",
     "AudioConfig",
     "AudioFormat",
+    "AudioOutputConfig",
+    "AudioQuality",
+    "MelodyConfig",
+    "MusicConditioningConfig",
+    "MusicGenConfig",
+    "MusicGenerationStats",
+    "MusicGenre",
+    "MusicModelType",
     "SpeechTask",
     "TTSConfig",
     "TranscriptionResult",
     "WhisperConfig",
     "WhisperSize",
     "calculate_audio_duration",
+    "calculate_audio_file_size",
     "create_audio_config",
+    "create_audio_output_config",
+    "create_music_conditioning_config",
+    "create_music_gen_config",
     "create_transcription_result",
     "create_tts_config",
     "create_whisper_config",
+    "estimate_generation_time",
     "estimate_transcription_time",
     "format_timestamp",
     "get_audio_format",
+    "get_audio_quality",
+    "get_music_genre",
+    "get_music_model_type",
     "get_recommended_whisper_size",
     "get_speech_task",
     "get_whisper_size",
     "list_audio_formats",
+    "list_audio_qualities",
+    "list_music_genres",
+    "list_music_model_types",
     "list_speech_tasks",
     "list_supported_languages",
     "list_whisper_sizes",
     "validate_audio_config",
+    "validate_melody_config",
+    "validate_music_gen_config",
     "validate_whisper_config",
 ]
