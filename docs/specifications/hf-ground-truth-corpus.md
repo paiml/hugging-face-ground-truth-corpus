@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.17.0
-**Status**: COMPLETE - MULTIMODAL & DEPLOYMENT EXPANSION
+**Version**: 2.18.0
+**Status**: COMPLETE - ADVANCED ML PATTERNS EXPANSION
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -43,9 +43,17 @@
 | `hf_gtc.deployment.safetensors` | COMPLETE | 100% | 86 | PMAT-018 |
 | `hf_gtc.deployment.merging` | COMPLETE | 100% | 90 | PMAT-018 |
 | `hf_gtc.multimodal.vision` | COMPLETE | 100% | 127 | PMAT-018 |
+| `hf_gtc.generation.sampling` | COMPLETE | 100% | 68 | PMAT-011 |
+| `hf_gtc.inference.optimization` | COMPLETE | 100% | 56 | PMAT-011 |
+| `hf_gtc.preprocessing.tokenizer_training` | COMPLETE | 98% | 52 | PMAT-011 |
+| `hf_gtc.hub.collections` | COMPLETE | 100% | 68 | PMAT-011 |
+| `hf_gtc.audio.speech` | COMPLETE | 92% | 68 | PMAT-011 |
+| `hf_gtc.agents.tools` | COMPLETE | 100% | 68 | PMAT-011 |
+| `hf_gtc.rag.retrieval` | COMPLETE | 98% | 62 | PMAT-011 |
+| `hf_gtc.training.distributed` | COMPLETE | 95% | 57 | PMAT-011 |
 | `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 1889 tests (1842 core + 47 export), ~98% coverage
+**Total**: 2388 tests (2341 core + 47 export), ~98% coverage
 
 ---
 
@@ -2273,6 +2281,8 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.14.1 | 2026-01-30 | Claude Code | **Zero Type Ignore Complete**: All `type: ignore` comments eliminated from src/. BiasType Literal added to lora.py, importlib dynamic import in pipelines.py (bypasses complex transformers overloads), runtime DatasetDict import in datasets.py. All quality gates pass: 1305 tests, 98.17% coverage, 0 type ignores. |
 | 2.15.0 | 2026-01-30 | Claude Code | **New Modules**: Added generation/diffusers (77 tests), training/trl (62 tests), inference/embeddings (67 tests). Added pdoc for API documentation (`make docs`). Added mutmut for mutation testing (`make mutation`). Total: 1511 tests, 97.97% coverage. |
 | 2.16.0 | 2026-01-30 | Claude Code | **Evaluate Module**: Added evaluation/evaluate (75 tests) for HuggingFace evaluate library patterns. Includes MetricConfig, metric computation (accuracy, precision, recall, F1, MSE, MAE), metric aggregation, and task recommendations. Total: 1586 tests. |
+| 2.17.0 | 2026-01-30 | Claude Code | **Multimodal & Deployment**: Added deployment/safetensors (86 tests), deployment/merging (90 tests), multimodal/vision (127 tests). Total: 1889 tests. |
+| 2.18.0 | 2026-01-30 | Claude Code | **Advanced ML Patterns**: Added 8 new modules - generation/sampling (68 tests), inference/optimization (56 tests), preprocessing/tokenizer_training (52 tests), hub/collections (68 tests), audio/speech (68 tests), agents/tools (68 tests), rag/retrieval (62 tests), training/distributed (57 tests). Total: 2388 tests, 97.86% coverage. |
 
 ---
 
