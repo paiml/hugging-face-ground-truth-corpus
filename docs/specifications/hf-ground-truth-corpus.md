@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.15.0
+**Version**: 2.16.0
 **Status**: COMPLETE - EXPANDED WITH NEW MODULES
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -39,9 +39,10 @@
 | `hf_gtc.generation.diffusers` | COMPLETE | 100% | 77 | PMAT-010 |
 | `hf_gtc.training.trl` | COMPLETE | 87% | 62 | PMAT-010 |
 | `hf_gtc.inference.embeddings` | COMPLETE | 99% | 67 | PMAT-010 |
+| `hf_gtc.evaluation.evaluate` | COMPLETE | 100% | 75 | PMAT-010 |
 | `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 1511 tests (1464 core + 47 export), 97.97% coverage, 3122 statements
+**Total**: 1586 tests (1539 core + 47 export), 97.97% coverage, 3251 statements
 
 ---
 
@@ -2268,6 +2269,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.14.0 | 2026-01-30 | Claude Code | **Zero Type Ignore Policy**: Added F-T5/F-T6 falsification checks. Prohibited `type: ignore` and `Any` in src/. Requires elimination of all 4 type: ignore comments added in v2.13.0. |
 | 2.14.1 | 2026-01-30 | Claude Code | **Zero Type Ignore Complete**: All `type: ignore` comments eliminated from src/. BiasType Literal added to lora.py, importlib dynamic import in pipelines.py (bypasses complex transformers overloads), runtime DatasetDict import in datasets.py. All quality gates pass: 1305 tests, 98.17% coverage, 0 type ignores. |
 | 2.15.0 | 2026-01-30 | Claude Code | **New Modules**: Added generation/diffusers (77 tests), training/trl (62 tests), inference/embeddings (67 tests). Added pdoc for API documentation (`make docs`). Added mutmut for mutation testing (`make mutation`). Total: 1511 tests, 97.97% coverage. |
+| 2.16.0 | 2026-01-30 | Claude Code | **Evaluate Module**: Added evaluation/evaluate (75 tests) for HuggingFace evaluate library patterns. Includes MetricConfig, metric computation (accuracy, precision, recall, F1, MSE, MAE), metric aggregation, and task recommendations. Total: 1586 tests. |
 
 ---
 
