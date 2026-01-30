@@ -189,3 +189,24 @@ roadmap:
   estimated_effort: null
   labels: []
   notes: null
+- id: PMAT-027
+  github_issue: null
+  item_type: task
+  title: Implement prompt engineering module (generation/prompts.py)
+  status: completed
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T18:00:00Z
+  updated: 2026-01-30T18:30:00Z
+  spec: null
+  acceptance_criteria:
+  - Implement PromptTemplate with variable substitution
+  - Add FewShotConfig for few-shot learning
+  - Add ChainOfThoughtConfig for reasoning prompts
+  - Add SystemPromptConfig for persona/constraints
+  - Achieve 95%+ test coverage
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null

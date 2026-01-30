@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.21.0
+**Version**: 2.22.0
 **Status**: COMPLETE - COMPREHENSIVE ML PATTERNS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-026
+**PMAT Tickets**: PMAT-001 through PMAT-027
 
 ---
 
@@ -57,6 +57,7 @@
 | `hf_gtc.agents.planning` | COMPLETE | 100% | 67 | PMAT-020 |
 | `hf_gtc.generation.structured` | COMPLETE | 100% | 85 | PMAT-021 |
 | `hf_gtc.generation.chat` | COMPLETE | 99% | 75 | PMAT-021 |
+| `hf_gtc.generation.prompts` | COMPLETE | 97% | 148 | PMAT-027 |
 | `hf_gtc.inference.streaming` | COMPLETE | 100% | 72 | PMAT-021 |
 | `hf_gtc.multimodal.video` | COMPLETE | 99% | 85 | PMAT-022 |
 | `hf_gtc.multimodal.document` | COMPLETE | 100% | 90 | PMAT-022 |
@@ -71,8 +72,8 @@
 | `hf_gtc.deployment.torchscript` | COMPLETE | 100% | 88 | PMAT-025 |
 | `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 4979 tests, 98.40% coverage
-**Complete**: All 17 expansion modules across PMAT-020 through PMAT-025, plus knowledge distillation (PMAT-026)
+**Total**: 5127 tests, 98.35% coverage
+**Complete**: All 17 expansion modules across PMAT-020 through PMAT-025, plus knowledge distillation (PMAT-026) and prompt engineering (PMAT-027)
 
 ---
 
@@ -2305,6 +2306,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.19.0 | 2026-01-30 | Claude Code | **Comprehensive ML Patterns**: Planned 17 new modules across 6 PMAT tickets: RAG expansion (indexing, reranking), agents expansion (memory, planning), generation expansion (structured, chat), inference streaming, multimodal expansion (video, document), audio music, safety (guardrails, watermarking), training alignment (DPO, PPO), deployment formats (ONNX, TFLite, TorchScript). |
 | 2.20.0 | 2026-01-30 | Claude Code | **Complete ML Patterns**: Implemented all 17 planned modules - RAG (indexing 89%, reranking 100%), agents (memory 100%, planning 100%), generation (structured 100%, chat 99%), inference (streaming 100%), multimodal (video 99%, document 100%), audio (music 100%), safety (guardrails 100%, watermarking 98%), training (DPO 100%, PPO 100%), deployment (ONNX 100%, TFLite 100%, TorchScript 100%). Total: 4814 tests, 98.37% coverage. |
 | 2.21.0 | 2026-01-30 | Claude Code | **Knowledge Distillation**: Added training/distillation module (165 tests, 99% coverage) with teacher-student model compression, soft label training, temperature scheduling, and feature matching patterns. Total: 4979 tests, 98.40% coverage. |
+| 2.22.0 | 2026-01-30 | Claude Code | **Prompt Engineering**: Added generation/prompts module (148 tests, 97% coverage) with PromptTemplate, FewShotConfig, ChainOfThoughtConfig, SystemPromptConfig, and utility functions for prompt formatting and optimization. Total: 5127 tests, 98.35% coverage. |
 
 ---
 
