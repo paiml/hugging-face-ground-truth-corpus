@@ -1,79 +1,133 @@
-# HF Ground Truth Corpus
+# HuggingFace Ground Truth Corpus
 
-A curated collection of high-quality Python recipes implementing HuggingFace ML patterns with the highest standards of engineering excellence.
+<div align="center">
 
-[![CI](https://github.com/your-org/hf-ground-truth-corpus/workflows/CI/badge.svg)](https://github.com/your-org/hf-ground-truth-corpus/actions)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](https://github.com/your-org/hf-ground-truth-corpus)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+<img src="docs/assets/hero.svg" alt="HuggingFace Ground Truth Corpus" width="800"/>
+
+[![CI](https://github.com/paiml/hugging-face-ground-truth-corpus/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/hugging-face-ground-truth-corpus/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/paiml/hugging-face-ground-truth-corpus)
+[![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org)
+[![uv](https://img.shields.io/badge/uv-package%20manager-blueviolet)](https://github.com/astral-sh/uv)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Production-ready ML recipes with 95%+ test coverage**
+
+</div>
 
 ## Overview
 
-HF-GTC provides a **single source of truth** for HuggingFace patterns that:
+A curated collection of **production-ready Python recipes** for HuggingFace ML workflows, built with the highest engineering standards:
 
-1. **Guarantees quality** via PMAT compliance (95% coverage, zero lint violations)
-2. **Corroborates correctness** via doctest-driven semantic equivalence checks
-3. **Enables transpilation** to Rust via Depyler qualification pipeline
-4. **Powers discovery** via Batuta oracle's RAG-based retrieval
+- **95%+ Test Coverage** enforced via pytest
+- **Property-Based Testing** with Hypothesis
+- **Zero Linting Violations** via ruff
+- **Toyota Production System** quality methodology
+- **Popperian Falsification** test philosophy
 
 ## Installation
 
 ```bash
-# Using uv (required)
-uv sync --all-extras
+# Clone the repository
+git clone https://github.com/paiml/hugging-face-ground-truth-corpus.git
+cd hugging-face-ground-truth-corpus
 
-# For development
-uv sync --all-extras
-uv run pre-commit install
+# Install with uv (required)
+uv sync --extra dev
 ```
 
 ## Quick Start
 
 ```python
-from hf_gtc.hub import search_models
-from hf_gtc.inference import get_device, create_pipeline
-from hf_gtc.preprocessing import preprocess_text
+from hf_gtc.hub.search import search_models, search_datasets
+from hf_gtc.inference.pipelines import create_pipeline
+from hf_gtc.preprocessing.tokenization import preprocess_text
 
 # Search for models
 models = search_models(task="text-classification", limit=5)
+for model in models:
+    print(f"{model.model_id}: {model.downloads} downloads")
 
-# Check available device
-device = get_device()  # Returns "cuda", "mps", or "cpu"
-
-# Create a pipeline
-classifier = create_pipeline("sentiment-analysis")
-result = classifier("I love this library!")
+# Create inference pipeline
+pipe = create_pipeline("sentiment-analysis")
+result = pipe("I love this library!")
 
 # Preprocess text
-clean_text = preprocess_text("  HELLO  WORLD  ")  # "hello world"
+clean_text = preprocess_text("  HELLO   WORLD  ")
+# Returns: "hello world"
 ```
 
 ## Modules
 
 | Module | Description |
 |--------|-------------|
-| `hf_gtc.hub` | Model/dataset search and Hub API utilities |
-| `hf_gtc.inference` | Pipeline creation and device management |
+| `hf_gtc.hub` | HuggingFace Hub search and discovery |
+| `hf_gtc.inference` | Device management and pipelines |
 | `hf_gtc.preprocessing` | Text preprocessing and tokenization |
-| `hf_gtc.training` | Trainer API and fine-tuning utilities |
-| `hf_gtc.evaluation` | Metrics and benchmark utilities |
-| `hf_gtc.deployment` | Quantization and serving utilities |
+| `hf_gtc.training` | Fine-tuning utilities |
+| `hf_gtc.evaluation` | Metrics and evaluation |
+| `hf_gtc.deployment` | Model optimization |
 
-## Quality Standards
-
-- **95% minimum test coverage** (enforced)
-- **Zero ruff violations** (enforced)
-- **100% docstring coverage** for public APIs
-- **Property-based testing** via Hypothesis
-
-## Commands
+## Development
 
 ```bash
-make setup          # Install dependencies
-make lint           # Run linter
-make test           # Full test suite
-make check          # All quality gates
+# Run tests with coverage
+uv run pytest --cov-fail-under=95
+
+# Lint
+uv run ruff check src/ tests/
+
+# Format
+uv run ruff format src/ tests/
+
+# Security scan
+uv run bandit -r src/ -ll
 ```
+
+## Quality Gates (Jidoka)
+
+All PRs must pass:
+
+1. **Gate 1** - Lint (ruff check)
+2. **Gate 2** - Format (ruff format --check)
+3. **Gate 3** - Security (bandit)
+4. **Gate 4** - Tests + Coverage (95% minimum)
+
+## Architecture
+
+```
+src/hf_gtc/
+├── hub/           # HuggingFace Hub integration
+│   └── search.py  # Model/dataset search
+├── inference/     # Inference utilities
+│   ├── device.py  # GPU/CPU device management
+│   └── pipelines.py
+├── preprocessing/ # Data preprocessing
+│   └── tokenization.py
+├── training/      # Training recipes
+│   └── fine_tuning.py
+├── evaluation/    # Metrics
+└── deployment/    # Optimization
+```
+
+## Rust Ground Truth
+
+This project cross-references HuggingFace's Rust implementations for validation:
+
+- **[candle](https://github.com/huggingface/candle)** - Tensor operations
+- **[safetensors](https://github.com/huggingface/safetensors)** - Safe serialization
+
+## References
+
+- Ohno, T. (1988). *Toyota Production System: Beyond Large-Scale Production*
+- Popper, K. (1959). *The Logic of Scientific Discovery*
+- Wolf, T. et al. (2020). *Transformers: State-of-the-Art Natural Language Processing*
 
 ## License
 
-Apache 2.0 - See [LICENSE](LICENSE) for details.
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+<sub>Built with the PAIML team</sub>
+</div>

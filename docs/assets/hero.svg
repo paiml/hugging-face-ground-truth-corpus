@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF9D00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFD21E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF9D00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" fill="#0d1117"/>
+
+  <!-- HuggingFace emoji style icon -->
+  <circle cx="100" cy="100" r="50" fill="url(#grad1)"/>
+  <circle cx="85" cy="90" r="8" fill="#0d1117"/>
+  <circle cx="115" cy="90" r="8" fill="#0d1117"/>
+  <path d="M 75 115 Q 100 140 125 115" stroke="#0d1117" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- Title -->
+  <text x="180" y="85" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="bold" fill="#ffffff">HuggingFace</text>
+  <text x="180" y="130" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="bold" fill="url(#grad2)">Ground Truth Corpus</text>
+
+  <!-- Tagline -->
+  <text x="180" y="165" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#8b949e">Production-ready ML recipes with 95%+ test coverage</text>
+
+  <!-- Decorative elements -->
+  <circle cx="720" cy="40" r="20" fill="url(#grad2)" opacity="0.3"/>
+  <circle cx="760" cy="80" r="15" fill="url(#grad1)" opacity="0.3"/>
+  <circle cx="700" cy="160" r="25" fill="url(#grad2)" opacity="0.2"/>
+</svg>
