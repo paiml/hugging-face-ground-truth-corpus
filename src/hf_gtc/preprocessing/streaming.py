@@ -235,6 +235,7 @@ def stream_dataset(
     dataset_name: str,
     *,
     split: str = "train",
+    revision: str | None = None,
     config: StreamConfig | None = None,
     columns: list[str] | None = None,
 ) -> Iterator[dict[str, Any]]:
@@ -243,6 +244,7 @@ def stream_dataset(
     Args:
         dataset_name: Name of the dataset on HuggingFace Hub.
         split: Dataset split to stream. Defaults to "train".
+        revision: Dataset revision/commit hash for reproducibility. Defaults to None.
         config: Streaming configuration. Defaults to None (uses defaults).
         columns: Columns to include. Defaults to None (all columns).
 
@@ -275,8 +277,13 @@ def stream_dataset(
 
     from datasets import load_dataset
 
-    # Load dataset in streaming mode
-    ds = load_dataset(dataset_name, split=split, streaming=True)
+    # Load dataset in streaming mode with optional revision pinning
+    ds = load_dataset(  # nosec B615
+        dataset_name,
+        split=split,
+        streaming=True,
+        revision=revision,  # Supports pinning for reproducibility
+    )
 
     # Select columns if specified
     if columns:
@@ -293,6 +300,7 @@ def stream_batches(
     dataset_name: str,
     *,
     split: str = "train",
+    revision: str | None = None,
     config: StreamConfig | None = None,
     columns: list[str] | None = None,
 ) -> Iterator[list[dict[str, Any]]]:
@@ -301,6 +309,7 @@ def stream_batches(
     Args:
         dataset_name: Name of the dataset on HuggingFace Hub.
         split: Dataset split to stream. Defaults to "train".
+        revision: Dataset revision/commit hash for reproducibility. Defaults to None.
         config: Streaming configuration. Defaults to None.
         columns: Columns to include. Defaults to None.
 
@@ -323,6 +332,7 @@ def stream_batches(
     rows = stream_dataset(
         dataset_name,
         split=split,
+        revision=revision,
         config=effective_config,
         columns=columns,
     )

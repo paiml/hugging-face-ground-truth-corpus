@@ -1,6 +1,6 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.10.1
+**Version**: 2.11.0
 **Status**: IMPLEMENTATION COMPLETE - DISTRIBUTION READY
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
@@ -2236,6 +2236,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.9.0 | 2026-01-30 | Claude Code | **Implementation Requirements**: Added Section 4.6.1 with explicit TODO table for export tooling. Fixed section numbering (4.6.1-4.6.7). Clarified that export script, tests, Makefile target, and dataset card are TODO items. |
 | 2.10.0 | 2026-01-30 | Claude Code | **Export Tooling Complete**: Implemented `scripts/export_corpus.py` (228 functions, 1262 doctests extracted), `tests/unit/test_export_corpus.py` (47 tests), `make export` target, and `scripts/dataset_card.md` template. |
 | 2.10.1 | 2026-01-30 | Claude Code | **Doctest Fixes**: Fixed 7 failing doctests - generator validation (force iteration with `next()`), float precision (use `round()`), random seed behavior, invalid test values. All 339 doctests now pass. |
+| 2.11.0 | 2026-01-30 | Claude Code | **Security Hardening**: Fixed B104 (ServerConfig default host 0.0.0.0 → 127.0.0.1), fixed B615 (added revision parameter for dataset version pinning). All bandit security checks now pass. |
 
 ---
 

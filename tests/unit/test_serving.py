@@ -88,7 +88,7 @@ class TestServerConfig:
     def test_default_values(self) -> None:
         """Test default configuration values."""
         config = ServerConfig()
-        assert config.host == "0.0.0.0"
+        assert config.host == "127.0.0.1"  # Secure default: localhost only
         assert config.port == 8000
         assert config.model_path is None
         assert config.backend == InferenceBackend.PYTORCH

@@ -388,7 +388,9 @@ class TestStreamDataset:
 
         list(stream_dataset("test/dataset"))
 
-        mock_load.assert_called_once_with("test/dataset", split="train", streaming=True)
+        mock_load.assert_called_once_with(
+            "test/dataset", split="train", streaming=True, revision=None
+        )
 
     @patch("datasets.load_dataset")
     def test_yields_rows(self, mock_load: MagicMock) -> None:

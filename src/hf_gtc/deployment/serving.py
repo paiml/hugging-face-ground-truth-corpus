@@ -98,7 +98,7 @@ class ServerConfig:
         9000
     """
 
-    host: str = "0.0.0.0"
+    host: str = "127.0.0.1"  # Secure default: localhost only
     port: int = 8000
     model_path: str | None = None
     backend: InferenceBackend = InferenceBackend.PYTORCH
