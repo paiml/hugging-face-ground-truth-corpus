@@ -12,6 +12,61 @@ Examples:
 
 from __future__ import annotations
 
+from hf_gtc.deployment.compression import (
+    VALID_DECOMPOSITION_METHODS,
+    VALID_FUSION_TYPES,
+    VALID_IMPORTANCE_METRICS,
+    VALID_PRUNING_METHODS,
+    VALID_PRUNING_SCOPES,
+    VALID_STRUCTURED_DIMS,
+    CompressionConfig,
+    CompressionStats,
+    DecompositionMethod,
+    FusionType,
+    ImportanceMetric,
+    LayerFusionConfig,
+    LowRankConfig,
+    PruningConfig,
+    PruningMethod,
+    PruningSchedule,
+    PruningScope,
+    StructuredPruningConfig,
+    StructuredPruningDim,
+    WeightSharingConfig,
+    calculate_flops_reduction,
+    calculate_low_rank_params,
+    calculate_sparsity_at_step,
+    calculate_weight_sharing_bits,
+    create_compression_config,
+    create_compression_stats,
+    create_layer_fusion_config,
+    create_low_rank_config,
+    create_pruning_config,
+    create_pruning_schedule,
+    create_structured_pruning_config,
+    create_weight_sharing_config,
+    estimate_compressed_size,
+    estimate_speedup_from_sparsity,
+    format_compression_stats,
+    get_decomposition_method,
+    get_fusion_type,
+    get_importance_metric,
+    get_pruning_method,
+    get_pruning_scope,
+    get_recommended_compression_config,
+    get_structured_pruning_dim,
+    list_decomposition_methods,
+    list_fusion_types,
+    list_importance_metrics,
+    list_pruning_methods,
+    list_pruning_scopes,
+    list_structured_pruning_dims,
+    validate_compression_config,
+    validate_low_rank_config,
+    validate_pruning_config,
+    validate_structured_pruning_config,
+    validate_weight_sharing_config,
+)
 from hf_gtc.deployment.gguf import (
     GGUFArchitecture,
     GGUFConfig,
@@ -218,11 +273,17 @@ from hf_gtc.deployment.torchscript import (
 __all__: list[str] = [
     # Constants
     "DENSITY_VALUES",
+    "VALID_DECOMPOSITION_METHODS",
     "VALID_DTYPES",
     "VALID_EXECUTION_PROVIDERS",
+    "VALID_FUSION_TYPES",
+    "VALID_IMPORTANCE_METRICS",
     "VALID_MERGE_METHODS",
     "VALID_ONNX_OPSET_VERSIONS",
     "VALID_OPTIMIZATION_LEVELS",
+    "VALID_PRUNING_METHODS",
+    "VALID_PRUNING_SCOPES",
+    "VALID_STRUCTURED_DIMS",
     "VALID_TENSOR_FORMATS",
     # Quantization
     "AWQConfig",
@@ -230,8 +291,12 @@ __all__: list[str] = [
     "CalibrationMethod",
     # TorchScript
     "CompilationStats",
+    # Compression
+    "CompressionConfig",
+    "CompressionStats",
     # SafeTensors
     "DType",
+    "DecompositionMethod",
     "DensityType",
     # ONNX
     "ExecutionProvider",
@@ -239,6 +304,8 @@ __all__: list[str] = [
     "FileInfo",
     # TorchScript
     "FreezeMode",
+    # Compression
+    "FusionType",
     # GGUF
     "GGUFArchitecture",
     "GGUFConfig",
@@ -250,10 +317,16 @@ __all__: list[str] = [
     "GPTQConfig",
     # Serving
     "HealthStatus",
+    # Compression
+    "ImportanceMetric",
     "InferenceBackend",
     "InferenceRequest",
     "InferenceResponse",
+    # Compression
+    "LayerFusionConfig",
     "LoadConfig",
+    # Compression
+    "LowRankConfig",
     "MergeConfig",
     "MergeMethod",
     "MergeResult",
@@ -273,6 +346,11 @@ __all__: list[str] = [
     "OptimizationResult",
     # TorchScript
     "OptimizeFor",
+    # Compression - Classes
+    "PruningConfig",
+    "PruningMethod",
+    "PruningSchedule",
+    "PruningScope",
     "QuantGranularity",
     "QuantMethod",
     "QuantProfile",
@@ -286,18 +364,26 @@ __all__: list[str] = [
     "ScriptMode",
     "ServerConfig",
     "ServerStatus",
+    "StructuredPruningConfig",
+    "StructuredPruningDim",
     "TensorFormat",
     "TensorInfo",
     # TorchScript
     "TorchScriptConfig",
     "TorchScriptInfo",
     "TraceConfig",
+    "WeightSharingConfig",
     # Functions - Quantization
     "calculate_compression_ratio",
+    # Compression - Functions
+    "calculate_flops_reduction",
+    "calculate_low_rank_params",
     # Functions - SafeTensors
     "calculate_memory_savings",
     # Functions - Merging
     "calculate_merged_parameter_count",
+    "calculate_sparsity_at_step",
+    "calculate_weight_sharing_bits",
     # Functions - TorchScript
     "check_scriptable",
     "compute_compression_ratio",
@@ -307,6 +393,8 @@ __all__: list[str] = [
     "create_calibration_config",
     # Functions - TorchScript
     "create_compilation_stats",
+    "create_compression_config",
+    "create_compression_stats",
     # Functions - ONNX
     "create_export_config",
     # Functions - GGUF
@@ -314,7 +402,9 @@ __all__: list[str] = [
     "create_gguf_export_result",
     "create_gguf_metadata",
     "create_gptq_config",
+    "create_layer_fusion_config",
     "create_load_config",
+    "create_low_rank_config",
     "create_merge_config",
     "create_metadata",
     # Functions - TorchScript
@@ -324,16 +414,21 @@ __all__: list[str] = [
     "create_optimization_config",
     # Functions - ONNX
     "create_optimize_config",
+    "create_pruning_config",
+    "create_pruning_schedule",
     "create_quant_profile",
     "create_quant_result",
     # Functions - ONNX
     "create_runtime_config",
     "create_save_config",
     "create_server",
+    "create_structured_pruning_config",
     # Functions - TorchScript
     "create_torchscript_config",
     "create_torchscript_info",
     "create_trace_config",
+    "create_weight_sharing_config",
+    "estimate_compressed_size",
     "estimate_file_size",
     "estimate_gguf_size",
     "estimate_merge_time",
@@ -343,8 +438,10 @@ __all__: list[str] = [
     "estimate_quantized_size",
     # Functions - TorchScript
     "estimate_script_size",
+    "estimate_speedup_from_sparsity",
     # Functions - TorchScript
     "format_compilation_stats",
+    "format_compression_stats",
     # Functions - ONNX
     "format_export_stats",
     "format_gguf_export_result",
@@ -358,6 +455,7 @@ __all__: list[str] = [
     "format_torchscript_info",
     "get_awq_dict",
     "get_calibration_method",
+    "get_decomposition_method",
     "get_density_value",
     # Functions - ONNX
     "get_execution_provider",
@@ -365,6 +463,7 @@ __all__: list[str] = [
     "get_export_config_dict",
     # Functions - TorchScript
     "get_freeze_mode",
+    "get_fusion_type",
     "get_gguf_architecture",
     "get_gguf_config_dict",
     "get_gguf_filename",
@@ -372,6 +471,7 @@ __all__: list[str] = [
     "get_gguf_quant_type",
     "get_gptq_dict",
     "get_health_status",
+    "get_importance_metric",
     "get_inference_backend",
     # Functions - TorchScript
     "get_mobile_config_dict",
@@ -385,9 +485,12 @@ __all__: list[str] = [
     "get_optimization_result",
     # Functions - TorchScript
     "get_optimize_for",
+    "get_pruning_method",
+    "get_pruning_scope",
     "get_quant_granularity",
     "get_quant_method",
     "get_quantization_config",
+    "get_recommended_compression_config",
     # Functions - TorchScript
     "get_recommended_config",
     "get_recommended_dtype",
@@ -401,18 +504,22 @@ __all__: list[str] = [
     # Functions - TorchScript
     "get_script_mode",
     "get_server_status",
+    "get_structured_pruning_dim",
     # Functions - TorchScript
     "get_torchscript_config_dict",
     "get_trace_config_dict",
     "linear_interpolate",
     "list_calibration_methods",
+    "list_decomposition_methods",
     "list_dtypes",
     # Functions - ONNX
     "list_execution_providers",
     # Functions - TorchScript
     "list_freeze_modes",
+    "list_fusion_types",
     "list_gguf_architectures",
     "list_gguf_quant_types",
+    "list_importance_metrics",
     "list_inference_backends",
     "list_merge_methods",
     # Functions - ONNX
@@ -421,12 +528,15 @@ __all__: list[str] = [
     "list_optimization_levels",
     # Functions - TorchScript
     "list_optimize_for_options",
+    "list_pruning_methods",
+    "list_pruning_scopes",
     "list_quant_granularities",
     "list_quant_methods",
     "list_quantization_types",
     # Functions - TorchScript
     "list_script_modes",
     "list_server_statuses",
+    "list_structured_pruning_dims",
     "list_tensor_formats",
     "process_batch",
     "process_request",
@@ -435,6 +545,7 @@ __all__: list[str] = [
     "stop_server",
     "validate_calibration_config",
     "validate_calibration_method",
+    "validate_compression_config",
     # Functions - ONNX
     "validate_export_config",
     "validate_gguf_architecture",
@@ -443,12 +554,14 @@ __all__: list[str] = [
     "validate_gguf_quant_type",
     "validate_inference_backend",
     "validate_load_config",
+    "validate_low_rank_config",
     "validate_merge_config",
     # Functions - TorchScript
     "validate_mobile_config",
     "validate_model_slice",
     # Functions - TorchScript
     "validate_optimization_config",
+    "validate_pruning_config",
     "validate_quant_granularity",
     "validate_quant_method",
     "validate_quant_profile",
@@ -457,8 +570,10 @@ __all__: list[str] = [
     "validate_save_config",
     "validate_server_config",
     "validate_server_status",
+    "validate_structured_pruning_config",
     "validate_tensor_name",
     # Functions - TorchScript
     "validate_torchscript_config",
     "validate_trace_config",
+    "validate_weight_sharing_config",
 ]

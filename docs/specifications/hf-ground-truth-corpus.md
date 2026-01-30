@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.22.0
+**Version**: 2.23.0
 **Status**: COMPLETE - COMPREHENSIVE ML PATTERNS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-027
+**PMAT Tickets**: PMAT-001 through PMAT-034
 
 ---
 
@@ -70,10 +70,11 @@
 | `hf_gtc.deployment.onnx` | COMPLETE | 100% | 87 | PMAT-025 |
 | `hf_gtc.deployment.tflite` | COMPLETE | 100% | 95 | PMAT-025 |
 | `hf_gtc.deployment.torchscript` | COMPLETE | 100% | 88 | PMAT-025 |
+| `hf_gtc.deployment.compression` | COMPLETE | 100% | 227 | PMAT-034 |
 | `scripts.export_corpus` | COMPLETE | 82% | 47 | PMAT-010 |
 
-**Total**: 5127 tests, 98.35% coverage
-**Complete**: All 17 expansion modules across PMAT-020 through PMAT-025, plus knowledge distillation (PMAT-026) and prompt engineering (PMAT-027)
+**Total**: 5354 tests, 98.5% coverage
+**Complete**: All 17 expansion modules across PMAT-020 through PMAT-025, plus knowledge distillation (PMAT-026), prompt engineering (PMAT-027), and model compression (PMAT-034)
 
 ---
 

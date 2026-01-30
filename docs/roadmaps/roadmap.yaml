@@ -210,3 +210,25 @@ roadmap:
   estimated_effort: null
   labels: []
   notes: null
+- id: PMAT-034
+  github_issue: null
+  item_type: task
+  title: Implement model compression module (deployment/compression.py)
+  status: completed
+  priority: high
+  assigned_to: null
+  created: 2026-01-30T19:00:00Z
+  updated: 2026-01-30T19:30:00Z
+  spec: null
+  acceptance_criteria:
+  - Implement pruning methods (magnitude, structured, movement, lottery ticket, gradual)
+  - Add layer fusion configurations (conv-bn, linear-bn, attention, mlp)
+  - Add weight sharing/clustering compression
+  - Add low-rank factorization (SVD, Tucker, CP, NMF)
+  - Implement sparsity scheduling and speedup estimation
+  - Achieve 95%+ test coverage
+  phases: []
+  subtasks: []
+  estimated_effort: null
+  labels: []
+  notes: null
