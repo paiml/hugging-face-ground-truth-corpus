@@ -78,76 +78,99 @@ class TestCreatePipeline:
 
     def test_valid_task_accepted(self) -> None:
         """Test that valid tasks don't raise on task validation."""
-        # We can test that validation passes by mocking the pipeline call
-        # Must patch where it's imported as _hf_pipeline
+        # We can test that validation passes by mocking the pipeline factory
+        mock_pipeline_fn = MagicMock()
+        mock_pipeline_fn.return_value = MagicMock()
         with (
-            patch("hf_gtc.inference.pipelines._hf_pipeline") as mock_pipeline,
+            patch(
+                "hf_gtc.inference.pipelines._get_pipeline_factory",
+                return_value=mock_pipeline_fn,
+            ),
             patch("hf_gtc.inference.device.get_device", return_value="cpu"),
         ):
-            mock_pipeline.return_value = MagicMock()
             result = create_pipeline("text-classification")
-            mock_pipeline.assert_called_once()
+            mock_pipeline_fn.assert_called_once()
             assert result is not None
 
     def test_auto_device_detection(self) -> None:
         """Test that device is auto-detected when not specified."""
+        mock_pipeline_fn = MagicMock()
+        mock_pipeline_fn.return_value = MagicMock()
         with (
-            patch("hf_gtc.inference.pipelines._hf_pipeline") as mock_pipeline,
+            patch(
+                "hf_gtc.inference.pipelines._get_pipeline_factory",
+                return_value=mock_pipeline_fn,
+            ),
             patch("hf_gtc.inference.device.get_device", return_value="cuda"),
         ):
-            mock_pipeline.return_value = MagicMock()
             create_pipeline("text-classification")
 
             # Should pass device=0 for CUDA
-            call_kwargs = mock_pipeline.call_args.kwargs
+            call_kwargs = mock_pipeline_fn.call_args.kwargs
             assert call_kwargs["device"] == 0
 
     def test_explicit_device(self) -> None:
         """Test that explicit device is used when provided."""
-        with patch("hf_gtc.inference.pipelines._hf_pipeline") as mock_pipeline:
-            mock_pipeline.return_value = MagicMock()
+        mock_pipeline_fn = MagicMock()
+        mock_pipeline_fn.return_value = MagicMock()
+        with patch(
+            "hf_gtc.inference.pipelines._get_pipeline_factory",
+            return_value=mock_pipeline_fn,
+        ):
             create_pipeline("text-classification", device="cpu")
 
-            call_kwargs = mock_pipeline.call_args.kwargs
+            call_kwargs = mock_pipeline_fn.call_args.kwargs
             assert call_kwargs["device"] == "cpu"
 
     def test_model_passed_through(self) -> None:
         """Test that model parameter is passed through."""
+        mock_pipeline_fn = MagicMock()
+        mock_pipeline_fn.return_value = MagicMock()
         with (
-            patch("hf_gtc.inference.pipelines._hf_pipeline") as mock_pipeline,
+            patch(
+                "hf_gtc.inference.pipelines._get_pipeline_factory",
+                return_value=mock_pipeline_fn,
+            ),
             patch("hf_gtc.inference.device.get_device", return_value="cpu"),
         ):
-            mock_pipeline.return_value = MagicMock()
             create_pipeline("text-classification", model="my-model")
 
-            call_kwargs = mock_pipeline.call_args.kwargs
+            call_kwargs = mock_pipeline_fn.call_args.kwargs
             assert call_kwargs["model"] == "my-model"
 
     def test_kwargs_passed_through(self) -> None:
         """Test that additional kwargs are passed through."""
+        mock_pipeline_fn = MagicMock()
+        mock_pipeline_fn.return_value = MagicMock()
         with (
-            patch("hf_gtc.inference.pipelines._hf_pipeline") as mock_pipeline,
+            patch(
+                "hf_gtc.inference.pipelines._get_pipeline_factory",
+                return_value=mock_pipeline_fn,
+            ),
             patch("hf_gtc.inference.device.get_device", return_value="cpu"),
         ):
-            mock_pipeline.return_value = MagicMock()
             create_pipeline(
                 "text-classification",
                 batch_size=8,
                 framework="pt",
             )
 
-            call_kwargs = mock_pipeline.call_args.kwargs
+            call_kwargs = mock_pipeline_fn.call_args.kwargs
             assert call_kwargs["batch_size"] == 8
             assert call_kwargs["framework"] == "pt"
 
     def test_mps_device_handling(self) -> None:
         """Test MPS device is passed correctly."""
+        mock_pipeline_fn = MagicMock()
+        mock_pipeline_fn.return_value = MagicMock()
         with (
-            patch("hf_gtc.inference.pipelines._hf_pipeline") as mock_pipeline,
+            patch(
+                "hf_gtc.inference.pipelines._get_pipeline_factory",
+                return_value=mock_pipeline_fn,
+            ),
             patch("hf_gtc.inference.device.get_device", return_value="mps"),
         ):
-            mock_pipeline.return_value = MagicMock()
             create_pipeline("text-classification")
 
-            call_kwargs = mock_pipeline.call_args.kwargs
+            call_kwargs = mock_pipeline_fn.call_args.kwargs
             assert call_kwargs["device"] == "mps"

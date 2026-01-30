@@ -19,6 +19,9 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from datasets import Dataset, DatasetDict
+else:
+    # Runtime imports for isinstance checks
+    from datasets import DatasetDict
 
 
 @dataclass(frozen=True, slots=True)
@@ -214,9 +217,10 @@ def get_dataset_info(
         msg = "dataset cannot be None"
         raise ValueError(msg)
 
-    # Handle DatasetDict
-    if hasattr(dataset, "keys"):
-        splits = tuple(dataset.keys())  # type: ignore[call-non-callable]
+    # Handle DatasetDict with proper type narrowing
+    if isinstance(dataset, DatasetDict):
+        # Convert keys to strings (NamedSplit -> str)
+        splits = tuple(str(k) for k in dataset)
         # Use first split to get column info
         first_split = dataset[splits[0]]
         columns = tuple(first_split.column_names)

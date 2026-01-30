@@ -14,10 +14,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     pass
+
+# Strict type for bias configuration matching PEFT's Literal expectation
+BiasType = Literal["none", "all", "lora_only"]
 
 
 class TaskType(Enum):
@@ -94,7 +97,7 @@ class LoRAConfig:
     lora_dropout: float
     target_modules: tuple[str, ...]
     task_type: TaskType
-    bias: str
+    bias: BiasType
     modules_to_save: tuple[str, ...] | None
 
 
@@ -105,7 +108,7 @@ def validate_lora_config(
     r: int,
     lora_alpha: int,
     lora_dropout: float,
-    bias: str,
+    bias: BiasType,
 ) -> None:
     """Validate LoRA configuration parameters.
 
@@ -150,7 +153,7 @@ def create_lora_config(
     lora_dropout: float = 0.1,
     target_modules: tuple[str, ...] | None = None,
     task_type: str = "CAUSAL_LM",
-    bias: str = "none",
+    bias: BiasType = "none",
     modules_to_save: tuple[str, ...] | None = None,
 ) -> LoRAConfig:
     """Create a LoRA configuration.
@@ -241,7 +244,7 @@ def get_peft_config(lora_config: LoRAConfig) -> Any:
         lora_dropout=lora_config.lora_dropout,
         target_modules=list(lora_config.target_modules),
         task_type=task_type_map[lora_config.task_type],
-        bias=lora_config.bias,  # type: ignore[arg-type]  # validated in validate_lora_config
+        bias=lora_config.bias,
         modules_to_save=modules_to_save,
     )
 

@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.13.0
-**Status**: IMPLEMENTATION COMPLETE - FULLY TYPED
+**Version**: 2.14.0
+**Status**: IMPLEMENTATION IN PROGRESS - STRICT TYPING ENFORCEMENT
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -924,8 +924,28 @@ exclude_lines = [
 | Cyclomatic Complexity | ≤15 | `ruff` C901 rule |
 | Cognitive Complexity | ≤10 | `ruff` C901 rule |
 | Function Length | ≤50 lines | `ruff` PLR0915 rule |
-| Type Coverage | 100% | `ty --strict` |
+| Type Coverage | 100% | `ty check` exit code 0 |
+| Type Ignores | 0 | `grep -r "type: ignore" src/` count = 0 |
 | Docstring Coverage | 100% public | `ruff` D100-D107 rules |
+
+**CRITICAL: Zero Type Ignore Policy**
+
+The corpus enforces **absolute type safety** with no escape hatches:
+
+```
+PROHIBITED in src/hf_gtc/:
+  ✗ # type: ignore
+  ✗ # type: ignore[...]
+  ✗ typing.cast(Any, ...)
+  ✗ -> Any return types
+  ✗ : Any parameter types
+
+ALLOWED only in tests/:
+  ✓ # type: ignore (for mock objects)
+  ✓ typing.cast (for test fixtures)
+```
+
+**Rationale**: `type: ignore` comments bypass the Popperian falsification process. They represent unfalsifiable claims that cannot be corroborated through the qualification pipeline. Every type annotation must be verifiable by ty without exceptions.
 
 ### 5.4 PMAT Compliance
 
@@ -1910,6 +1930,8 @@ Following Popper's falsificationist methodology [3], this checklist systematical
 | F-T2 | Pass `None` where not Optional | Raises TypeError | Accepts None silently |
 | F-T3 | Pass wrong types to all parameters | Raises TypeError | Accepts wrong types |
 | F-T4 | Verify return types match annotations | Types match | Return type mismatch |
+| F-T5 | Search for `type: ignore` in src/ | Zero matches | Any match found |
+| F-T6 | Search for `Any` type annotations | Zero in signatures | Any found in public API |
 
 **Checklist**:
 - [ ] F-T1: `ty check --strict` passes
@@ -2240,6 +2262,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.11.0 | 2026-01-30 | Claude Code | **Security Hardening**: Fixed B104 (ServerConfig default host 0.0.0.0 → 127.0.0.1), fixed B615 (added revision parameter for dataset version pinning). All bandit security checks now pass. |
 | 2.12.0 | 2026-01-30 | Claude Code | **alimentar Integration**: Fixed alimentar GH-013 (nested Arrow types support). Quality score now passes at 85% (C grade). Exported corpus validates successfully. |
 | 2.13.0 | 2026-01-30 | Claude Code | **ty Type Checker Integration**: Added ty≥0.0.14 to quality gates. Fixed 9 type errors (Callable types, attribute access, deprecated API). 100% type coverage enforced via `make typecheck`. Updated Trainer API to use `processing_class` parameter. |
+| 2.14.0 | 2026-01-30 | Claude Code | **Zero Type Ignore Policy**: Added F-T5/F-T6 falsification checks. Prohibited `type: ignore` and `Any` in src/. Requires elimination of all 4 type: ignore comments added in v2.13.0. |
 
 ---
 
