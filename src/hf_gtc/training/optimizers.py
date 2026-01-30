@@ -1314,8 +1314,7 @@ def get_weight_decay_type(name: str) -> WeightDecayType:
     """
     if name not in VALID_WEIGHT_DECAY_TYPES:
         msg = (
-            f"weight decay type must be one of {VALID_WEIGHT_DECAY_TYPES}, "
-            f"got '{name}'"
+            f"weight decay type must be one of {VALID_WEIGHT_DECAY_TYPES}, got '{name}'"
         )
         raise ValueError(msg)
     return WeightDecayType(name)

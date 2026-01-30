@@ -315,10 +315,7 @@ def validate_router_config(config: RouterConfig) -> None:
         msg = f"top_k must be positive, got {config.top_k}"
         raise ValueError(msg)
     if config.top_k > config.num_experts:
-        msg = (
-            f"top_k ({config.top_k}) cannot exceed "
-            f"num_experts ({config.num_experts})"
-        )
+        msg = f"top_k ({config.top_k}) cannot exceed num_experts ({config.num_experts})"
         raise ValueError(msg)
     if config.jitter_noise < 0:
         msg = f"jitter_noise must be non-negative, got {config.jitter_noise}"
@@ -864,8 +861,7 @@ def get_expert_activation(name: str) -> ExpertActivation:
     """
     if name not in VALID_EXPERT_ACTIVATIONS:
         msg = (
-            f"expert_activation must be one of {VALID_EXPERT_ACTIVATIONS}, "
-            f"got '{name}'"
+            f"expert_activation must be one of {VALID_EXPERT_ACTIVATIONS}, got '{name}'"
         )
         raise ValueError(msg)
     return ExpertActivation(name)

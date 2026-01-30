@@ -273,9 +273,7 @@ class TestValidateStructuredConfig:
 
     def test_json_schema_with_schema_passes(self) -> None:
         """JSON_SCHEMA format with schema passes."""
-        config = StructuredConfig(
-            OutputFormat.JSON_SCHEMA, {"type": "object"}, True, 3
-        )
+        config = StructuredConfig(OutputFormat.JSON_SCHEMA, {"type": "object"}, True, 3)
         validate_structured_config(config)
 
 
@@ -693,7 +691,7 @@ class TestValidateJsonOutput:
 
     def test_json_array(self) -> None:
         """Validate JSON array."""
-        result = validate_json_output('[1, 2, 3]')
+        result = validate_json_output("[1, 2, 3]")
         assert result.is_valid is True
         assert result.parsed_output == [1, 2, 3]
 

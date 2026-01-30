@@ -246,9 +246,7 @@ class TestDistillationLossConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = DistillationLossConfig(
-            DistillationLoss.MSE, 4.0, 0.5, 0.0, True
-        )
+        config = DistillationLossConfig(DistillationLoss.MSE, 4.0, 0.5, 0.0, True)
         with pytest.raises(AttributeError):
             config.alpha = 0.8  # type: ignore[misc]
 
@@ -558,17 +556,13 @@ class TestValidateFeatureMatchingConfig:
     def test_hidden_states_without_indices_raises(self) -> None:
         """Match hidden states without indices raises ValueError."""
         config = FeatureMatchingConfig(True, False, (), (), 768)
-        with pytest.raises(
-            ValueError, match="hidden_layer_indices required"
-        ):
+        with pytest.raises(ValueError, match="hidden_layer_indices required"):
             validate_feature_matching_config(config)
 
     def test_attention_without_indices_raises(self) -> None:
         """Match attention without indices raises ValueError."""
         config = FeatureMatchingConfig(False, True, (), (), 768)
-        with pytest.raises(
-            ValueError, match="attention_layer_indices required"
-        ):
+        with pytest.raises(ValueError, match="attention_layer_indices required"):
             validate_feature_matching_config(config)
 
 
@@ -814,9 +808,7 @@ class TestGetDistillationMethod:
             ("progressive", DistillationMethod.PROGRESSIVE),
         ],
     )
-    def test_all_methods(
-        self, name: str, expected: DistillationMethod
-    ) -> None:
+    def test_all_methods(self, name: str, expected: DistillationMethod) -> None:
         """Test all valid methods."""
         assert get_distillation_method(name) == expected
 
@@ -862,9 +854,7 @@ class TestGetTemperatureSchedule:
             ("warmup", TemperatureSchedule.WARMUP),
         ],
     )
-    def test_all_schedules(
-        self, name: str, expected: TemperatureSchedule
-    ) -> None:
+    def test_all_schedules(self, name: str, expected: TemperatureSchedule) -> None:
         """Test all valid schedules."""
         assert get_temperature_schedule(name) == expected
 
@@ -970,7 +960,7 @@ class TestCalculateTemperatureAtStep:
     def test_step_exceeds_total_raises(self) -> None:
         """current_step > total_steps raises ValueError."""
         config = create_distillation_config()
-        with pytest.raises(ValueError, match="current_step.*cannot exceed"):
+        with pytest.raises(ValueError, match=r"current_step.*cannot exceed"):
             calculate_temperature_at_step(config, 1001, 1000)
 
 
@@ -1208,7 +1198,7 @@ class TestGetLayerMappingStrategy:
 
     def test_student_exceeds_teacher_raises(self) -> None:
         """Student > teacher raises ValueError."""
-        with pytest.raises(ValueError, match="student_layers.*cannot exceed"):
+        with pytest.raises(ValueError, match=r"student_layers.*cannot exceed"):
             get_layer_mapping_strategy(6, 12, "uniform")
 
     def test_invalid_strategy_raises(self) -> None:

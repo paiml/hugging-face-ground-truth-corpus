@@ -170,9 +170,7 @@ class ContentPolicyConfig:
         0
     """
 
-    blocked_categories: frozenset[ContentCategory] = field(
-        default_factory=frozenset
-    )
+    blocked_categories: frozenset[ContentCategory] = field(default_factory=frozenset)
     allowed_topics: frozenset[str] = field(default_factory=frozenset)
     custom_rules: tuple[str, ...] = field(default_factory=tuple)
 
@@ -235,7 +233,12 @@ class ToxicityConfig:
     threshold: float = 0.5
     categories: tuple[str, ...] = field(
         default_factory=lambda: (
-            "toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"
+            "toxic",
+            "severe_toxic",
+            "obscene",
+            "threat",
+            "insult",
+            "identity_hate",
         )
     )
 
@@ -564,7 +567,12 @@ def create_toxicity_config(
 
     if categories is None:
         categories = (
-            "toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"
+            "toxic",
+            "severe_toxic",
+            "obscene",
+            "threat",
+            "insult",
+            "identity_hate",
         )
     elif isinstance(categories, list):
         categories = tuple(categories)
@@ -727,9 +735,7 @@ _PHONE_PATTERN = re.compile(
     r"(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}"
 )
 _SSN_PATTERN = re.compile(r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b")
-_CREDIT_CARD_PATTERN = re.compile(
-    r"\b(?:\d{4}[-.\s]?){3}\d{4}\b|\b\d{15,16}\b"
-)
+_CREDIT_CARD_PATTERN = re.compile(r"\b(?:\d{4}[-.\s]?){3}\d{4}\b|\b\d{15,16}\b")
 
 
 def _detect_pii(content: str, config: PIIConfig) -> list[str]:
@@ -773,24 +779,16 @@ def _redact_pii(content: str, config: PIIConfig) -> str:
     char = config.redaction_char
 
     if config.detect_email:
-        redacted = _EMAIL_PATTERN.sub(
-            lambda m: char * len(m.group()), redacted
-        )
+        redacted = _EMAIL_PATTERN.sub(lambda m: char * len(m.group()), redacted)
 
     if config.detect_phone:
-        redacted = _PHONE_PATTERN.sub(
-            lambda m: char * len(m.group()), redacted
-        )
+        redacted = _PHONE_PATTERN.sub(lambda m: char * len(m.group()), redacted)
 
     if config.detect_ssn:
-        redacted = _SSN_PATTERN.sub(
-            lambda m: char * len(m.group()), redacted
-        )
+        redacted = _SSN_PATTERN.sub(lambda m: char * len(m.group()), redacted)
 
     if config.detect_credit_card:
-        redacted = _CREDIT_CARD_PATTERN.sub(
-            lambda m: char * len(m.group()), redacted
-        )
+        redacted = _CREDIT_CARD_PATTERN.sub(lambda m: char * len(m.group()), redacted)
 
     return redacted
 

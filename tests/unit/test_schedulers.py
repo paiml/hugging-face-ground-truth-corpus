@@ -355,9 +355,7 @@ class TestValidateLRSchedulerConfig:
 
     def test_zero_total_steps_raises(self) -> None:
         """Zero total_steps raises ValueError."""
-        config = LRSchedulerConfig(
-            LRSchedulerType.COSINE, None, None, None, 0, 3, 1e-4
-        )
+        config = LRSchedulerConfig(LRSchedulerType.COSINE, None, None, None, 0, 3, 1e-4)
         with pytest.raises(ValueError, match="total_steps must be positive"):
             validate_lr_scheduler_config(config)
 

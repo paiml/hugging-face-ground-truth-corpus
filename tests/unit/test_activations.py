@@ -912,9 +912,7 @@ class TestPropertyBasedTests:
         st.floats(min_value=0.1, max_value=10.0),
     )
     @settings(max_examples=20)
-    def test_glu_expansion_always_positive(
-        self, hidden_dim: int, ratio: float
-    ) -> None:
+    def test_glu_expansion_always_positive(self, hidden_dim: int, ratio: float) -> None:
         """Test that GLU expansion dimensions are always positive."""
         gate, up = estimate_glu_expansion(hidden_dim, ratio)
         assert gate > 0

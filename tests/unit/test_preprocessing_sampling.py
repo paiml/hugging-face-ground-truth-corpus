@@ -1072,14 +1072,13 @@ class TestPropertyBased:
 
     @given(st.lists(st.sampled_from(["A", "B"]), min_size=1, max_size=20))
     @settings(max_examples=20)
-    def test_inverse_frequency_minority_higher_weight(
-        self, labels: list[str]
-    ) -> None:
+    def test_inverse_frequency_minority_higher_weight(self, labels: list[str]) -> None:
         """Test that minority class gets higher weight with inverse frequency."""
         if len(set(labels)) < 2:
             return  # Skip if only one class
 
         from collections import Counter
+
         counts = Counter(labels)
         minority = min(counts, key=counts.get)  # type: ignore[arg-type]
         majority = max(counts, key=counts.get)  # type: ignore[arg-type]

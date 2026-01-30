@@ -424,16 +424,14 @@ def validate_qlora_config(config: QLoRAConfig) -> None:
     valid_dtypes = {"float16", "bfloat16", "float32"}
     if config.compute_dtype not in valid_dtypes:
         msg = (
-            f"compute_dtype must be one of {valid_dtypes}, "
-            f"got '{config.compute_dtype}'"
+            f"compute_dtype must be one of {valid_dtypes}, got '{config.compute_dtype}'"
         )
         raise ValueError(msg)
 
     valid_quant_types = {"nf4", "fp4"}
     if config.quant_type not in valid_quant_types:
         msg = (
-            f"quant_type must be one of {valid_quant_types}, "
-            f"got '{config.quant_type}'"
+            f"quant_type must be one of {valid_quant_types}, got '{config.quant_type}'"
         )
         raise ValueError(msg)
 

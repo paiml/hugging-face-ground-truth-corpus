@@ -855,9 +855,7 @@ class TestCalculateSpeculationEfficiency:
         gamma=st.integers(min_value=1, max_value=20),
     )
     @settings(max_examples=20)
-    def test_efficiency_bounded(
-        self, accepted: int, rejected: int, gamma: int
-    ) -> None:
+    def test_efficiency_bounded(self, accepted: int, rejected: int, gamma: int) -> None:
         """Test that efficiency is always in [0, 1]."""
         efficiency = calculate_speculation_efficiency(accepted, rejected, gamma)
         assert 0.0 <= efficiency <= 1.0

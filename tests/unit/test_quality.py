@@ -426,9 +426,7 @@ class TestCreateContaminationConfig:
 
     def test_invalid_threshold_raises_error(self) -> None:
         """Test that invalid threshold raises ValueError."""
-        with pytest.raises(
-            ValueError, match="ngram_overlap_threshold must be between"
-        ):
+        with pytest.raises(ValueError, match="ngram_overlap_threshold must be between"):
             create_contamination_config(
                 test_datasets=("test",),
                 ngram_overlap_threshold=1.5,

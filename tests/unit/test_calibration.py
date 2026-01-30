@@ -202,9 +202,7 @@ class TestUncertaintyResult:
 
     def test_frozen(self) -> None:
         """Test that UncertaintyResult is immutable."""
-        result = UncertaintyResult(
-            0.7, 0.05, (0.5, 0.9), UncertaintyType.PREDICTIVE
-        )
+        result = UncertaintyResult(0.7, 0.05, (0.5, 0.9), UncertaintyType.PREDICTIVE)
         with pytest.raises(AttributeError):
             result.mean = 0.8  # type: ignore[misc]
 
@@ -227,9 +225,7 @@ class TestReliabilityDiagram:
 
     def test_frozen(self) -> None:
         """Test that ReliabilityDiagram is immutable."""
-        diagram = ReliabilityDiagram(
-            (0.5,), (0.5,), (100,), 1
-        )
+        diagram = ReliabilityDiagram((0.5,), (0.5,), (100,), 1)
         with pytest.raises(AttributeError):
             diagram.n_bins = 2  # type: ignore[misc]
 
@@ -356,9 +352,7 @@ class TestValidateUncertaintyResult:
 
     def test_valid_result(self) -> None:
         """Test validation of valid result."""
-        result = UncertaintyResult(
-            0.5, 0.1, (0.3, 0.7), UncertaintyType.PREDICTIVE
-        )
+        result = UncertaintyResult(0.5, 0.1, (0.3, 0.7), UncertaintyType.PREDICTIVE)
         validate_uncertainty_result(result)  # Should not raise
 
     def test_none_result_raises_error(self) -> None:
@@ -368,25 +362,24 @@ class TestValidateUncertaintyResult:
 
     def test_negative_variance_raises_error(self) -> None:
         """Test that negative variance raises ValueError."""
-        result = UncertaintyResult(
-            0.5, -0.1, (0.3, 0.7), UncertaintyType.PREDICTIVE
-        )
+        result = UncertaintyResult(0.5, -0.1, (0.3, 0.7), UncertaintyType.PREDICTIVE)
         with pytest.raises(ValueError, match="variance cannot be negative"):
             validate_uncertainty_result(result)
 
     def test_invalid_confidence_interval_raises_error(self) -> None:
         """Test that invalid confidence interval raises ValueError."""
         result = UncertaintyResult(
-            0.5, 0.1, (0.7, 0.3), UncertaintyType.PREDICTIVE  # lower > upper
+            0.5,
+            0.1,
+            (0.7, 0.3),
+            UncertaintyType.PREDICTIVE,  # lower > upper
         )
         with pytest.raises(ValueError, match=r"lower bound.*cannot be greater"):
             validate_uncertainty_result(result)
 
     def test_equal_bounds_is_valid(self) -> None:
         """Test that equal bounds are valid."""
-        result = UncertaintyResult(
-            0.5, 0.0, (0.5, 0.5), UncertaintyType.ALEATORIC
-        )
+        result = UncertaintyResult(0.5, 0.0, (0.5, 0.5), UncertaintyType.ALEATORIC)
         validate_uncertainty_result(result)  # Should not raise
 
 
@@ -525,16 +518,12 @@ class TestCreateUncertaintyResult:
     def test_invalid_variance_raises_error(self) -> None:
         """Test that invalid variance raises ValueError."""
         with pytest.raises(ValueError, match="variance cannot be negative"):
-            create_uncertainty_result(
-                0.5, -0.1, (0.3, 0.7), UncertaintyType.PREDICTIVE
-            )
+            create_uncertainty_result(0.5, -0.1, (0.3, 0.7), UncertaintyType.PREDICTIVE)
 
     def test_invalid_interval_raises_error(self) -> None:
         """Test that invalid confidence interval raises ValueError."""
         with pytest.raises(ValueError, match=r"lower bound.*cannot be greater"):
-            create_uncertainty_result(
-                0.5, 0.1, (0.7, 0.3), UncertaintyType.PREDICTIVE
-            )
+            create_uncertainty_result(0.5, 0.1, (0.7, 0.3), UncertaintyType.PREDICTIVE)
 
 
 class TestListCalibrationMethods:
@@ -1204,9 +1193,7 @@ class TestPropertyBased:
         )
     )
     @settings(max_examples=10)
-    def test_uncertainty_variance_nonnegative(
-        self, predictions: list[float]
-    ) -> None:
+    def test_uncertainty_variance_nonnegative(self, predictions: list[float]) -> None:
         """Test that uncertainty variance is always non-negative."""
         result = estimate_uncertainty(predictions)
         assert result.variance >= 0.0
@@ -1224,9 +1211,7 @@ class TestPropertyBased:
         result = estimate_uncertainty(predictions)
         assert min(predictions) <= result.mean <= max(predictions)
 
-    @given(
-        st.integers(min_value=1, max_value=30)
-    )
+    @given(st.integers(min_value=1, max_value=30))
     @settings(max_examples=10)
     def test_reliability_diagram_bins_count(self, n_bins: int) -> None:
         """Test that reliability diagram has correct number of bins."""
@@ -1238,9 +1223,7 @@ class TestPropertyBased:
         assert len(diagram.bin_accuracies) == n_bins
         assert len(diagram.bin_counts) == n_bins
 
-    @given(
-        st.floats(min_value=0.1, max_value=10.0)
-    )
+    @given(st.floats(min_value=0.1, max_value=10.0))
     @settings(max_examples=10)
     def test_temperature_config_valid_temp(self, temp: float) -> None:
         """Test that valid temperatures create valid configs."""
@@ -1248,9 +1231,7 @@ class TestPropertyBased:
         assert config.initial_temp == temp
         validate_temperature_config(config)  # Should not raise
 
-    @given(
-        st.integers(min_value=1, max_value=100)
-    )
+    @given(st.integers(min_value=1, max_value=100))
     @settings(max_examples=10)
     def test_calibration_config_valid_bins(self, n_bins: int) -> None:
         """Test that valid n_bins create valid configs."""

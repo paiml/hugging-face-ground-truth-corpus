@@ -699,17 +699,13 @@ class TestCalculateUncertainty:
     def test_least_confidence_measure(self) -> None:
         """Least confidence measure calculation."""
         probs = (0.7, 0.3)
-        uncertainty = calculate_uncertainty(
-            probs, UncertaintyMeasure.LEAST_CONFIDENCE
-        )
+        uncertainty = calculate_uncertainty(probs, UncertaintyMeasure.LEAST_CONFIDENCE)
         assert uncertainty == pytest.approx(0.3)
 
     def test_variation_ratio_measure(self) -> None:
         """Variation ratio measure calculation."""
         probs = (0.6, 0.4)
-        uncertainty = calculate_uncertainty(
-            probs, UncertaintyMeasure.VARIATION_RATIO
-        )
+        uncertainty = calculate_uncertainty(probs, UncertaintyMeasure.VARIATION_RATIO)
         assert uncertainty == pytest.approx(0.4)
 
     def test_mutual_information_without_mc_samples(self) -> None:
@@ -810,9 +806,7 @@ class TestSelectSamples:
     def test_margin_strategy(self) -> None:
         """Select samples with margin strategy."""
         uncertainties = (0.9, 0.5, 0.8)
-        indices = select_samples(
-            uncertainties, 2, strategy=QueryStrategy.MARGIN
-        )
+        indices = select_samples(uncertainties, 2, strategy=QueryStrategy.MARGIN)
         assert len(indices) == 2
 
 

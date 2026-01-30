@@ -306,8 +306,7 @@ def validate_pacing_config(config: PacingConfig) -> None:
         raise ValueError(msg)
     if not 0 <= config.target_difficulty <= 1:
         msg = (
-            f"target_difficulty must be between 0 and 1, "
-            f"got {config.target_difficulty}"
+            f"target_difficulty must be between 0 and 1, got {config.target_difficulty}"
         )
         raise ValueError(msg)
     if config.warmup_steps < 0:
@@ -403,10 +402,7 @@ def validate_curriculum_stats(stats: CurriculumStats) -> None:
         msg = f"samples_seen must be non-negative, got {stats.samples_seen}"
         raise ValueError(msg)
     if not 0 <= stats.competence_score <= 1:
-        msg = (
-            f"competence_score must be between 0 and 1, "
-            f"got {stats.competence_score}"
-        )
+        msg = f"competence_score must be between 0 and 1, got {stats.competence_score}"
         raise ValueError(msg)
     if not 0 <= stats.curriculum_progress <= 1:
         msg = (
@@ -945,10 +941,7 @@ def get_difficulty_at_step(
         msg = f"total_steps must be positive, got {total_steps}"
         raise ValueError(msg)
     if current_step > total_steps:
-        msg = (
-            f"current_step ({current_step}) cannot exceed "
-            f"total_steps ({total_steps})"
-        )
+        msg = f"current_step ({current_step}) cannot exceed total_steps ({total_steps})"
         raise ValueError(msg)
 
     warmup = config.warmup_steps
@@ -1030,10 +1023,7 @@ def calculate_sample_weights(
         msg = "difficulties cannot be empty"
         raise ValueError(msg)
     if not 0 <= current_difficulty <= 1:
-        msg = (
-            f"current_difficulty must be between 0 and 1, "
-            f"got {current_difficulty}"
-        )
+        msg = f"current_difficulty must be between 0 and 1, got {current_difficulty}"
         raise ValueError(msg)
     if temperature <= 0:
         msg = f"temperature must be positive, got {temperature}"
@@ -1126,13 +1116,15 @@ def get_recommended_curriculum_config(task_type: str) -> CurriculumConfig:
             ...
         ValueError: task_type must be one of ...
     """
-    valid_tasks = frozenset({
-        "classification",
-        "generation",
-        "translation",
-        "summarization",
-        "qa",
-    })
+    valid_tasks = frozenset(
+        {
+            "classification",
+            "generation",
+            "translation",
+            "summarization",
+            "qa",
+        }
+    )
 
     if task_type not in valid_tasks:
         msg = f"task_type must be one of {valid_tasks}, got '{task_type}'"

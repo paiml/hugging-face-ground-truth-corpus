@@ -373,9 +373,7 @@ def validate_evol_instruct_config(config: EvolInstructConfig) -> None:
         raise ValueError(msg)
 
     if config.complexity_increase < 1.0:
-        msg = (
-            f"complexity_increase must be >= 1.0, got {config.complexity_increase}"
-        )
+        msg = f"complexity_increase must be >= 1.0, got {config.complexity_increase}"
         raise ValueError(msg)
 
     if config.max_length <= 0:
@@ -432,9 +430,7 @@ def validate_synthetic_config(config: SyntheticConfig) -> None:
         raise ValueError(msg)
 
     if not 0.0 <= config.dedup_threshold <= 1.0:
-        msg = (
-            f"dedup_threshold must be between 0 and 1, got {config.dedup_threshold}"
-        )
+        msg = f"dedup_threshold must be between 0 and 1, got {config.dedup_threshold}"
         raise ValueError(msg)
 
     if config.target_count <= 0:
@@ -1089,9 +1085,9 @@ def validate_synthetic_quality(
     # Check for low-quality individual samples
     low_quality_count = sum(1 for s in samples if s.quality_score < min_quality_score)
     if low_quality_count > len(samples) * 0.2:
+        pct = low_quality_count / len(samples) * 100
         issues.append(
-            f"{low_quality_count} samples ({low_quality_count/len(samples)*100:.1f}%) "
-            f"below quality threshold"
+            f"{low_quality_count} samples ({pct:.1f}%) below quality threshold"
         )
 
     return {

@@ -749,9 +749,7 @@ class TestCheckScriptable:
     def test_with_both_not_scriptable(self) -> None:
         """Test model with both control flow and dynamic shapes is not scriptable."""
         assert (
-            check_scriptable(
-                "custom", has_control_flow=True, has_dynamic_shapes=True
-            )
+            check_scriptable("custom", has_control_flow=True, has_dynamic_shapes=True)
             is False
         )
 
@@ -903,9 +901,7 @@ class TestCreateTorchScriptInfo:
 
     def test_creates_info_with_string_mode(self) -> None:
         """Test creating info with string mode."""
-        info = create_torchscript_info(
-            "/models/model.pt", "trace", 1500, 7_000_000_000
-        )
+        info = create_torchscript_info("/models/model.pt", "trace", 1500, 7_000_000_000)
         assert info.script_mode == ScriptMode.TRACE
 
     def test_creates_info_with_enum_mode(self) -> None:

@@ -380,9 +380,7 @@ class TestCreateVideoConfig:
             ("slowfast", VideoModelType.SLOWFAST),
         ],
     )
-    def test_all_model_types(
-        self, model_type: str, expected: VideoModelType
-    ) -> None:
+    def test_all_model_types(self, model_type: str, expected: VideoModelType) -> None:
         """Test all valid model types."""
         config = create_video_config(model_type=model_type)
         assert config.model_type == expected
@@ -661,9 +659,7 @@ class TestGetSamplingStrategy:
             ("dense", FrameSamplingStrategy.DENSE),
         ],
     )
-    def test_valid_strategies(
-        self, name: str, expected: FrameSamplingStrategy
-    ) -> None:
+    def test_valid_strategies(self, name: str, expected: FrameSamplingStrategy) -> None:
         """Test getting valid strategies."""
         assert get_sampling_strategy(name) == expected
 

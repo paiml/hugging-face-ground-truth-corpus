@@ -264,9 +264,7 @@ class TestValidateVectorStoreConfig:
     def test_zero_dimension_raises(self) -> None:
         """Zero dimension raises ValueError."""
         idx = IndexConfig(IndexType.FLAT, 100, 10, 128)
-        config = VectorStoreConfig(
-            VectorStoreType.FAISS, idx, DistanceMetric.COSINE, 0
-        )
+        config = VectorStoreConfig(VectorStoreType.FAISS, idx, DistanceMetric.COSINE, 0)
         with pytest.raises(ValueError, match="dimension must be positive"):
             validate_vectorstore_config(config)
 
@@ -802,9 +800,7 @@ class TestPropertyBased:
         dimension=st.integers(min_value=1, max_value=4096),
     )
     @settings(max_examples=50)
-    def test_index_size_always_positive(
-        self, num_vectors: int, dimension: int
-    ) -> None:
+    def test_index_size_always_positive(self, num_vectors: int, dimension: int) -> None:
         """Index size is always positive for valid inputs."""
         size = calculate_index_size(num_vectors, dimension, IndexType.FLAT)
         assert size > 0
@@ -824,9 +820,7 @@ class TestPropertyBased:
         k=st.integers(min_value=1, max_value=100),
     )
     @settings(max_examples=50)
-    def test_recall_in_valid_range(
-        self, relevant: int, total: int, k: int
-    ) -> None:
+    def test_recall_in_valid_range(self, relevant: int, total: int, k: int) -> None:
         """Recall is always between 0 and 1."""
         if relevant <= total and relevant <= k:
             recall = calculate_recall_at_k(relevant, total, k)

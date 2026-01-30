@@ -1073,13 +1073,15 @@ def get_recommended_nas_config(task_type: str) -> SearchConfig:
             ...
         ValueError: task_type must be one of ...
     """
-    valid_tasks = frozenset({
-        "classification",
-        "generation",
-        "translation",
-        "summarization",
-        "qa",
-    })
+    valid_tasks = frozenset(
+        {
+            "classification",
+            "generation",
+            "translation",
+            "summarization",
+            "qa",
+        }
+    )
 
     if task_type not in valid_tasks:
         msg = f"task_type must be one of {valid_tasks}, got '{task_type}'"

@@ -81,9 +81,7 @@ VALID_TEMPLATE_FORMATS = frozenset(f.value for f in ChatTemplateFormat)
 
 # Truncation strategy types
 TruncationStrategyType = Literal["oldest_first", "newest_first", "middle_out"]
-VALID_TRUNCATION_STRATEGIES = frozenset(
-    {"oldest_first", "newest_first", "middle_out"}
-)
+VALID_TRUNCATION_STRATEGIES = frozenset({"oldest_first", "newest_first", "middle_out"})
 
 
 @dataclass(frozen=True, slots=True)

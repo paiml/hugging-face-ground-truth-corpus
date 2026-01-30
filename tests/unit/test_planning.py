@@ -125,9 +125,7 @@ class TestPlanConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = PlanConfig(
-            PlanningStrategy.CHAIN_OF_THOUGHT, 10, 3, True
-        )
+        config = PlanConfig(PlanningStrategy.CHAIN_OF_THOUGHT, 10, 3, True)
         with pytest.raises(AttributeError):
             config.max_steps = 20  # type: ignore[misc]
 
@@ -174,9 +172,7 @@ class TestTaskNode:
 
     def test_task_node_is_frozen(self) -> None:
         """Task node is immutable."""
-        task = TaskNode(
-            "t1", "Description", TaskStatus.PENDING, (), None
-        )
+        task = TaskNode("t1", "Description", TaskStatus.PENDING, (), None)
         with pytest.raises(AttributeError):
             task.status = TaskStatus.COMPLETED  # type: ignore[misc]
 
@@ -257,9 +253,7 @@ class TestValidatePlanConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = PlanConfig(
-            PlanningStrategy.CHAIN_OF_THOUGHT, 10, 3, True
-        )
+        config = PlanConfig(PlanningStrategy.CHAIN_OF_THOUGHT, 10, 3, True)
         validate_plan_config(config)
 
     def test_none_config_raises(self) -> None:
@@ -350,9 +344,7 @@ class TestCreatePlanConfig:
             ("reflexion", PlanningStrategy.REFLEXION),
         ],
     )
-    def test_all_strategies(
-        self, strategy: str, expected: PlanningStrategy
-    ) -> None:
+    def test_all_strategies(self, strategy: str, expected: PlanningStrategy) -> None:
         """Create config with each strategy."""
         config = create_plan_config(strategy=strategy)
         assert config.strategy == expected
@@ -422,23 +414,17 @@ class TestCreateTaskNode:
 
     def test_with_dependencies(self) -> None:
         """Create task with dependencies."""
-        task = create_task_node(
-            "t2", "Process data", dependencies=("t1",)
-        )
+        task = create_task_node("t2", "Process data", dependencies=("t1",))
         assert task.dependencies == ("t1",)
 
     def test_with_multiple_dependencies(self) -> None:
         """Create task with multiple dependencies."""
-        task = create_task_node(
-            "t3", "Aggregate", dependencies=("t1", "t2")
-        )
+        task = create_task_node("t3", "Aggregate", dependencies=("t1", "t2"))
         assert task.dependencies == ("t1", "t2")
 
     def test_with_result(self) -> None:
         """Create task with result."""
-        task = create_task_node(
-            "t1", "Fetch", status="completed", result="Success"
-        )
+        task = create_task_node("t1", "Fetch", status="completed", result="Success")
         assert task.result == "Success"
 
     def test_empty_task_id_raises(self) -> None:
@@ -625,9 +611,7 @@ class TestGetPlanningStrategy:
             ("reflexion", PlanningStrategy.REFLEXION),
         ],
     )
-    def test_all_strategies(
-        self, name: str, expected: PlanningStrategy
-    ) -> None:
+    def test_all_strategies(self, name: str, expected: PlanningStrategy) -> None:
         """Get all strategies by name."""
         assert get_planning_strategy(name) == expected
 

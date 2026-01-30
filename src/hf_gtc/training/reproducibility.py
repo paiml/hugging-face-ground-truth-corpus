@@ -394,7 +394,8 @@ def validate_rng_state(state: RNGState) -> None:
         raise ValueError(msg)
 
     if all(
-        s is None for s in [
+        s is None
+        for s in [
             state.python_state,
             state.numpy_state,
             state.torch_state,
@@ -803,8 +804,7 @@ def get_determinism_level(name: str) -> DeterminismLevel:
     """
     if name not in VALID_DETERMINISM_LEVELS:
         msg = (
-            f"determinism_level must be one of {VALID_DETERMINISM_LEVELS}, "
-            f"got '{name}'"
+            f"determinism_level must be one of {VALID_DETERMINISM_LEVELS}, got '{name}'"
         )
         raise ValueError(msg)
     return DeterminismLevel(name)

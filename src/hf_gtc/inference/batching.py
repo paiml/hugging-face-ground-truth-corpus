@@ -247,8 +247,7 @@ def validate_batch_config(config: BatchConfig) -> None:
 
     if config.max_tokens_per_batch <= 0:
         msg = (
-            f"max_tokens_per_batch must be positive, "
-            f"got {config.max_tokens_per_batch}"
+            f"max_tokens_per_batch must be positive, got {config.max_tokens_per_batch}"
         )
         raise ValueError(msg)
 
@@ -428,10 +427,7 @@ def create_batch_config(
         ValueError: max_batch_size must be positive
     """
     if strategy not in VALID_BATCHING_STRATEGIES:
-        msg = (
-            f"strategy must be one of {VALID_BATCHING_STRATEGIES}, "
-            f"got '{strategy}'"
-        )
+        msg = f"strategy must be one of {VALID_BATCHING_STRATEGIES}, got '{strategy}'"
         raise ValueError(msg)
 
     config = BatchConfig(
@@ -655,10 +651,7 @@ def get_batching_strategy(name: str) -> BatchingStrategy:
         ValueError: Unknown batching strategy
     """
     if name not in VALID_BATCHING_STRATEGIES:
-        msg = (
-            f"Unknown batching strategy: '{name}'. "
-            f"Valid: {VALID_BATCHING_STRATEGIES}"
-        )
+        msg = f"Unknown batching strategy: '{name}'. Valid: {VALID_BATCHING_STRATEGIES}"
         raise ValueError(msg)
     return BatchingStrategy(name)
 
@@ -686,10 +679,7 @@ def get_scheduling_policy(name: str) -> SchedulingPolicy:
         ValueError: Unknown scheduling policy
     """
     if name not in VALID_SCHEDULING_POLICIES:
-        msg = (
-            f"Unknown scheduling policy: '{name}'. "
-            f"Valid: {VALID_SCHEDULING_POLICIES}"
-        )
+        msg = f"Unknown scheduling policy: '{name}'. Valid: {VALID_SCHEDULING_POLICIES}"
         raise ValueError(msg)
     return SchedulingPolicy(name)
 

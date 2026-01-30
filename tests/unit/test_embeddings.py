@@ -271,7 +271,7 @@ class TestValidatePoolingConfig:
     def test_weights_not_sum_to_one_raises(self) -> None:
         """Test that weights not summing to 1.0 raises error."""
         config = PoolingConfig(PoolingStrategy.MEAN, (0.3, 0.3), True)
-        with pytest.raises(ValueError, match="layer_weights must sum to 1.0"):
+        with pytest.raises(ValueError, match=r"layer_weights must sum to 1\.0"):
             validate_pooling_config(config)
 
     def test_negative_weights_raises(self) -> None:
@@ -725,7 +725,9 @@ class TestComputePooledEmbedding:
         """Test weighted mean pooling."""
         emb = ((1.0, 0.0), (0.0, 1.0))
         weights = (0.75, 0.25)
-        pooled = compute_pooled_embedding(emb, strategy="weighted_mean", weights=weights)
+        pooled = compute_pooled_embedding(
+            emb, strategy="weighted_mean", weights=weights
+        )
         assert pooled[0] == pytest.approx(0.75)
         assert pooled[1] == pytest.approx(0.25)
 
@@ -733,7 +735,9 @@ class TestComputePooledEmbedding:
         """Test weighted mean with zero total weight."""
         emb = ((1.0, 2.0), (3.0, 4.0))
         weights = (0.0, 0.0)
-        pooled = compute_pooled_embedding(emb, strategy="weighted_mean", weights=weights)
+        pooled = compute_pooled_embedding(
+            emb, strategy="weighted_mean", weights=weights
+        )
         assert pooled == (0.0, 0.0)
 
     def test_weighted_mean_without_weights_raises(self) -> None:

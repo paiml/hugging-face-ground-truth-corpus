@@ -756,7 +756,13 @@ def get_recommended_opset(model_type: str) -> ONNXOpset:
 
     # Models that work well with opset 14
     medium_opset_models = {
-        "bert", "roberta", "gpt2", "t5", "bart", "mbart", "distilbert",
+        "bert",
+        "roberta",
+        "gpt2",
+        "t5",
+        "bart",
+        "mbart",
+        "distilbert",
     }
 
     if model_type in high_opset_models:
@@ -939,9 +945,11 @@ def format_export_stats(stats: ExportStats) -> str:
     # Format size in appropriate units
     size_mb = stats.model_size_bytes / (1024 * 1024)
 
-    return "\n".join([
-        f"Export Time: {stats.export_time_seconds:.2f}s",
-        f"Model Size: {size_mb:.1f} MB",
-        f"Nodes: {stats.num_nodes:,}",
-        f"Initializers: {stats.num_initializers:,}",
-    ])
+    return "\n".join(
+        [
+            f"Export Time: {stats.export_time_seconds:.2f}s",
+            f"Model Size: {size_mb:.1f} MB",
+            f"Nodes: {stats.num_nodes:,}",
+            f"Initializers: {stats.num_initializers:,}",
+        ]
+    )

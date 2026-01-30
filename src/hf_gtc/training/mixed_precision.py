@@ -584,8 +584,7 @@ def calculate_memory_reduction(
 
     if target_dtype not in VALID_PRECISION_TYPES:
         msg = (
-            f"target_dtype must be one of {VALID_PRECISION_TYPES}, "
-            f"got '{target_dtype}'"
+            f"target_dtype must be one of {VALID_PRECISION_TYPES}, got '{target_dtype}'"
         )
         raise ValueError(msg)
 
@@ -655,8 +654,7 @@ def estimate_speedup(
 
     if target_dtype not in VALID_PRECISION_TYPES:
         msg = (
-            f"target_dtype must be one of {VALID_PRECISION_TYPES}, "
-            f"got '{target_dtype}'"
+            f"target_dtype must be one of {VALID_PRECISION_TYPES}, got '{target_dtype}'"
         )
         raise ValueError(msg)
 
@@ -1048,8 +1046,7 @@ def get_scaling_strategy(name: str) -> ScalingStrategy:
     """
     if name not in VALID_SCALING_STRATEGIES:
         msg = (
-            f"scaling strategy must be one of {VALID_SCALING_STRATEGIES}, "
-            f"got '{name}'"
+            f"scaling strategy must be one of {VALID_SCALING_STRATEGIES}, got '{name}'"
         )
         raise ValueError(msg)
     return ScalingStrategy(name)

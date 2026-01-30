@@ -779,9 +779,7 @@ class TestCalculateSampleWeights:
     def test_weighted_strategy(self) -> None:
         """Weighted strategy gives smooth weights."""
         difficulties = (0.1, 0.3, 0.5, 0.7, 0.9)
-        weights = calculate_sample_weights(
-            difficulties, 0.5, SamplingStrategy.WEIGHTED
-        )
+        weights = calculate_sample_weights(difficulties, 0.5, SamplingStrategy.WEIGHTED)
         assert all(w >= 0 for w in weights)
         assert weights[0] >= weights[-1]
 

@@ -503,8 +503,7 @@ def create_stopping_criteria(
     """
     if criteria_type not in VALID_STOP_CRITERIA:
         msg = (
-            f"criteria_type must be one of {VALID_STOP_CRITERIA}, "
-            f"got '{criteria_type}'"
+            f"criteria_type must be one of {VALID_STOP_CRITERIA}, got '{criteria_type}'"
         )
         raise ValueError(msg)
 

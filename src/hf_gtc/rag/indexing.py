@@ -313,8 +313,7 @@ def validate_search_config(config: SearchConfig) -> None:
 
     if not 0.0 <= config.score_threshold <= 1.0:
         msg = (
-            f"score_threshold must be between 0.0 and 1.0, "
-            f"got {config.score_threshold}"
+            f"score_threshold must be between 0.0 and 1.0, got {config.score_threshold}"
         )
         raise ValueError(msg)
 
@@ -691,8 +690,7 @@ def get_distance_function(name: str) -> DistanceFunction:
     """
     if name not in VALID_DISTANCE_FUNCTIONS:
         msg = (
-            f"distance_function must be one of {VALID_DISTANCE_FUNCTIONS}, "
-            f"got '{name}'"
+            f"distance_function must be one of {VALID_DISTANCE_FUNCTIONS}, got '{name}'"
         )
         raise ValueError(msg)
     return DistanceFunction(name)

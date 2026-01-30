@@ -264,8 +264,7 @@ def validate_adversarial_config(config: AdversarialConfig) -> None:
 
     if not 0.0 <= config.success_threshold <= 1.0:
         msg = (
-            f"success_threshold must be between 0 and 1, "
-            f"got {config.success_threshold}"
+            f"success_threshold must be between 0 and 1, got {config.success_threshold}"
         )
         raise ValueError(msg)
 
@@ -987,9 +986,7 @@ def calculate_attack_success_rate(
         raise ValueError(msg)
 
     if not (
-        len(original_predictions)
-        == len(attacked_predictions)
-        == len(original_labels)
+        len(original_predictions) == len(attacked_predictions) == len(original_labels)
     ):
         msg = (
             f"inputs must have same length, got "

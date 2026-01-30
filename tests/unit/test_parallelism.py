@@ -2,21 +2,19 @@
 
 from __future__ import annotations
 
-import math
-
 import pytest
 
 from hf_gtc.training.parallelism import (
     VALID_COMMUNICATION_BACKENDS,
-    VALID_PARALLELISM_TYPES,
     VALID_PARALLEL_SHARDING_STRATEGIES,
+    VALID_PARALLELISM_TYPES,
     CommunicationBackend,
-    ParallelFSDPConfig,
     ParallelConfig,
+    ParallelFSDPConfig,
     ParallelismType,
+    ParallelShardingStrategy,
     ParallelStats,
     PipelineParallelConfig,
-    ParallelShardingStrategy,
     TensorParallelConfig,
     calculate_memory_per_device,
     calculate_world_size,
@@ -192,7 +190,9 @@ class TestParallelFSDPConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        config = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         with pytest.raises(AttributeError):
             config.cpu_offload = True  # type: ignore[misc]
 
@@ -204,7 +204,9 @@ class TestParallelConfig:
         """Create parallel config."""
         tp = TensorParallelConfig(2, 1, True, True)
         pp = PipelineParallelConfig(2, 4, False, True)
-        fsdp = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        fsdp = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         config = ParallelConfig(
             dp_size=2,
             tp_config=tp,
@@ -219,7 +221,9 @@ class TestParallelConfig:
         """Config is immutable."""
         tp = TensorParallelConfig(2, 1, True, True)
         pp = PipelineParallelConfig(2, 4, False, True)
-        fsdp = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        fsdp = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         config = ParallelConfig(2, tp, pp, fsdp, CommunicationBackend.NCCL)
         with pytest.raises(AttributeError):
             config.dp_size = 4  # type: ignore[misc]
@@ -319,7 +323,7 @@ class TestValidatePipelineParallelConfig:
     def test_microbatches_less_than_pp_size_raises(self) -> None:
         """num_microbatches < pp_size raises ValueError."""
         config = PipelineParallelConfig(8, 4, True, True)
-        with pytest.raises(ValueError, match="num_microbatches.*must be >= pp_size"):
+        with pytest.raises(ValueError, match=r"num_microbatches.*must be >= pp_size"):
             validate_pipeline_parallel_config(config)
 
 
@@ -328,7 +332,9 @@ class TestValidateParallelFSDPConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        config = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         validate_fsdp_config(config)
 
     def test_cpu_offload_with_no_shard_raises(self) -> None:
@@ -339,7 +345,9 @@ class TestValidateParallelFSDPConfig:
 
     def test_cpu_offload_with_full_shard_valid(self) -> None:
         """CPU offload with FULL_SHARD is valid."""
-        config = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, True, True, True)
+        config = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, True, True, True
+        )
         validate_fsdp_config(config)
 
 
@@ -350,7 +358,9 @@ class TestValidateParallelConfig:
         """Valid config passes validation."""
         tp = TensorParallelConfig(2, 1, True, True)
         pp = PipelineParallelConfig(2, 4, False, True)
-        fsdp = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        fsdp = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         config = ParallelConfig(2, tp, pp, fsdp, CommunicationBackend.NCCL)
         validate_parallel_config(config)
 
@@ -358,7 +368,9 @@ class TestValidateParallelConfig:
         """Zero dp_size raises ValueError."""
         tp = TensorParallelConfig(2, 1, True, True)
         pp = PipelineParallelConfig(2, 4, False, True)
-        fsdp = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        fsdp = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         config = ParallelConfig(0, tp, pp, fsdp, CommunicationBackend.NCCL)
         with pytest.raises(ValueError, match="dp_size must be positive"):
             validate_parallel_config(config)
@@ -367,7 +379,9 @@ class TestValidateParallelConfig:
         """Invalid tp_config raises ValueError."""
         tp = TensorParallelConfig(0, 1, True, True)  # Invalid
         pp = PipelineParallelConfig(2, 4, False, True)
-        fsdp = ParallelFSDPConfig(ParallelShardingStrategy.FULL_SHARD, False, True, True)
+        fsdp = ParallelFSDPConfig(
+            ParallelShardingStrategy.FULL_SHARD, False, True, True
+        )
         config = ParallelConfig(2, tp, pp, fsdp, CommunicationBackend.NCCL)
         with pytest.raises(ValueError, match="tp_size must be positive"):
             validate_parallel_config(config)
@@ -590,7 +604,9 @@ class TestGetParallelShardingStrategy:
             ("hybrid", ParallelShardingStrategy.HYBRID),
         ],
     )
-    def test_all_strategies(self, name: str, expected: ParallelShardingStrategy) -> None:
+    def test_all_strategies(
+        self, name: str, expected: ParallelShardingStrategy
+    ) -> None:
         """Test all valid sharding strategies."""
         assert get_sharding_strategy(name) == expected
 
@@ -682,13 +698,19 @@ class TestEstimateCommunicationOverhead:
         tp_sp = create_tensor_parallel_config(tp_size=8, sequence_parallel=True)
         config_no_sp = create_parallel_config(tp_config=tp_no_sp)
         config_sp = create_parallel_config(tp_config=tp_sp)
-        assert estimate_communication_overhead(config_sp) < estimate_communication_overhead(config_no_sp)
+        assert estimate_communication_overhead(
+            config_sp
+        ) < estimate_communication_overhead(config_no_sp)
 
     def test_larger_models_less_overhead(self) -> None:
         """Larger models amortize overhead better."""
         config = create_parallel_config(dp_size=8)
-        small_overhead = estimate_communication_overhead(config, model_params_billions=1.0)
-        large_overhead = estimate_communication_overhead(config, model_params_billions=70.0)
+        small_overhead = estimate_communication_overhead(
+            config, model_params_billions=1.0
+        )
+        large_overhead = estimate_communication_overhead(
+            config, model_params_billions=70.0
+        )
         assert large_overhead < small_overhead
 
     def test_zero_model_params_raises(self) -> None:
@@ -699,11 +721,17 @@ class TestEstimateCommunicationOverhead:
 
     def test_interleave_reduces_pp_overhead(self) -> None:
         """Interleaved pipeline reduces overhead."""
-        pp_no_interleave = create_pipeline_parallel_config(pp_size=4, num_microbatches=8, interleave=False)
-        pp_interleave = create_pipeline_parallel_config(pp_size=4, num_microbatches=8, interleave=True)
+        pp_no_interleave = create_pipeline_parallel_config(
+            pp_size=4, num_microbatches=8, interleave=False
+        )
+        pp_interleave = create_pipeline_parallel_config(
+            pp_size=4, num_microbatches=8, interleave=True
+        )
         config_no = create_parallel_config(pp_config=pp_no_interleave)
         config_yes = create_parallel_config(pp_config=pp_interleave)
-        assert estimate_communication_overhead(config_yes) < estimate_communication_overhead(config_no)
+        assert estimate_communication_overhead(
+            config_yes
+        ) < estimate_communication_overhead(config_no)
 
 
 class TestCalculateMemoryPerDevice:

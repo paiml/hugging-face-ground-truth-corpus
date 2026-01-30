@@ -624,11 +624,15 @@ def create_meta_learning_config(
     if method in (MetaLearningMethod.MAML, MetaLearningMethod.REPTILE):
         if maml_config is None:
             maml_config = create_maml_config()
-    elif method in (
-        MetaLearningMethod.PROTONET,
-        MetaLearningMethod.MATCHING_NET,
-        MetaLearningMethod.RELATION_NET,
-    ) and protonet_config is None:
+    elif (
+        method
+        in (
+            MetaLearningMethod.PROTONET,
+            MetaLearningMethod.MATCHING_NET,
+            MetaLearningMethod.RELATION_NET,
+        )
+        and protonet_config is None
+    ):
         protonet_config = create_protonet_config()
 
     config = MetaLearningConfig(

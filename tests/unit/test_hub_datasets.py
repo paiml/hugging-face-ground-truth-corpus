@@ -222,9 +222,7 @@ class TestValidateDatasetConfig:
 
     def test_empty_name_raises(self) -> None:
         """Test that empty name raises ValueError."""
-        config = DatasetConfig(
-            "", None, SplitType.TRAIN, StreamingMode.DISABLED, False
-        )
+        config = DatasetConfig("", None, SplitType.TRAIN, StreamingMode.DISABLED, False)
         with pytest.raises(ValueError, match="name cannot be empty"):
             validate_dataset_config(config)
 

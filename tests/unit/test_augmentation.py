@@ -1493,11 +1493,11 @@ class TestPropertyBased:
         result = random_swap(words, 2)
         assert sorted(result) == sorted(words)
 
-    @given(st.integers(min_value=1, max_value=10), st.integers(min_value=0, max_value=5))
+    @given(
+        st.integers(min_value=1, max_value=10), st.integers(min_value=0, max_value=5)
+    )
     @settings(max_examples=10)
-    def test_augmentation_factor_positive(
-        self, num_augs: int, num_techs: int
-    ) -> None:
+    def test_augmentation_factor_positive(self, num_augs: int, num_techs: int) -> None:
         """Test that augmentation factor is always positive."""
         factor = calculate_augmentation_factor(num_augs, num_techs)
         assert factor >= 1.0

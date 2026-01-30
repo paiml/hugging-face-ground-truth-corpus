@@ -379,10 +379,7 @@ def validate_cot_config(config: CoTConfig) -> None:
         ValueError: step_marker cannot be empty for chain_of_thought reasoning
     """
     if config.reasoning_type != ReasoningType.NONE and not config.step_marker:
-        msg = (
-            f"step_marker cannot be empty for "
-            f"{config.reasoning_type.value} reasoning"
-        )
+        msg = f"step_marker cannot be empty for {config.reasoning_type.value} reasoning"
         raise ValueError(msg)
 
 
@@ -995,16 +992,11 @@ def add_cot_reasoning(
         return prompt
 
     reasoning_instructions = {
-        ReasoningType.CHAIN_OF_THOUGHT: (
-            "\n\nLet's think through this step by step:"
-        ),
+        ReasoningType.CHAIN_OF_THOUGHT: ("\n\nLet's think through this step by step:"),
         ReasoningType.TREE_OF_THOUGHT: (
-            "\n\nLet's explore multiple solution paths:\n"
-            "Path 1: \nPath 2: \nPath 3: "
+            "\n\nLet's explore multiple solution paths:\nPath 1: \nPath 2: \nPath 3: "
         ),
-        ReasoningType.STEP_BY_STEP: (
-            f"\n\n{config.step_marker.format(n=1)}"
-        ),
+        ReasoningType.STEP_BY_STEP: (f"\n\n{config.step_marker.format(n=1)}"),
     }
 
     instruction = reasoning_instructions.get(config.reasoning_type, "")

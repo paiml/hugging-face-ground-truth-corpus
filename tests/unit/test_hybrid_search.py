@@ -225,9 +225,7 @@ class TestHybridSearchResult:
 
     def test_result_is_frozen(self) -> None:
         """Result is immutable."""
-        result = HybridSearchResult(
-            ("doc1",), (0.9,), (0.85,), (0.95,)
-        )
+        result = HybridSearchResult(("doc1",), (0.9,), (0.85,), (0.95,))
         with pytest.raises(AttributeError):
             result.scores = (0.8,)  # type: ignore[misc]
 
@@ -391,34 +389,26 @@ class TestValidateHybridSearchResult:
 
     def test_valid_result(self) -> None:
         """Valid result passes validation."""
-        result = HybridSearchResult(
-            ("doc1",), (0.9,), (0.85,), (0.95,)
-        )
+        result = HybridSearchResult(("doc1",), (0.9,), (0.85,), (0.95,))
         validate_hybrid_search_result(result)  # Should not raise
 
     def test_mismatched_scores_raises(self) -> None:
         """Mismatched doc_ids and scores raises ValueError."""
-        result = HybridSearchResult(
-            ("doc1", "doc2"), (0.9,), (0.85, 0.8), (0.95, 0.9)
-        )
+        result = HybridSearchResult(("doc1", "doc2"), (0.9,), (0.85, 0.8), (0.95, 0.9))
         expected_match = "doc_ids and scores must have the same length"
         with pytest.raises(ValueError, match=expected_match):
             validate_hybrid_search_result(result)
 
     def test_mismatched_dense_scores_raises(self) -> None:
         """Mismatched dense_scores raises ValueError."""
-        result = HybridSearchResult(
-            ("doc1", "doc2"), (0.9, 0.8), (0.85,), (0.95, 0.9)
-        )
+        result = HybridSearchResult(("doc1", "doc2"), (0.9, 0.8), (0.85,), (0.95, 0.9))
         expected_match = "doc_ids and dense_scores must have the same length"
         with pytest.raises(ValueError, match=expected_match):
             validate_hybrid_search_result(result)
 
     def test_mismatched_sparse_scores_raises(self) -> None:
         """Mismatched sparse_scores raises ValueError."""
-        result = HybridSearchResult(
-            ("doc1", "doc2"), (0.9, 0.8), (0.85, 0.8), (0.95,)
-        )
+        result = HybridSearchResult(("doc1", "doc2"), (0.9, 0.8), (0.85, 0.8), (0.95,))
         expected_match = "doc_ids and sparse_scores must have the same length"
         with pytest.raises(ValueError, match=expected_match):
             validate_hybrid_search_result(result)
@@ -482,9 +472,7 @@ class TestCreateSparseConfig:
             ("splade", SparseMethod.SPLADE),
         ],
     )
-    def test_all_sparse_methods(
-        self, method: str, expected: SparseMethod
-    ) -> None:
+    def test_all_sparse_methods(self, method: str, expected: SparseMethod) -> None:
         """Create config with all sparse methods."""
         config = create_sparse_config(method=method)
         assert config.method == expected
@@ -537,9 +525,7 @@ class TestCreateHybridConfig:
             ("learned", FusionMethod.LEARNED),
         ],
     )
-    def test_all_fusion_methods(
-        self, method: str, expected: FusionMethod
-    ) -> None:
+    def test_all_fusion_methods(self, method: str, expected: FusionMethod) -> None:
         """Create config with all fusion methods."""
         config = create_hybrid_config(fusion_method=method)
         assert config.fusion_method == expected
@@ -796,8 +782,7 @@ class TestCalculateBM25Score:
         """Custom BM25 config affects score."""
         config = create_bm25_config(k1=2.0, b=0.5)
         score = calculate_bm25_score(
-            tf=3, df=100, doc_len=500, avg_doc_len=400.0, num_docs=10000,
-            config=config
+            tf=3, df=100, doc_len=500, avg_doc_len=400.0, num_docs=10000, config=config
         )
         assert score > 0
 
@@ -936,27 +921,21 @@ class TestFuseRankings:
         """Linear fusion method."""
         dense = {"doc1": 1, "doc2": 2}
         sparse = {"doc1": 2, "doc2": 1}
-        results = fuse_rankings(
-            dense, sparse, fusion_method=FusionMethod.LINEAR
-        )
+        results = fuse_rankings(dense, sparse, fusion_method=FusionMethod.LINEAR)
         assert len(results) == 2
 
     def test_convex_fusion(self) -> None:
         """Convex fusion method."""
         dense = {"doc1": 1}
         sparse = {"doc1": 1}
-        results = fuse_rankings(
-            dense, sparse, fusion_method=FusionMethod.CONVEX
-        )
+        results = fuse_rankings(dense, sparse, fusion_method=FusionMethod.CONVEX)
         assert len(results) == 1
 
     def test_learned_fusion(self) -> None:
         """Learned fusion method (fallback to equal weights)."""
         dense = {"doc1": 1}
         sparse = {"doc1": 1}
-        results = fuse_rankings(
-            dense, sparse, fusion_method=FusionMethod.LEARNED
-        )
+        results = fuse_rankings(dense, sparse, fusion_method=FusionMethod.LEARNED)
         assert len(results) == 1
 
     def test_custom_weights(self) -> None:
@@ -1027,9 +1006,7 @@ class TestOptimizeFusionWeights:
 
     def test_zero_total_weight_returns_default(self) -> None:
         """Zero total weight returns default (0.5, 0.5)."""
-        weights = optimize_fusion_weights(
-            (0.7,), (0.6,), ((0.0, 0.0, 0.5),)
-        )
+        weights = optimize_fusion_weights((0.7,), (0.6,), ((0.0, 0.0, 0.5),))
         assert weights == (0.5, 0.5)
 
 
@@ -1166,9 +1143,7 @@ class TestPropertyBased:
         k=st.integers(min_value=1, max_value=200),
     )
     @settings(max_examples=50)
-    def test_rrf_score_always_positive(
-        self, ranks: list[int], k: int
-    ) -> None:
+    def test_rrf_score_always_positive(self, ranks: list[int], k: int) -> None:
         """RRF score is always positive for valid inputs."""
         score = calculate_rrf_score(tuple(ranks), k=k)
         assert score > 0

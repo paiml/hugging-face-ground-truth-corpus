@@ -312,9 +312,7 @@ def validate_merge_config(config: MergeConfig) -> None:
         raise ValueError(msg)
 
     if not 0.0 <= config.dropout_rate <= 1.0:
-        msg = (
-            f"dropout_rate must be between 0 and 1, got {config.dropout_rate}"
-        )
+        msg = f"dropout_rate must be between 0 and 1, got {config.dropout_rate}"
         raise ValueError(msg)
 
 

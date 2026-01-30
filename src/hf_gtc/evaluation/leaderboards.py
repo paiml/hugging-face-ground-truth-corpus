@@ -1367,8 +1367,7 @@ def create_leaderboard_entry(
         raise ValueError(msg)
 
     model_scores = [
-        ModelScore(metric_name=name, score=score)
-        for name, score in scores.items()
+        ModelScore(metric_name=name, score=score) for name, score in scores.items()
     ]
 
     return LeaderboardEntry(
@@ -1541,10 +1540,7 @@ def calculate_ranking(
         return []
 
     # Calculate average scores for sorting
-    entry_scores = [
-        (entry, compute_average_score(entry))
-        for entry in entries
-    ]
+    entry_scores = [(entry, compute_average_score(entry)) for entry in entries]
 
     # Sort by score (descending if higher is better)
     sorted_entries = sorted(
@@ -1733,8 +1729,10 @@ def compare_models(
             if score_a is not None and score_b is not None:
                 diff = score_a - score_b
                 metric_winner = (
-                    model_a.model_name if diff > 0
-                    else model_b.model_name if diff < 0
+                    model_a.model_name
+                    if diff > 0
+                    else model_b.model_name
+                    if diff < 0
                     else "tie"
                 )
                 per_metric[metric] = {
@@ -1861,7 +1859,12 @@ def get_recommended_leaderboard_config(
             "leaderboard_type": LeaderboardType.OPEN_LLM,
             "ranking_method": RankingMethod.WEIGHTED,
             "metrics": (
-                "mmlu", "hellaswag", "arc", "truthfulqa", "winogrande", "gsm8k",
+                "mmlu",
+                "hellaswag",
+                "arc",
+                "truthfulqa",
+                "winogrande",
+                "gsm8k",
             ),
             "higher_is_better": True,
             "precision": "float16",

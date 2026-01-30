@@ -528,8 +528,7 @@ def create_reward_config(
     """
     if model_type not in VALID_REWARD_MODEL_TYPES:
         msg = (
-            f"model_type must be one of {VALID_REWARD_MODEL_TYPES}, "
-            f"got '{model_type}'"
+            f"model_type must be one of {VALID_REWARD_MODEL_TYPES}, got '{model_type}'"
         )
         raise ValueError(msg)
 

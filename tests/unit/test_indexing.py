@@ -104,9 +104,7 @@ class TestFAISSConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = FAISSConfig(
-            FAISSIndexType.FLAT, 768, 100, 10, 8, 8, 200, 128
-        )
+        config = FAISSConfig(FAISSIndexType.FLAT, 768, 100, 10, 8, 8, 200, 128)
         with pytest.raises(AttributeError):
             config.dimension = 384  # type: ignore[misc]
 
@@ -116,9 +114,7 @@ class TestValidateFAISSConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = FAISSConfig(
-            FAISSIndexType.FLAT, 768, 100, 10, 8, 8, 200, 128
-        )
+        config = FAISSConfig(FAISSIndexType.FLAT, 768, 100, 10, 8, 8, 200, 128)
         validate_faiss_config(config)
 
     def test_zero_dimension_raises(self) -> None:

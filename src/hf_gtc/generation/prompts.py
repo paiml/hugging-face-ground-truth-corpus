@@ -1445,9 +1445,7 @@ def build_conversation_prompt(
         result.append(PromptMessage(role=PromptRole.SYSTEM, content=system_text))
 
     if few_shot_config and system_config and system_config.examples_in_system:
-        examples_text = format_few_shot_prompt(
-            few_shot_config, "", include_query=False
-        )
+        examples_text = format_few_shot_prompt(few_shot_config, "", include_query=False)
         if result:
             current = result[0]
             updated_content = f"{current.content}\n\nExamples:\n{examples_text}"

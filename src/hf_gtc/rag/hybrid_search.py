@@ -944,12 +944,8 @@ def fuse_rankings(
         elif fusion_method in (FusionMethod.LINEAR, FusionMethod.CONVEX):
             # Linear/Convex combination of inverse ranks
             max_rank = max(len(dense_ranks), len(sparse_ranks)) + 1
-            dense_score = (
-                1.0 / dense_rank if dense_rank else 1.0 / max_rank
-            )
-            sparse_score = (
-                1.0 / sparse_rank if sparse_rank else 1.0 / max_rank
-            )
+            dense_score = 1.0 / dense_rank if dense_rank else 1.0 / max_rank
+            sparse_score = 1.0 / sparse_rank if sparse_rank else 1.0 / max_rank
 
             total_weight = dense_weight + sparse_weight
             if total_weight > 0:

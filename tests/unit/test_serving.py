@@ -1339,7 +1339,9 @@ class TestGetRecommendedServingConfig:
         """Test config for small model."""
         config = get_recommended_serving_config(7.0, 100.0)
         valid_backends = (
-            ServingBackend.VLLM, ServingBackend.TGI, ServingBackend.FASTAPI
+            ServingBackend.VLLM,
+            ServingBackend.TGI,
+            ServingBackend.FASTAPI,
         )
         assert config.backend in valid_backends
 

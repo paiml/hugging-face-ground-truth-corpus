@@ -1072,9 +1072,7 @@ class TestHypothesis:
         assert config.human_prefix == prefix
 
     @given(st.sampled_from(list(MemoryType)))
-    def test_all_memory_types_have_string_value(
-        self, memory_type: MemoryType
-    ) -> None:
+    def test_all_memory_types_have_string_value(self, memory_type: MemoryType) -> None:
         """All memory types have string values."""
         result = get_memory_type(memory_type.value)
         assert result == memory_type

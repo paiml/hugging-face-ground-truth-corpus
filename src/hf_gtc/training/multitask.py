@@ -291,8 +291,7 @@ def validate_gradient_config(config: GradientConfig) -> None:
     """
     if config.conflict_threshold < 0:
         msg = (
-            f"conflict_threshold must be non-negative, "
-            f"got {config.conflict_threshold}"
+            f"conflict_threshold must be non-negative, got {config.conflict_threshold}"
         )
         raise ValueError(msg)
 
@@ -997,9 +996,7 @@ def project_conflicting_gradients(
                 if i == j:
                     continue
                 # Compute dot product
-                dot = sum(
-                    projected[i][k] * gradients[j][k] for k in range(grad_dim)
-                )
+                dot = sum(projected[i][k] * gradients[j][k] for k in range(grad_dim))
                 norm_sq = sum(gradients[j][k] ** 2 for k in range(grad_dim))
                 if dot < 0 and norm_sq > 0:
                     # Project out conflicting component
@@ -1205,12 +1202,14 @@ def get_recommended_multitask_config(task_type: str) -> MultiTaskConfig:
             ...
         ValueError: task_type must be one of ...
     """
-    valid_tasks = frozenset({
-        "classification",
-        "generation",
-        "mixed",
-        "hierarchical",
-    })
+    valid_tasks = frozenset(
+        {
+            "classification",
+            "generation",
+            "mixed",
+            "hierarchical",
+        }
+    )
 
     if task_type not in valid_tasks:
         msg = f"task_type must be one of {valid_tasks}, got '{task_type}'"

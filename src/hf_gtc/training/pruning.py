@@ -284,9 +284,7 @@ def validate_iterative_pruning_config(config: IterativePruningConfig) -> None:
         ValueError: final_sparsity (0.3) must be >= initial_sparsity (0.5)
     """
     if not 0 <= config.initial_sparsity <= 1:
-        msg = (
-            f"initial_sparsity must be between 0 and 1, got {config.initial_sparsity}"
-        )
+        msg = f"initial_sparsity must be between 0 and 1, got {config.initial_sparsity}"
         raise ValueError(msg)
     if not 0 <= config.final_sparsity <= 1:
         msg = f"final_sparsity must be between 0 and 1, got {config.final_sparsity}"
@@ -937,10 +935,7 @@ def schedule_sparsity(
         msg = f"total_steps must be positive, got {total_steps}"
         raise ValueError(msg)
     if current_step > total_steps:
-        msg = (
-            f"current_step ({current_step}) cannot exceed "
-            f"total_steps ({total_steps})"
-        )
+        msg = f"current_step ({current_step}) cannot exceed total_steps ({total_steps})"
         raise ValueError(msg)
     if not 0 <= initial_sparsity <= 1:
         msg = f"initial_sparsity must be between 0 and 1, got {initial_sparsity}"
@@ -986,6 +981,7 @@ def format_pruning_stats(stats: PruningStats) -> str:
         >>> "Original: 110.00M" in formatted
         True
     """
+
     def format_params(n: int) -> str:
         if n >= 1_000_000_000:
             return f"{n / 1_000_000_000:.2f}B"

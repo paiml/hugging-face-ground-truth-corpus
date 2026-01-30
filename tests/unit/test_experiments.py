@@ -252,8 +252,7 @@ class TestExperimentRun:
         """Run is immutable."""
         config = ExperimentConfig("test", "", (), {}, None)
         run = ExperimentRun(
-            "run-1", config, ExperimentStatus.RUNNING, {}, (),
-            datetime.now(UTC), None
+            "run-1", config, ExperimentStatus.RUNNING, {}, (), datetime.now(UTC), None
         )
         with pytest.raises(AttributeError):
             run.run_id = "new"  # type: ignore[misc]
@@ -353,8 +352,7 @@ class TestValidateExperimentRun:
         """Valid run passes validation."""
         config = ExperimentConfig("test", "", (), {}, None)
         run = ExperimentRun(
-            "run-1", config, ExperimentStatus.RUNNING, {}, (),
-            datetime.now(UTC), None
+            "run-1", config, ExperimentStatus.RUNNING, {}, (), datetime.now(UTC), None
         )
         validate_experiment_run(run)
 
@@ -362,8 +360,7 @@ class TestValidateExperimentRun:
         """Empty run_id raises ValueError."""
         config = ExperimentConfig("test", "", (), {}, None)
         run = ExperimentRun(
-            "", config, ExperimentStatus.RUNNING, {}, (),
-            datetime.now(UTC), None
+            "", config, ExperimentStatus.RUNNING, {}, (), datetime.now(UTC), None
         )
         with pytest.raises(ValueError, match="run_id cannot be empty"):
             validate_experiment_run(run)
@@ -372,8 +369,7 @@ class TestValidateExperimentRun:
         """Invalid config raises ValueError."""
         config = ExperimentConfig("", "", (), {}, None)
         run = ExperimentRun(
-            "run-1", config, ExperimentStatus.RUNNING, {}, (),
-            datetime.now(UTC), None
+            "run-1", config, ExperimentStatus.RUNNING, {}, (), datetime.now(UTC), None
         )
         with pytest.raises(ValueError, match="name cannot be empty"):
             validate_experiment_run(run)
@@ -383,8 +379,13 @@ class TestValidateExperimentRun:
         config = ExperimentConfig("test", "", (), {}, None)
         now = datetime.now(UTC)
         run = ExperimentRun(
-            "run-1", config, ExperimentStatus.COMPLETED, {}, (),
-            now, now - timedelta(hours=1)
+            "run-1",
+            config,
+            ExperimentStatus.COMPLETED,
+            {},
+            (),
+            now,
+            now - timedelta(hours=1),
         )
         with pytest.raises(ValueError, match="end_time cannot be before start_time"):
             validate_experiment_run(run)
@@ -918,9 +919,7 @@ class TestCalculateExperimentStats:
         run1 = ExperimentRun(
             "run-1", config, ExperimentStatus.COMPLETED, {}, (), now, now
         )
-        run2 = ExperimentRun(
-            "run-2", config, ExperimentStatus.FAILED, {}, (), now, now
-        )
+        run2 = ExperimentRun("run-2", config, ExperimentStatus.FAILED, {}, (), now, now)
         run3 = ExperimentRun(
             "run-3", config, ExperimentStatus.RUNNING, {}, (), now, None
         )
@@ -933,8 +932,13 @@ class TestCalculateExperimentStats:
         config = create_experiment_config("test")
         now = datetime.now(UTC)
         run = ExperimentRun(
-            "run-1", config, ExperimentStatus.COMPLETED, {}, (),
-            now, now + timedelta(hours=1)
+            "run-1",
+            config,
+            ExperimentStatus.COMPLETED,
+            {},
+            (),
+            now,
+            now + timedelta(hours=1),
         )
         stats = calculate_experiment_stats([run])
         assert stats.avg_duration_seconds == 3600.0

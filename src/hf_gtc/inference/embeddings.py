@@ -422,10 +422,7 @@ def create_pooling_config(
         ValueError: strategy must be one of
     """
     if strategy not in VALID_POOLING_STRATEGIES:
-        msg = (
-            f"strategy must be one of {VALID_POOLING_STRATEGIES}, "
-            f"got '{strategy}'"
-        )
+        msg = f"strategy must be one of {VALID_POOLING_STRATEGIES}, got '{strategy}'"
         raise ValueError(msg)
 
     config = PoolingConfig(
@@ -667,10 +664,7 @@ def get_pooling_strategy(name: str) -> PoolingStrategy:
         ValueError: Unknown pooling strategy
     """
     if name not in VALID_POOLING_STRATEGIES:
-        msg = (
-            f"Unknown pooling strategy: '{name}'. "
-            f"Valid: {VALID_POOLING_STRATEGIES}"
-        )
+        msg = f"Unknown pooling strategy: '{name}'. Valid: {VALID_POOLING_STRATEGIES}"
         raise ValueError(msg)
     return PoolingStrategy(name)
 
@@ -729,10 +723,7 @@ def get_similarity_metric(name: str) -> SimilarityMetric:
         ValueError: Unknown similarity metric
     """
     if name not in VALID_SIMILARITY_METRICS:
-        msg = (
-            f"Unknown similarity metric: '{name}'. "
-            f"Valid: {VALID_SIMILARITY_METRICS}"
-        )
+        msg = f"Unknown similarity metric: '{name}'. Valid: {VALID_SIMILARITY_METRICS}"
         raise ValueError(msg)
     return SimilarityMetric(name)
 

@@ -1274,9 +1274,7 @@ class TestCompareBenchmarkResults:
         config2 = LegacyBenchmarkConfig(name="model2")
         timing1 = TimingResult(1.0, 100.0, 5.0, 8.0, 10.0)
         timing2 = TimingResult(0.8, 125.0, 4.0, 6.0, 8.0)
-        r1 = LegacyBenchmarkResult(
-            config1, timing1, {"accuracy": 0.9}, 100, True, None
-        )
+        r1 = LegacyBenchmarkResult(config1, timing1, {"accuracy": 0.9}, 100, True, None)
         r2 = LegacyBenchmarkResult(
             config2, timing2, {"accuracy": 0.95}, 100, True, None
         )

@@ -198,17 +198,13 @@ class TestMusicGenConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, 32000, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, 32000, 3.0)
         with pytest.raises(AttributeError):
             config.duration_seconds = 60  # type: ignore[misc]
 
     def test_config_has_slots(self) -> None:
         """Config uses slots for memory efficiency."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, 32000, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, 32000, 3.0)
         assert hasattr(config, "__slots__") or not hasattr(config, "__dict__")
 
 
@@ -228,9 +224,7 @@ class TestMusicConditioningConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = MusicConditioningConfig(
-            "upbeat jazz", False, True
-        )
+        config = MusicConditioningConfig("upbeat jazz", False, True)
         with pytest.raises(AttributeError):
             config.text_prompt = "changed"  # type: ignore[misc]
 
@@ -253,9 +247,7 @@ class TestAudioOutputConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = AudioOutputConfig(
-            "mp3", AudioQuality.MEDIUM, 1, False
-        )
+        config = AudioOutputConfig("mp3", AudioQuality.MEDIUM, 1, False)
         with pytest.raises(AttributeError):
             config.channels = 2  # type: ignore[misc]
 
@@ -307,56 +299,42 @@ class TestValidateMusicGenConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, 32000, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, 32000, 3.0)
         validate_music_gen_config(config)  # Should not raise
 
     def test_zero_duration_raises(self) -> None:
         """Zero duration raises ValueError."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 0, 32000, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 0, 32000, 3.0)
         with pytest.raises(ValueError, match="duration_seconds must be positive"):
             validate_music_gen_config(config)
 
     def test_negative_duration_raises(self) -> None:
         """Negative duration raises ValueError."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, -10, 32000, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, -10, 32000, 3.0)
         with pytest.raises(ValueError, match="duration_seconds must be positive"):
             validate_music_gen_config(config)
 
     def test_zero_sample_rate_raises(self) -> None:
         """Zero sample rate raises ValueError."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, 0, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, 0, 3.0)
         with pytest.raises(ValueError, match="sample_rate must be positive"):
             validate_music_gen_config(config)
 
     def test_negative_sample_rate_raises(self) -> None:
         """Negative sample rate raises ValueError."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, -16000, 3.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, -16000, 3.0)
         with pytest.raises(ValueError, match="sample_rate must be positive"):
             validate_music_gen_config(config)
 
     def test_negative_guidance_scale_raises(self) -> None:
         """Negative guidance scale raises ValueError."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, 32000, -1.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, 32000, -1.0)
         with pytest.raises(ValueError, match="guidance_scale must be non-negative"):
             validate_music_gen_config(config)
 
     def test_zero_guidance_scale_valid(self) -> None:
         """Zero guidance scale is valid."""
-        config = MusicGenConfig(
-            MusicModelType.MUSICGEN, 30, 32000, 0.0
-        )
+        config = MusicGenConfig(MusicModelType.MUSICGEN, 30, 32000, 0.0)
         validate_music_gen_config(config)  # Should not raise
 
 
@@ -433,13 +411,16 @@ class TestCreateMusicGenConfig:
         assert config.sample_rate == 44100
         assert config.guidance_scale == 5.0
 
-    @pytest.mark.parametrize("model_type", [
-        "musicgen",
-        "audioldm",
-        "audioldm2",
-        "riffusion",
-        "musiclm",
-    ])
+    @pytest.mark.parametrize(
+        "model_type",
+        [
+            "musicgen",
+            "audioldm",
+            "audioldm2",
+            "riffusion",
+            "musiclm",
+        ],
+    )
     def test_all_valid_model_types(self, model_type: str) -> None:
         """All valid model types are accepted."""
         config = create_music_gen_config(model_type=model_type)

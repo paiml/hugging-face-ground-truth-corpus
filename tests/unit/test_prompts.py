@@ -288,9 +288,7 @@ class TestSystemPromptConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = SystemPromptConfig(
-            "Helpful", (), OutputFormat.TEXT, "", False
-        )
+        config = SystemPromptConfig("Helpful", (), OutputFormat.TEXT, "", False)
         with pytest.raises(AttributeError):
             config.persona = "Different"  # type: ignore[misc]
 
@@ -332,9 +330,7 @@ class TestPromptConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = PromptConfig(
-            PromptStyle.ZERO_SHOT, None, None, None, None, 2048
-        )
+        config = PromptConfig(PromptStyle.ZERO_SHOT, None, None, None, None, 2048)
         with pytest.raises(AttributeError):
             config.max_tokens = 4096  # type: ignore[misc]
 
@@ -1098,7 +1094,9 @@ class TestTruncatePrompt:
 
     def test_custom_marker(self) -> None:
         """Uses custom truncation marker."""
-        result = truncate_prompt("Hello, world!", max_tokens=2, truncation_marker="[...]")
+        result = truncate_prompt(
+            "Hello, world!", max_tokens=2, truncation_marker="[...]"
+        )
         assert result.endswith("[...]")
 
     def test_zero_max_tokens_raises(self) -> None:

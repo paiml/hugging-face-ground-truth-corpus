@@ -857,9 +857,7 @@ def estimate_conversion_time(
         (ModelFormat.GGUF, ModelFormat.HUGGINGFACE): 3.0,
     }
 
-    multiplier = format_multipliers.get(
-        (source_format, target_format), 2.0
-    )
+    multiplier = format_multipliers.get((source_format, target_format), 2.0)
 
     # Additional time for quantization
     quantization_multipliers = {

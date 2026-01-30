@@ -1181,9 +1181,7 @@ def format_curation_stats(stats: CurationStats) -> str:
         raise ValueError(msg)
 
     retention_rate = (
-        stats.final_size / stats.original_size * 100
-        if stats.original_size > 0
-        else 0.0
+        stats.final_size / stats.original_size * 100 if stats.original_size > 0 else 0.0
     )
 
     duplicate_rate = (

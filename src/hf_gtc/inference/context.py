@@ -1099,9 +1099,7 @@ def get_recommended_context_config(
             # Need sparse attention - use sliding window
             # Choose window size based on memory constraint
             # window_size * target_length * 2 bytes <= memory
-            max_window = int(
-                (memory_constraint_gb * (1024**3)) / (target_length * 2)
-            )
+            max_window = int((memory_constraint_gb * (1024**3)) / (target_length * 2))
             window_size = min(max(1024, max_window), target_length)
 
             window_config = SlidingWindowConfig(

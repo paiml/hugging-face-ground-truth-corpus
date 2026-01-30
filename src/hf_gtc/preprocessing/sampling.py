@@ -991,8 +991,8 @@ def importance_sample(
     # Softmax normalization with numerical stability
     exp_weights = [math.exp(w - max_scaled) for w in scaled]
     total = sum(exp_weights)
-    probs = [w / total for w in exp_weights] if total > 0 else [1.0 / len(data)] * len(
-        data
+    probs = (
+        [w / total for w in exp_weights] if total > 0 else [1.0 / len(data)] * len(data)
     )
 
     # Sample with replacement using weighted probabilities

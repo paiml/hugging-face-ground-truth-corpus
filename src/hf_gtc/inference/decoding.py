@@ -339,8 +339,7 @@ def validate_beam_config(config: BeamConfig) -> None:
 
     if config.num_return_sequences <= 0:
         msg = (
-            f"num_return_sequences must be positive, "
-            f"got {config.num_return_sequences}"
+            f"num_return_sequences must be positive, got {config.num_return_sequences}"
         )
         raise ValueError(msg)
 
@@ -1029,8 +1028,13 @@ def calculate_beam_memory(
 
     # KV cache for all beams: 2 * layers * batch * beams * seq * hidden * dtype
     total_bytes = (
-        2 * num_layers * batch_size * num_beams
-        * sequence_length * hidden_size * dtype_bytes
+        2
+        * num_layers
+        * batch_size
+        * num_beams
+        * sequence_length
+        * hidden_size
+        * dtype_bytes
     )
 
     # Convert to gigabytes

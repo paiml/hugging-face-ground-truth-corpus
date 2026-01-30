@@ -905,9 +905,7 @@ def estimate_merged_performance(
             raise ValueError(msg)
 
     # Base weighted average
-    weighted_sum = sum(
-        p * w for p, w in zip(model_performances, weights, strict=True)
-    )
+    weighted_sum = sum(p * w for p, w in zip(model_performances, weights, strict=True))
     total_weight = sum(weights)
 
     if total_weight == 0:
@@ -1046,9 +1044,7 @@ def calculate_task_vector(
         msg = "fine_tuned and base parameters must have same length"
         raise ValueError(msg)
 
-    return tuple(
-        ft - b for ft, b in zip(fine_tuned_params, base_params, strict=True)
-    )
+    return tuple(ft - b for ft, b in zip(fine_tuned_params, base_params, strict=True))
 
 
 def apply_task_vector(
@@ -1094,8 +1090,7 @@ def apply_task_vector(
         raise ValueError(msg)
 
     return tuple(
-        b + scaling_factor * tv
-        for b, tv in zip(base_params, task_vector, strict=True)
+        b + scaling_factor * tv for b, tv in zip(base_params, task_vector, strict=True)
     )
 
 
@@ -1306,8 +1301,7 @@ def slerp_interpolate(
     interp_norm = (1 - t) * norm0 + t * norm1
 
     result = tuple(
-        (s0 * a + s1 * b) * interp_norm
-        for a, b in zip(v0_norm, v1_norm, strict=True)
+        (s0 * a + s1 * b) * interp_norm for a, b in zip(v0_norm, v1_norm, strict=True)
     )
 
     return result

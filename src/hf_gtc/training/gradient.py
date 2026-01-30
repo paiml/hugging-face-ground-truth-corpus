@@ -571,8 +571,7 @@ def create_accumulation_config(
     """
     if strategy not in VALID_ACCUMULATION_STRATEGIES:
         msg = (
-            f"strategy must be one of {VALID_ACCUMULATION_STRATEGIES}, "
-            f"got '{strategy}'"
+            f"strategy must be one of {VALID_ACCUMULATION_STRATEGIES}, got '{strategy}'"
         )
         raise ValueError(msg)
 

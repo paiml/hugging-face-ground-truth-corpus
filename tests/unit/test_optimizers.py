@@ -985,9 +985,7 @@ class TestGetParamGroups:
     def test_custom_no_decay_keywords(self) -> None:
         """Get groups with custom no-decay keywords."""
         keywords = ("bias", "norm")
-        groups = get_param_groups(
-            1_000_000, "adamw", no_decay_keywords=keywords
-        )
+        groups = get_param_groups(1_000_000, "adamw", no_decay_keywords=keywords)
         assert groups[1]["no_decay_keywords"] == keywords
 
     def test_zero_params_raises(self) -> None:

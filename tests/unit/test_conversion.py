@@ -622,52 +622,73 @@ class TestValidateFormatCompatibility:
 
     def test_huggingface_to_safetensors(self) -> None:
         """Test HuggingFace to SafeTensors."""
-        assert validate_format_compatibility(
-            ModelFormat.HUGGINGFACE,
-            ModelFormat.SAFETENSORS,
-        ) is True
+        assert (
+            validate_format_compatibility(
+                ModelFormat.HUGGINGFACE,
+                ModelFormat.SAFETENSORS,
+            )
+            is True
+        )
 
     def test_huggingface_to_gguf(self) -> None:
         """Test HuggingFace to GGUF."""
-        assert validate_format_compatibility(
-            ModelFormat.HUGGINGFACE,
-            ModelFormat.GGUF,
-        ) is True
+        assert (
+            validate_format_compatibility(
+                ModelFormat.HUGGINGFACE,
+                ModelFormat.GGUF,
+            )
+            is True
+        )
 
     def test_huggingface_to_onnx(self) -> None:
         """Test HuggingFace to ONNX."""
-        assert validate_format_compatibility(
-            ModelFormat.HUGGINGFACE,
-            ModelFormat.ONNX,
-        ) is True
+        assert (
+            validate_format_compatibility(
+                ModelFormat.HUGGINGFACE,
+                ModelFormat.ONNX,
+            )
+            is True
+        )
 
     def test_tflite_to_gguf_unsupported(self) -> None:
         """Test TFLite to GGUF (unsupported)."""
-        assert validate_format_compatibility(
-            ModelFormat.TFLITE,
-            ModelFormat.GGUF,
-        ) is False
+        assert (
+            validate_format_compatibility(
+                ModelFormat.TFLITE,
+                ModelFormat.GGUF,
+            )
+            is False
+        )
 
     def test_same_format_unsupported(self) -> None:
         """Test same format (unsupported)."""
-        assert validate_format_compatibility(
-            ModelFormat.HUGGINGFACE,
-            ModelFormat.HUGGINGFACE,
-        ) is False
+        assert (
+            validate_format_compatibility(
+                ModelFormat.HUGGINGFACE,
+                ModelFormat.HUGGINGFACE,
+            )
+            is False
+        )
 
     def test_safetensors_to_gguf(self) -> None:
         """Test SafeTensors to GGUF."""
-        assert validate_format_compatibility(
-            ModelFormat.SAFETENSORS,
-            ModelFormat.GGUF,
-        ) is True
+        assert (
+            validate_format_compatibility(
+                ModelFormat.SAFETENSORS,
+                ModelFormat.GGUF,
+            )
+            is True
+        )
 
     def test_onnx_to_tflite(self) -> None:
         """Test ONNX to TFLite."""
-        assert validate_format_compatibility(
-            ModelFormat.ONNX,
-            ModelFormat.TFLITE,
-        ) is True
+        assert (
+            validate_format_compatibility(
+                ModelFormat.ONNX,
+                ModelFormat.TFLITE,
+            )
+            is True
+        )
 
 
 class TestCalculatePrecisionLoss:

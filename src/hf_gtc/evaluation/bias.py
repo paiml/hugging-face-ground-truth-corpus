@@ -926,13 +926,15 @@ def detect_stereotypes(
             for pattern in stereotype_patterns[category]:
                 if pattern in text_lower:
                     start_idx = text_lower.find(pattern)
-                    detections.append({
-                        "category": category,
-                        "pattern": pattern,
-                        "start_index": start_idx,
-                        "end_index": start_idx + len(pattern),
-                        "confidence": config.sensitivity,
-                    })
+                    detections.append(
+                        {
+                            "category": category,
+                            "pattern": pattern,
+                            "start_index": start_idx,
+                            "end_index": start_idx + len(pattern),
+                            "confidence": config.sensitivity,
+                        }
+                    )
 
     return detections
 

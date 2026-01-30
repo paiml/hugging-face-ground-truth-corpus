@@ -435,10 +435,7 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
         msg = f"num_few_shot cannot be negative, got {config.num_few_shot}"
         raise ValueError(msg)
 
-    if (
-        config.evaluation_mode == EvaluationMode.FEW_SHOT
-        and config.num_few_shot == 0
-    ):
+    if config.evaluation_mode == EvaluationMode.FEW_SHOT and config.num_few_shot == 0:
         msg = "num_few_shot must be > 0 when using FEW_SHOT evaluation mode"
         raise ValueError(msg)
 

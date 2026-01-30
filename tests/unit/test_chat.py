@@ -628,9 +628,7 @@ class TestCreateConversationConfig:
                 truncation_strategy="invalid"  # type: ignore[arg-type]
             )
 
-    @pytest.mark.parametrize(
-        "strategy", ["oldest_first", "newest_first", "middle_out"]
-    )
+    @pytest.mark.parametrize("strategy", ["oldest_first", "newest_first", "middle_out"])
     def test_all_valid_truncation_strategies(self, strategy: str) -> None:
         """Test that all valid truncation strategies work."""
         config = create_conversation_config(

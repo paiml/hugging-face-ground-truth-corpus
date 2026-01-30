@@ -268,17 +268,13 @@ class TestValidateScalerConfig:
 
     def test_zero_initial_scale_raises(self) -> None:
         """Zero initial scale raises ValueError."""
-        config = ScalerConfig(
-            ScalingStrategy.DYNAMIC, 0.0, 2.0, 0.5, 2000, 2**24, 1.0
-        )
+        config = ScalerConfig(ScalingStrategy.DYNAMIC, 0.0, 2.0, 0.5, 2000, 2**24, 1.0)
         with pytest.raises(ValueError, match="initial_scale must be positive"):
             validate_scaler_config(config)
 
     def test_negative_initial_scale_raises(self) -> None:
         """Negative initial scale raises ValueError."""
-        config = ScalerConfig(
-            ScalingStrategy.DYNAMIC, -1.0, 2.0, 0.5, 2000, 2**24, 1.0
-        )
+        config = ScalerConfig(ScalingStrategy.DYNAMIC, -1.0, 2.0, 0.5, 2000, 2**24, 1.0)
         with pytest.raises(ValueError, match="initial_scale must be positive"):
             validate_scaler_config(config)
 
@@ -324,9 +320,7 @@ class TestValidateScalerConfig:
 
     def test_zero_growth_interval_raises(self) -> None:
         """Zero growth interval raises ValueError."""
-        config = ScalerConfig(
-            ScalingStrategy.DYNAMIC, 65536.0, 2.0, 0.5, 0, 2**24, 1.0
-        )
+        config = ScalerConfig(ScalingStrategy.DYNAMIC, 65536.0, 2.0, 0.5, 0, 2**24, 1.0)
         with pytest.raises(ValueError, match="growth_interval must be positive"):
             validate_scaler_config(config)
 
@@ -358,9 +352,7 @@ class TestValidateMixedPrecisionConfig:
         scaler = ScalerConfig(
             ScalingStrategy.DYNAMIC, 65536.0, 2.0, 0.5, 2000, 2**24, 1.0
         )
-        config = MixedPrecisionConfig(
-            precision, scaler, CastingPolicy.ALL, True, True
-        )
+        config = MixedPrecisionConfig(precision, scaler, CastingPolicy.ALL, True, True)
         validate_mixed_precision_config(config)
 
     def test_none_config_raises(self) -> None:

@@ -119,16 +119,24 @@ class TestValidateFSDPConfig:
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
         config = FSDPConfig(
-            ShardingStrategy.FULL_SHARD, False, True, True, False,
-            ActivationCheckpointing.FULL
+            ShardingStrategy.FULL_SHARD,
+            False,
+            True,
+            True,
+            False,
+            ActivationCheckpointing.FULL,
         )
         validate_fsdp_config(config)
 
     def test_cpu_offload_with_no_shard_raises(self) -> None:
         """CPU offload with NO_SHARD raises ValueError."""
         config = FSDPConfig(
-            ShardingStrategy.NO_SHARD, True, True, True, False,
-            ActivationCheckpointing.FULL
+            ShardingStrategy.NO_SHARD,
+            True,
+            True,
+            True,
+            False,
+            ActivationCheckpointing.FULL,
         )
         with pytest.raises(ValueError, match="cpu_offload requires sharding"):
             validate_fsdp_config(config)
@@ -170,9 +178,7 @@ class TestValidateDeepSpeedConfig:
 
     def test_zero_bucket_size_raises(self) -> None:
         """Zero bucket size raises ValueError."""
-        config = DeepSpeedConfig(
-            DeepSpeedStage.STAGE_2, False, False, True, True, 0
-        )
+        config = DeepSpeedConfig(DeepSpeedStage.STAGE_2, False, False, True, True, 0)
         with pytest.raises(ValueError, match="reduce_bucket_size must be positive"):
             validate_deepspeed_config(config)
 
@@ -292,9 +298,7 @@ class TestCreateDistributedConfig:
 
     def test_custom_config(self) -> None:
         """Create custom config."""
-        config = create_distributed_config(
-            world_size=8, num_nodes=2, gpus_per_node=4
-        )
+        config = create_distributed_config(world_size=8, num_nodes=2, gpus_per_node=4)
         assert config.world_size == 8
         assert config.num_nodes == 2
 

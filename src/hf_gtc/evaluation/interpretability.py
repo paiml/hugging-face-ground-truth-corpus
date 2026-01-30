@@ -278,9 +278,7 @@ def validate_attention_config(config: AttentionConfig) -> None:
         msg = "layer_indices cannot contain negative values"
         raise ValueError(msg)
 
-    if config.head_indices is not None and any(
-        idx < 0 for idx in config.head_indices
-    ):
+    if config.head_indices is not None and any(idx < 0 for idx in config.head_indices):
         msg = "head_indices cannot contain negative values"
         raise ValueError(msg)
 

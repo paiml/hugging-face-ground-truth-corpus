@@ -156,9 +156,7 @@ class TestDocumentConfig:
 
     def test_frozen(self) -> None:
         """Test config is immutable."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 512, (224, 224), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 512, (224, 224), True)
         with pytest.raises(AttributeError):
             config.max_seq_length = 256  # type: ignore[misc]
 
@@ -256,9 +254,7 @@ class TestValidateDocumentConfig:
 
     def test_valid_config(self) -> None:
         """Test valid config."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 512, (224, 224), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 512, (224, 224), True)
         validate_document_config(config)  # Should not raise
 
     def test_none_config(self) -> None:
@@ -268,49 +264,37 @@ class TestValidateDocumentConfig:
 
     def test_zero_max_seq_length(self) -> None:
         """Test zero max_seq_length."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 0, (224, 224), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 0, (224, 224), True)
         with pytest.raises(ValueError, match="max_seq_length must be positive"):
             validate_document_config(config)
 
     def test_negative_max_seq_length(self) -> None:
         """Test negative max_seq_length."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, -1, (224, 224), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, -1, (224, 224), True)
         with pytest.raises(ValueError, match="max_seq_length must be positive"):
             validate_document_config(config)
 
     def test_zero_image_width(self) -> None:
         """Test zero image width."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 512, (0, 224), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 512, (0, 224), True)
         with pytest.raises(ValueError, match="image_size width must be positive"):
             validate_document_config(config)
 
     def test_negative_image_width(self) -> None:
         """Test negative image width."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 512, (-1, 224), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 512, (-1, 224), True)
         with pytest.raises(ValueError, match="image_size width must be positive"):
             validate_document_config(config)
 
     def test_zero_image_height(self) -> None:
         """Test zero image height."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 512, (224, 0), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 512, (224, 0), True)
         with pytest.raises(ValueError, match="image_size height must be positive"):
             validate_document_config(config)
 
     def test_negative_image_height(self) -> None:
         """Test negative image height."""
-        config = DocumentConfig(
-            DocumentModelType.LAYOUTLMV3, 512, (224, -1), True
-        )
+        config = DocumentConfig(DocumentModelType.LAYOUTLMV3, 512, (224, -1), True)
         with pytest.raises(ValueError, match="image_size height must be positive"):
             validate_document_config(config)
 
@@ -628,9 +612,7 @@ class TestGetDocumentModelType:
             ("udop", DocumentModelType.UDOP),
         ],
     )
-    def test_valid_model_types(
-        self, name: str, expected: DocumentModelType
-    ) -> None:
+    def test_valid_model_types(self, name: str, expected: DocumentModelType) -> None:
         """Test getting valid model types."""
         assert get_document_model_type(name) == expected
 
@@ -705,9 +687,7 @@ class TestNormalizeBoundingBox:
 
     def test_custom_target_range(self) -> None:
         """Test custom target_range."""
-        result = normalize_bounding_box(
-            (0, 0, 100, 100), 100, 100, target_range=100
-        )
+        result = normalize_bounding_box((0, 0, 100, 100), 100, 100, target_range=100)
         assert result == (0, 0, 100, 100)
 
     def test_clamping_upper(self) -> None:
@@ -818,17 +798,13 @@ class TestEstimateDocumentTokens:
 
     def test_custom_image_size(self) -> None:
         """Test custom image size."""
-        tokens = estimate_document_tokens(
-            100, 50, image_size=(336, 336), patch_size=16
-        )
+        tokens = estimate_document_tokens(100, 50, image_size=(336, 336), patch_size=16)
         # 100 text + (336/16)*(336/16) = 100 + 441
         assert tokens == 541
 
     def test_custom_patch_size(self) -> None:
         """Test custom patch size."""
-        tokens = estimate_document_tokens(
-            100, 50, image_size=(224, 224), patch_size=14
-        )
+        tokens = estimate_document_tokens(100, 50, image_size=(224, 224), patch_size=14)
         # 100 text + (224/14)*(224/14) = 100 + 256
         assert tokens == 356
 
@@ -880,9 +856,7 @@ class TestGetDefaultDocumentConfig:
         "model_type",
         list(DocumentModelType),
     )
-    def test_all_model_types_have_defaults(
-        self, model_type: DocumentModelType
-    ) -> None:
+    def test_all_model_types_have_defaults(self, model_type: DocumentModelType) -> None:
         """Test all model types have default configs."""
         config = get_default_document_config(model_type)
         assert config.model_type == model_type

@@ -1256,7 +1256,10 @@ class TestAllAttentionPatterns:
     def test_memory_scaling_with_window(self, pattern: str) -> None:
         """Memory scaling works for patterns requiring window."""
         scale = estimate_memory_scaling(
-            4096, 8192, attention_pattern=pattern, window_size=2048  # type: ignore[arg-type]
+            4096,
+            8192,
+            attention_pattern=pattern,
+            window_size=2048,  # type: ignore[arg-type]
         )
         assert scale > 0
 
@@ -1264,6 +1267,8 @@ class TestAllAttentionPatterns:
     def test_attention_complexity_with_window(self, pattern: str) -> None:
         """Attention complexity works for patterns requiring window."""
         flops = calculate_attention_complexity(
-            4096, attention_pattern=pattern, window_size=2048  # type: ignore[arg-type]
+            4096,
+            attention_pattern=pattern,
+            window_size=2048,  # type: ignore[arg-type]
         )
         assert flops > 0

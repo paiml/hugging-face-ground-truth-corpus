@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 
 from hf_gtc.training.adapters import (
-    ATTENTION_MODULES,
     ALL_MODULES,
+    ATTENTION_MODULES,
     MLP_MODULES,
     VALID_ADAPTER_TYPES,
     VALID_MERGE_STRATEGIES,
@@ -542,7 +542,7 @@ class TestValidateAdaLoRAConfig:
             tfinal=1000,
             delta_t=10,
         )
-        with pytest.raises(ValueError, match="target_r .* cannot exceed init_r"):
+        with pytest.raises(ValueError, match=r"target_r .* cannot exceed init_r"):
             validate_adalora_config(config)
 
     def test_invalid_beta1_raises_error(self) -> None:
@@ -598,7 +598,7 @@ class TestValidateAdaLoRAConfig:
             tfinal=500,
             delta_t=10,
         )
-        with pytest.raises(ValueError, match="tfinal .* must be greater than tinit"):
+        with pytest.raises(ValueError, match=r"tfinal .* must be greater than tinit"):
             validate_adalora_config(config)
 
     def test_zero_delta_t_raises_error(self) -> None:
@@ -1020,7 +1020,9 @@ class TestCreateAdapterConfig:
 
     def test_prefix_tuning_config(self) -> None:
         """Test creating prefix tuning adapter config."""
-        config = create_adapter_config(adapter_type="prefix_tuning", num_virtual_tokens=30)
+        config = create_adapter_config(
+            adapter_type="prefix_tuning", num_virtual_tokens=30
+        )
         assert config.adapter_type == AdapterType.PREFIX_TUNING
         assert config.prefix_config is not None
         assert config.prefix_config.num_virtual_tokens == 30
@@ -1088,7 +1090,9 @@ class TestEstimateMemorySavings:
 
     def test_qlora_savings(self) -> None:
         """Test estimating QLoRA memory savings."""
-        saved_mb, pct = estimate_memory_savings("qlora", 7_000_000_000, 4_000_000, bits=4)
+        _saved_mb, pct = estimate_memory_savings(
+            "qlora", 7_000_000_000, 4_000_000, bits=4
+        )
         assert pct > 70
 
     def test_zero_base_params_raises_error(self) -> None:
@@ -1127,7 +1131,9 @@ class TestMergeAdapterWeights:
 
     def test_weighted_strategy(self) -> None:
         """Test weighted merge strategy."""
-        result = merge_adapter_weights([1.0, 2.0], [0.1, 0.2], strategy="weighted", alpha=0.5)
+        result = merge_adapter_weights(
+            [1.0, 2.0], [0.1, 0.2], strategy="weighted", alpha=0.5
+        )
         assert result == pytest.approx([1.05, 2.1])
 
     def test_invalid_strategy_raises_error(self) -> None:
@@ -1371,7 +1377,9 @@ class TestGetPeftConfigDict:
 
     def test_prefix_config(self) -> None:
         """Test getting PEFT dict for prefix tuning."""
-        config = create_adapter_config(adapter_type="prefix_tuning", num_virtual_tokens=30)
+        config = create_adapter_config(
+            adapter_type="prefix_tuning", num_virtual_tokens=30
+        )
         peft_dict = get_peft_config_dict(config)
         assert peft_dict["num_virtual_tokens"] == 30
 

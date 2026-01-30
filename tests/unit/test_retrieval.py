@@ -144,40 +144,30 @@ class TestValidateRAGConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = RAGConfig(
-            RetrievalMethod.DENSE, DistanceMetric.COSINE, 10, 0.5, 5
-        )
+        config = RAGConfig(RetrievalMethod.DENSE, DistanceMetric.COSINE, 10, 0.5, 5)
         validate_rag_config(config)
 
     def test_zero_top_k_raises(self) -> None:
         """Zero top_k raises ValueError."""
-        config = RAGConfig(
-            RetrievalMethod.DENSE, DistanceMetric.COSINE, 0, 0.5, 5
-        )
+        config = RAGConfig(RetrievalMethod.DENSE, DistanceMetric.COSINE, 0, 0.5, 5)
         with pytest.raises(ValueError, match="top_k must be positive"):
             validate_rag_config(config)
 
     def test_zero_rerank_top_k_raises(self) -> None:
         """Zero rerank_top_k raises ValueError."""
-        config = RAGConfig(
-            RetrievalMethod.DENSE, DistanceMetric.COSINE, 10, 0.5, 0
-        )
+        config = RAGConfig(RetrievalMethod.DENSE, DistanceMetric.COSINE, 10, 0.5, 0)
         with pytest.raises(ValueError, match="rerank_top_k must be positive"):
             validate_rag_config(config)
 
     def test_rerank_exceeds_top_k_raises(self) -> None:
         """rerank_top_k > top_k raises ValueError."""
-        config = RAGConfig(
-            RetrievalMethod.DENSE, DistanceMetric.COSINE, 5, 0.5, 10
-        )
+        config = RAGConfig(RetrievalMethod.DENSE, DistanceMetric.COSINE, 5, 0.5, 10)
         with pytest.raises(ValueError, match=r"rerank_top_k.*cannot exceed top_k"):
             validate_rag_config(config)
 
     def test_invalid_score_threshold_raises(self) -> None:
         """Invalid score threshold raises ValueError."""
-        config = RAGConfig(
-            RetrievalMethod.DENSE, DistanceMetric.COSINE, 10, 1.5, 5
-        )
+        config = RAGConfig(RetrievalMethod.DENSE, DistanceMetric.COSINE, 10, 1.5, 5)
         with pytest.raises(ValueError, match="score_threshold must be between"):
             validate_rag_config(config)
 

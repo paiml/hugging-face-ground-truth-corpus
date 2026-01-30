@@ -71,9 +71,7 @@ VALID_THEMES = frozenset(t.value for t in CollectionTheme)
 
 # Sort options for collection items
 SortOption = Literal["position", "created", "updated", "likes", "downloads"]
-VALID_SORT_OPTIONS = frozenset(
-    {"position", "created", "updated", "likes", "downloads"}
-)
+VALID_SORT_OPTIONS = frozenset({"position", "created", "updated", "likes", "downloads"})
 
 
 @dataclass(frozen=True, slots=True)

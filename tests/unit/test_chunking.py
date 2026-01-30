@@ -160,17 +160,13 @@ class TestChunkConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 512, 50, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 512, 50, OverlapType.CHARACTER)
         with pytest.raises(AttributeError):
             config.chunk_size = 256  # type: ignore[misc]
 
     def test_config_has_slots(self) -> None:
         """Config uses slots for memory efficiency."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 512, 50, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 512, 50, OverlapType.CHARACTER)
         assert hasattr(config, "__slots__") or not hasattr(config, "__dict__")
 
 
@@ -223,56 +219,42 @@ class TestValidateChunkConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 512, 50, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 512, 50, OverlapType.CHARACTER)
         validate_chunk_config(config)  # Should not raise
 
     def test_zero_chunk_size_raises(self) -> None:
         """Zero chunk_size raises ValueError."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 0, 50, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 0, 50, OverlapType.CHARACTER)
         with pytest.raises(ValueError, match="chunk_size must be positive"):
             validate_chunk_config(config)
 
     def test_negative_chunk_size_raises(self) -> None:
         """Negative chunk_size raises ValueError."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, -100, 50, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, -100, 50, OverlapType.CHARACTER)
         with pytest.raises(ValueError, match="chunk_size must be positive"):
             validate_chunk_config(config)
 
     def test_negative_overlap_raises(self) -> None:
         """Negative overlap_size raises ValueError."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 512, -10, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 512, -10, OverlapType.CHARACTER)
         with pytest.raises(ValueError, match="overlap_size must be non-negative"):
             validate_chunk_config(config)
 
     def test_overlap_exceeds_chunk_size_raises(self) -> None:
         """Overlap >= chunk_size raises ValueError."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 100, 150, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 100, 150, OverlapType.CHARACTER)
         with pytest.raises(ValueError, match=r"overlap_size.*must be less than"):
             validate_chunk_config(config)
 
     def test_overlap_equal_chunk_size_raises(self) -> None:
         """Overlap equal to chunk_size raises ValueError."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 100, 100, OverlapType.CHARACTER
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 100, 100, OverlapType.CHARACTER)
         with pytest.raises(ValueError, match=r"overlap_size.*must be less than"):
             validate_chunk_config(config)
 
     def test_no_overlap_type_none_valid(self) -> None:
         """Overlap type NONE with any overlap_size is valid."""
-        config = ChunkConfig(
-            ChunkingStrategy.FIXED, 100, 200, OverlapType.NONE
-        )
+        config = ChunkConfig(ChunkingStrategy.FIXED, 100, 200, OverlapType.NONE)
         validate_chunk_config(config)  # Should not raise
 
 

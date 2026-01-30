@@ -165,9 +165,7 @@ class TestAttentionConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = AttentionConfig(
-            AttentionType.STANDARD, 32, 128, 0.0, True
-        )
+        config = AttentionConfig(AttentionType.STANDARD, 32, 128, 0.0, True)
         with pytest.raises(AttributeError):
             config.num_heads = 64  # type: ignore[misc]
 
@@ -244,9 +242,7 @@ class TestValidateAttentionConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = AttentionConfig(
-            AttentionType.STANDARD, 32, 128, 0.0, True
-        )
+        config = AttentionConfig(AttentionType.STANDARD, 32, 128, 0.0, True)
         validate_attention_config(config)
 
     def test_none_config_raises(self) -> None:

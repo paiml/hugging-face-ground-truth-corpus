@@ -143,9 +143,7 @@ class TestSearchSpaceConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (4, 12), (256, 1024), (4, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (4, 12), (256, 1024), (4, 16))
         with pytest.raises(AttributeError):
             config.space_type = SearchSpace.MACRO  # type: ignore[misc]
 
@@ -230,56 +228,42 @@ class TestValidateSearchSpaceConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (4, 12), (256, 1024), (4, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (4, 12), (256, 1024), (4, 16))
         validate_search_space_config(config)
 
     def test_inverted_layers_range_raises(self) -> None:
         """Inverted layers range raises ValueError."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (12, 4), (256, 1024), (4, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (12, 4), (256, 1024), (4, 16))
         with pytest.raises(ValueError, match="num_layers_range min"):
             validate_search_space_config(config)
 
     def test_zero_min_layers_raises(self) -> None:
         """Zero min layers raises ValueError."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (0, 12), (256, 1024), (4, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (0, 12), (256, 1024), (4, 16))
         with pytest.raises(ValueError, match="num_layers_range min must be positive"):
             validate_search_space_config(config)
 
     def test_inverted_hidden_dims_range_raises(self) -> None:
         """Inverted hidden dims range raises ValueError."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (4, 12), (1024, 256), (4, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (4, 12), (1024, 256), (4, 16))
         with pytest.raises(ValueError, match="hidden_dims_range min"):
             validate_search_space_config(config)
 
     def test_zero_min_hidden_dims_raises(self) -> None:
         """Zero min hidden dims raises ValueError."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (4, 12), (0, 1024), (4, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (4, 12), (0, 1024), (4, 16))
         with pytest.raises(ValueError, match="hidden_dims_range min must be positive"):
             validate_search_space_config(config)
 
     def test_inverted_heads_range_raises(self) -> None:
         """Inverted heads range raises ValueError."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (4, 12), (256, 1024), (16, 4)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (4, 12), (256, 1024), (16, 4))
         with pytest.raises(ValueError, match="num_heads_range min"):
             validate_search_space_config(config)
 
     def test_zero_min_heads_raises(self) -> None:
         """Zero min heads raises ValueError."""
-        config = SearchSpaceConfig(
-            SearchSpace.MICRO, (4, 12), (256, 1024), (0, 16)
-        )
+        config = SearchSpaceConfig(SearchSpace.MICRO, (4, 12), (256, 1024), (0, 16))
         with pytest.raises(ValueError, match="num_heads_range min must be positive"):
             validate_search_space_config(config)
 
@@ -325,9 +309,7 @@ class TestValidateArchitectureCandidate:
 
     def test_valid_candidate(self) -> None:
         """Valid candidate passes validation."""
-        candidate = ArchitectureCandidate(
-            {"num_layers": 6}, 0.9, 1e9, 1
-        )
+        candidate = ArchitectureCandidate({"num_layers": 6}, 0.9, 1e9, 1)
         validate_architecture_candidate(candidate)
 
     def test_negative_performance_raises(self) -> None:

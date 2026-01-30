@@ -296,9 +296,7 @@ class TestValidateReproducibilityConfig:
     def test_valid_config(self) -> None:
         """Test validating valid config."""
         seed_cfg = SeedConfig(42, (SeedComponent.PYTHON,), False)
-        config = ReproducibilityConfig(
-            seed_cfg, DeterminismLevel.PARTIAL, True, True
-        )
+        config = ReproducibilityConfig(seed_cfg, DeterminismLevel.PARTIAL, True, True)
         validate_reproducibility_config(config)  # Should not raise
 
     def test_none_config(self) -> None:
@@ -309,9 +307,7 @@ class TestValidateReproducibilityConfig:
     def test_invalid_seed_config(self) -> None:
         """Test invalid nested seed config."""
         seed_cfg = SeedConfig(-1, (SeedComponent.PYTHON,), False)
-        config = ReproducibilityConfig(
-            seed_cfg, DeterminismLevel.PARTIAL, True, True
-        )
+        config = ReproducibilityConfig(seed_cfg, DeterminismLevel.PARTIAL, True, True)
         with pytest.raises(ValueError, match="seed must be non-negative"):
             validate_reproducibility_config(config)
 
@@ -449,9 +445,7 @@ class TestCreateReproducibilityConfig:
 
     def test_determinism_level_enum(self) -> None:
         """Test determinism level from enum."""
-        config = create_reproducibility_config(
-            determinism_level=DeterminismLevel.NONE
-        )
+        config = create_reproducibility_config(determinism_level=DeterminismLevel.NONE)
         assert config.determinism_level == DeterminismLevel.NONE
 
     def test_invalid_determinism_level(self) -> None:

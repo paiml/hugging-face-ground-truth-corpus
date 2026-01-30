@@ -415,10 +415,7 @@ def create_draft_model_config(
         ValueError: gamma_tokens must be positive
     """
     if model_type not in VALID_DRAFT_MODEL_TYPES:
-        msg = (
-            f"model_type must be one of {VALID_DRAFT_MODEL_TYPES}, "
-            f"got '{model_type}'"
-        )
+        msg = f"model_type must be one of {VALID_DRAFT_MODEL_TYPES}, got '{model_type}'"
         raise ValueError(msg)
 
     config = DraftModelConfig(
@@ -486,8 +483,7 @@ def create_verification_config(
     """
     if strategy not in VALID_VERIFICATION_STRATEGIES:
         msg = (
-            f"strategy must be one of {VALID_VERIFICATION_STRATEGIES}, "
-            f"got '{strategy}'"
+            f"strategy must be one of {VALID_VERIFICATION_STRATEGIES}, got '{strategy}'"
         )
         raise ValueError(msg)
 

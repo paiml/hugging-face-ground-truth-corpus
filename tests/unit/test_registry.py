@@ -817,9 +817,7 @@ class TestTransitionStage:
         """Transition with specific action."""
         v = create_model_version("v1.0.0", stage="production")
         register_model("test-model", v)
-        new_v = transition_stage(
-            "test-model", "v1.0.0", "archived", action="archive"
-        )
+        new_v = transition_stage("test-model", "v1.0.0", "archived", action="archive")
         assert new_v.stage == ModelStage.ARCHIVED
 
     def test_empty_model_name_raises(self) -> None:

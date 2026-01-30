@@ -260,10 +260,7 @@ def validate_query_config(config: QueryConfig) -> None:
         msg = f"batch_size must be positive, got {config.batch_size}"
         raise ValueError(msg)
     if not 0 <= config.diversity_weight <= 1:
-        msg = (
-            f"diversity_weight must be between 0 and 1, "
-            f"got {config.diversity_weight}"
-        )
+        msg = f"diversity_weight must be between 0 and 1, got {config.diversity_weight}"
         raise ValueError(msg)
 
 
@@ -311,8 +308,7 @@ def validate_active_learning_config(config: ActiveLearningConfig) -> None:
         raise ValueError(msg)
     if config.stopping_criterion < 0:
         msg = (
-            f"stopping_criterion must be non-negative, "
-            f"got {config.stopping_criterion}"
+            f"stopping_criterion must be non-negative, got {config.stopping_criterion}"
         )
         raise ValueError(msg)
 
@@ -1091,13 +1087,15 @@ def get_recommended_active_learning_config(
             ...
         ValueError: task_type must be one of ...
     """
-    valid_tasks = frozenset({
-        "classification",
-        "ner",
-        "sentiment",
-        "qa",
-        "generation",
-    })
+    valid_tasks = frozenset(
+        {
+            "classification",
+            "ner",
+            "sentiment",
+            "qa",
+            "generation",
+        }
+    )
 
     if task_type not in valid_tasks:
         msg = f"task_type must be one of {valid_tasks}, got '{task_type}'"

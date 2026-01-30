@@ -64,9 +64,7 @@ class TestToolDefinition:
 
     def test_definition_is_frozen(self) -> None:
         """Definition is immutable."""
-        definition = ToolDefinition(
-            "calc", "Calculate", ToolType.FUNCTION, {}
-        )
+        definition = ToolDefinition("calc", "Calculate", ToolType.FUNCTION, {})
         with pytest.raises(AttributeError):
             definition.name = "new_name"  # type: ignore[misc]
 

@@ -514,8 +514,7 @@ def create_toxicity_config(
         for cat in categories:
             if cat not in VALID_TOXICITY_CATEGORIES:
                 msg = (
-                    f"category must be one of {VALID_TOXICITY_CATEGORIES}, "
-                    f"got '{cat}'"
+                    f"category must be one of {VALID_TOXICITY_CATEGORIES}, got '{cat}'"
                 )
                 raise ValueError(msg)
         category_enums = tuple(ToxicityCategory(c) for c in categories)
@@ -814,19 +813,13 @@ def get_toxicity_category(name: str) -> ToxicityCategory:
 
 
 # PII Detection Patterns
-_EMAIL_PATTERN = re.compile(
-    r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-)
+_EMAIL_PATTERN = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b")
 _PHONE_PATTERN = re.compile(
     r"\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b"
 )
 _SSN_PATTERN = re.compile(r"\b[0-9]{3}[-.\s]?[0-9]{2}[-.\s]?[0-9]{4}\b")
-_CREDIT_CARD_PATTERN = re.compile(
-    r"\b(?:[0-9]{4}[-.\s]?){3}[0-9]{4}\b"
-)
-_IP_PATTERN = re.compile(
-    r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
-)
+_CREDIT_CARD_PATTERN = re.compile(r"\b(?:[0-9]{4}[-.\s]?){3}[0-9]{4}\b")
+_IP_PATTERN = re.compile(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b")
 
 
 def detect_toxicity(
@@ -995,9 +988,7 @@ def _detect_names(text: str) -> list[str]:
         is_capitalized = (
             clean_word and clean_word[0].isupper() and clean_word[1:].islower()
         )
-        is_not_sentence_start = (
-            i > 0 and not words[i - 1].endswith((".", "!", "?"))
-        )
+        is_not_sentence_start = i > 0 and not words[i - 1].endswith((".", "!", "?"))
         if is_capitalized and is_not_sentence_start:
             names.append(clean_word)
 

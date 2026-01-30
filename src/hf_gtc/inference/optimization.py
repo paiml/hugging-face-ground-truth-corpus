@@ -683,9 +683,7 @@ def calculate_speculative_speedup(
         raise ValueError(msg)
 
     if num_speculative_tokens <= 0:
-        msg = (
-            f"num_speculative_tokens must be positive, got {num_speculative_tokens}"
-        )
+        msg = f"num_speculative_tokens must be positive, got {num_speculative_tokens}"
         raise ValueError(msg)
 
     if not 0.0 < draft_latency_ratio < 1.0:

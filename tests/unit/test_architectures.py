@@ -682,9 +682,7 @@ class TestCalculateModelParams:
 
     def test_basic_calculation(self) -> None:
         """Test basic parameter calculation."""
-        config = create_transformer_config(
-            num_layers=12, hidden_size=768, num_heads=12
-        )
+        config = create_transformer_config(num_layers=12, hidden_size=768, num_heads=12)
         params = calculate_model_params(config)
         assert params > 100_000_000  # BERT-base ~110M
         assert isinstance(params, int)
@@ -972,9 +970,7 @@ class TestPropertyBasedTests:
         st.integers(min_value=128, max_value=4096).filter(lambda x: x % 64 == 0),
     )
     @settings(max_examples=20)
-    def test_memory_footprint_positive(
-        self, num_layers: int, hidden_size: int
-    ) -> None:
+    def test_memory_footprint_positive(self, num_layers: int, hidden_size: int) -> None:
         """Test memory footprint is always positive."""
         config = create_transformer_config(
             num_layers=num_layers,

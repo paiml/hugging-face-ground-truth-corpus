@@ -334,8 +334,7 @@ def validate_ocr_config(config: OCRConfig) -> None:
 
     if not 0.0 <= config.confidence_threshold <= 1.0:
         msg = (
-            f"confidence_threshold must be in [0, 1], "
-            f"got {config.confidence_threshold}"
+            f"confidence_threshold must be in [0, 1], got {config.confidence_threshold}"
         )
         raise ValueError(msg)
 

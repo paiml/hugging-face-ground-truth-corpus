@@ -708,7 +708,9 @@ def get_versioning_scheme(name: str) -> VersioningScheme:
         ValueError: versioning_scheme must be one of
     """
     if name not in VALID_VERSIONING_SCHEMES:
-        msg = f"versioning_scheme must be one of {VALID_VERSIONING_SCHEMES}, got '{name}'"  # noqa: E501
+        msg = (
+            f"versioning_scheme must be one of {VALID_VERSIONING_SCHEMES}, got '{name}'"
+        )
         raise ValueError(msg)
     return VersioningScheme(name)
 
@@ -737,7 +739,9 @@ def get_transition_action(name: str) -> TransitionAction:
         ValueError: transition_action must be one of
     """
     if name not in VALID_TRANSITION_ACTIONS:
-        msg = f"transition_action must be one of {VALID_TRANSITION_ACTIONS}, got '{name}'"  # noqa: E501
+        msg = (
+            f"transition_action must be one of {VALID_TRANSITION_ACTIONS}, got '{name}'"
+        )
         raise ValueError(msg)
     return TransitionAction(name)
 

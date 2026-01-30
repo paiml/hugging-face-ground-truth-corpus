@@ -382,8 +382,7 @@ def validate_memory_breakdown(breakdown: MemoryBreakdown) -> None:
 
     if breakdown.optimizer_state_mb < 0:
         msg = (
-            f"optimizer_state_mb cannot be negative, "
-            f"got {breakdown.optimizer_state_mb}"
+            f"optimizer_state_mb cannot be negative, got {breakdown.optimizer_state_mb}"
         )
         raise ValueError(msg)
 
@@ -1103,8 +1102,7 @@ def compare_profiles(
 
     if len(names) != len(profiles):
         msg = (
-            f"names length ({len(names)}) "
-            f"must match profiles length ({len(profiles)})"
+            f"names length ({len(names)}) must match profiles length ({len(profiles)})"
         )
         raise ValueError(msg)
 

@@ -291,10 +291,7 @@ def validate_device_config(config: DeviceConfig) -> None:
         ValueError: memory_fraction must be between 0 and 1
     """
     if not 0 < config.memory_fraction <= 1:
-        msg = (
-            f"memory_fraction must be between 0 and 1, "
-            f"got {config.memory_fraction}"
-        )
+        msg = f"memory_fraction must be between 0 and 1, got {config.memory_fraction}"
         raise ValueError(msg)
 
     if not config.device_ids:
@@ -711,8 +708,7 @@ def get_compute_capability(name: str) -> ComputeCapability:
     """
     if name not in VALID_COMPUTE_CAPABILITIES:
         msg = (
-            f"Unknown compute capability: '{name}'. "
-            f"Valid: {VALID_COMPUTE_CAPABILITIES}"
+            f"Unknown compute capability: '{name}'. Valid: {VALID_COMPUTE_CAPABILITIES}"
         )
         raise ValueError(msg)
     return ComputeCapability(name)

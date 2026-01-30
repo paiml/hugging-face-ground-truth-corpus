@@ -102,9 +102,7 @@ class TestWhisperConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = WhisperConfig(
-            WhisperSize.BASE, "en", SpeechTask.TRANSCRIBE, True
-        )
+        config = WhisperConfig(WhisperSize.BASE, "en", SpeechTask.TRANSCRIBE, True)
         with pytest.raises(AttributeError):
             config.language = "fr"  # type: ignore[misc]
 
@@ -114,16 +112,12 @@ class TestValidateWhisperConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = WhisperConfig(
-            WhisperSize.BASE, "en", SpeechTask.TRANSCRIBE, True
-        )
+        config = WhisperConfig(WhisperSize.BASE, "en", SpeechTask.TRANSCRIBE, True)
         validate_whisper_config(config)
 
     def test_invalid_language_raises(self) -> None:
         """Invalid language raises ValueError."""
-        config = WhisperConfig(
-            WhisperSize.BASE, "invalid", SpeechTask.TRANSCRIBE, True
-        )
+        config = WhisperConfig(WhisperSize.BASE, "invalid", SpeechTask.TRANSCRIBE, True)
         with pytest.raises(ValueError, match="language must be one of"):
             validate_whisper_config(config)
 

@@ -1017,9 +1017,7 @@ class TestPropertyBased:
 
     @given(st.integers(min_value=1, max_value=100000))
     @settings(max_examples=20)
-    def test_estimate_compression_ratio_always_positive(
-        self, vocab_size: int
-    ) -> None:
+    def test_estimate_compression_ratio_always_positive(self, vocab_size: int) -> None:
         """Test that compression ratio is always positive."""
         ratio = estimate_compression_ratio(vocab_size)
         assert ratio > 0

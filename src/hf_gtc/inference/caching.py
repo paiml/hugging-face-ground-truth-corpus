@@ -297,8 +297,7 @@ def validate_prefix_config(config: PrefixConfig) -> None:
     """
     if config.shared_prefix_length <= 0:
         msg = (
-            f"shared_prefix_length must be positive, "
-            f"got {config.shared_prefix_length}"
+            f"shared_prefix_length must be positive, got {config.shared_prefix_length}"
         )
         raise ValueError(msg)
 
@@ -734,10 +733,7 @@ def get_cache_backend(name: str) -> CacheBackend:
         ValueError: Unknown cache backend: 'invalid'
     """
     if name not in VALID_CACHE_BACKENDS:
-        msg = (
-            f"Unknown cache backend: '{name}'. "
-            f"Valid: {sorted(VALID_CACHE_BACKENDS)}"
-        )
+        msg = f"Unknown cache backend: '{name}'. Valid: {sorted(VALID_CACHE_BACKENDS)}"
         raise ValueError(msg)
     return CacheBackend(name)
 
@@ -834,15 +830,13 @@ def estimate_latency_savings(
 
     if avg_inference_latency_ms <= 0:
         msg = (
-            f"avg_inference_latency_ms must be positive, "
-            f"got {avg_inference_latency_ms}"
+            f"avg_inference_latency_ms must be positive, got {avg_inference_latency_ms}"
         )
         raise ValueError(msg)
 
     if cache_lookup_latency_ms < 0:
         msg = (
-            f"cache_lookup_latency_ms cannot be negative, "
-            f"got {cache_lookup_latency_ms}"
+            f"cache_lookup_latency_ms cannot be negative, got {cache_lookup_latency_ms}"
         )
         raise ValueError(msg)
 
@@ -851,8 +845,7 @@ def estimate_latency_savings(
     # Savings = (without - with) / without * 100
 
     latency_with_cache = (
-        hit_rate * cache_lookup_latency_ms
-        + (1 - hit_rate) * avg_inference_latency_ms
+        hit_rate * cache_lookup_latency_ms + (1 - hit_rate) * avg_inference_latency_ms
     )
 
     savings_ms = avg_inference_latency_ms - latency_with_cache
@@ -963,8 +956,7 @@ def optimize_cache_size(
 
     if estimated_unique_prompts <= 0:
         msg = (
-            f"estimated_unique_prompts must be positive, "
-            f"got {estimated_unique_prompts}"
+            f"estimated_unique_prompts must be positive, got {estimated_unique_prompts}"
         )
         raise ValueError(msg)
 

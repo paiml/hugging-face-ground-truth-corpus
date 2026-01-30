@@ -372,9 +372,7 @@ def validate_activation_stats(stats: ActivationStats) -> None:
         raise ValueError(msg)
 
     if not 0.0 <= stats.gradient_stability <= 1.0:
-        msg = (
-            f"gradient_stability must be in [0, 1], got {stats.gradient_stability}"
-        )
+        msg = f"gradient_stability must be in [0, 1], got {stats.gradient_stability}"
         raise ValueError(msg)
 
 
@@ -959,9 +957,7 @@ def get_recommended_activation_config(
             return create_activation_config(
                 activation_type="gelu_new", approximate="tanh"
             )
-        return create_activation_config(
-            activation_type="swiglu", hidden_dim=4096
-        )
+        return create_activation_config(activation_type="swiglu", hidden_dim=4096)
 
     # Vision and encoder models typically use GELU
     if efficiency_priority:

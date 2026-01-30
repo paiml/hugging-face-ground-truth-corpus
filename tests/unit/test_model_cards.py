@@ -171,17 +171,13 @@ class TestModelMetadata:
 
     def test_metadata_is_frozen(self) -> None:
         """Metadata is immutable."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         with pytest.raises(AttributeError):
             metadata.name = "new-name"  # type: ignore[misc]
 
     def test_metadata_has_slots(self) -> None:
         """Metadata uses __slots__."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         assert not hasattr(metadata, "__dict__")
 
 
@@ -227,17 +223,13 @@ class TestEvaluationResults:
 
     def test_results_is_frozen(self) -> None:
         """Results is immutable."""
-        results = EvaluationResults(
-            ("accuracy",), ("glue",), {"accuracy": 0.9}
-        )
+        results = EvaluationResults(("accuracy",), ("glue",), {"accuracy": 0.9})
         with pytest.raises(AttributeError):
             results.metrics = ("f1",)  # type: ignore[misc]
 
     def test_results_has_slots(self) -> None:
         """Results uses __slots__."""
-        results = EvaluationResults(
-            ("accuracy",), ("glue",), {"accuracy": 0.9}
-        )
+        results = EvaluationResults(("accuracy",), ("glue",), {"accuracy": 0.9})
         assert not hasattr(results, "__dict__")
 
 
@@ -246,9 +238,7 @@ class TestModelCardConfig:
 
     def test_create_config(self) -> None:
         """Create model card config."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         config = ModelCardConfig(
             metadata=metadata,
             training=None,
@@ -261,9 +251,7 @@ class TestModelCardConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         config = ModelCardConfig(metadata, None, None, (), ("en",))
         with pytest.raises(AttributeError):
             config.language = ("de",)  # type: ignore[misc]
@@ -294,32 +282,24 @@ class TestValidateModelMetadata:
 
     def test_valid_metadata(self) -> None:
         """Valid metadata passes validation."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         validate_model_metadata(metadata)
 
     def test_empty_name_raises(self) -> None:
         """Empty name raises ValueError."""
-        metadata = ModelMetadata(
-            "", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("", "1.0", "hf", LicenseType.MIT, (), None)
         with pytest.raises(ValueError, match="name cannot be empty"):
             validate_model_metadata(metadata)
 
     def test_empty_version_raises(self) -> None:
         """Empty version raises ValueError."""
-        metadata = ModelMetadata(
-            "bert", "", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "", "hf", LicenseType.MIT, (), None)
         with pytest.raises(ValueError, match="version cannot be empty"):
             validate_model_metadata(metadata)
 
     def test_empty_author_raises(self) -> None:
         """Empty author raises ValueError."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "", LicenseType.MIT, (), None)
         with pytest.raises(ValueError, match="author cannot be empty"):
             validate_model_metadata(metadata)
 
@@ -374,9 +354,7 @@ class TestValidateEvaluationResults:
 
     def test_valid_results(self) -> None:
         """Valid results passes validation."""
-        results = EvaluationResults(
-            ("accuracy",), ("glue",), {"accuracy": 0.9}
-        )
+        results = EvaluationResults(("accuracy",), ("glue",), {"accuracy": 0.9})
         validate_evaluation_results(results)
 
     def test_empty_metrics_raises(self) -> None:
@@ -387,24 +365,22 @@ class TestValidateEvaluationResults:
 
     def test_empty_datasets_raises(self) -> None:
         """Empty datasets raises ValueError."""
-        results = EvaluationResults(
-            ("accuracy",), (), {"accuracy": 0.9}
-        )
+        results = EvaluationResults(("accuracy",), (), {"accuracy": 0.9})
         with pytest.raises(ValueError, match="datasets cannot be empty"):
             validate_evaluation_results(results)
 
     def test_missing_score_raises(self) -> None:
         """Missing score for metric raises ValueError."""
-        results = EvaluationResults(
-            ("accuracy", "f1"), ("glue",), {"accuracy": 0.9}
-        )
+        results = EvaluationResults(("accuracy", "f1"), ("glue",), {"accuracy": 0.9})
         with pytest.raises(ValueError, match="metric 'f1' not found in scores"):
             validate_evaluation_results(results)
 
     def test_non_numeric_score_raises(self) -> None:
         """Non-numeric score raises ValueError."""
         results = EvaluationResults(
-            ("accuracy",), ("glue",), {"accuracy": "not a number"}  # type: ignore[dict-item]
+            ("accuracy",),
+            ("glue",),
+            {"accuracy": "not a number"},  # type: ignore[dict-item]
         )
         with pytest.raises(ValueError, match="score for 'accuracy' must be numeric"):
             validate_evaluation_results(results)
@@ -415,53 +391,41 @@ class TestValidateModelCardConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         config = ModelCardConfig(metadata, None, None, (), ("en",))
         validate_model_card_config(config)
 
     def test_invalid_metadata_raises(self) -> None:
         """Invalid metadata raises ValueError."""
-        metadata = ModelMetadata(
-            "", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("", "1.0", "hf", LicenseType.MIT, (), None)
         config = ModelCardConfig(metadata, None, None, (), ("en",))
         with pytest.raises(ValueError, match="name cannot be empty"):
             validate_model_card_config(config)
 
     def test_empty_language_raises(self) -> None:
         """Empty language raises ValueError."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         config = ModelCardConfig(metadata, None, None, (), ())
         with pytest.raises(ValueError, match="language cannot be empty"):
             validate_model_card_config(config)
 
     def test_empty_language_entry_raises(self) -> None:
         """Empty language entry raises ValueError."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         config = ModelCardConfig(metadata, None, None, (), ("en", ""))
         with pytest.raises(ValueError, match="language entries cannot be empty"):
             validate_model_card_config(config)
 
     def test_with_valid_training(self) -> None:
         """Config with valid training passes."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         training = TrainingDetails("wiki", 3, 32, 2e-5, "GPU")
         config = ModelCardConfig(metadata, training, None, (), ("en",))
         validate_model_card_config(config)
 
     def test_with_invalid_training_raises(self) -> None:
         """Config with invalid training raises."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         training = TrainingDetails("", 3, 32, 2e-5, "GPU")
         config = ModelCardConfig(metadata, training, None, (), ("en",))
         with pytest.raises(ValueError, match="dataset cannot be empty"):
@@ -469,20 +433,14 @@ class TestValidateModelCardConfig:
 
     def test_with_valid_evaluation(self) -> None:
         """Config with valid evaluation passes."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
-        evaluation = EvaluationResults(
-            ("accuracy",), ("glue",), {"accuracy": 0.9}
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
+        evaluation = EvaluationResults(("accuracy",), ("glue",), {"accuracy": 0.9})
         config = ModelCardConfig(metadata, None, evaluation, (), ("en",))
         validate_model_card_config(config)
 
     def test_with_invalid_evaluation_raises(self) -> None:
         """Config with invalid evaluation raises."""
-        metadata = ModelMetadata(
-            "bert", "1.0", "hf", LicenseType.MIT, (), None
-        )
+        metadata = ModelMetadata("bert", "1.0", "hf", LicenseType.MIT, (), None)
         evaluation = EvaluationResults((), (), {})
         config = ModelCardConfig(metadata, None, evaluation, (), ("en",))
         with pytest.raises(ValueError, match="metrics cannot be empty"):
@@ -817,9 +775,7 @@ class TestGenerateModelCard:
 
     def test_generate_card_with_pipeline_tag(self) -> None:
         """Generate card with pipeline tag."""
-        metadata = create_model_metadata(
-            "bert", pipeline_tag="text_classification"
-        )
+        metadata = create_model_metadata("bert", pipeline_tag="text_classification")
         config = create_model_card_config(metadata)
         card = generate_model_card(config)
         assert "text_classification" in card or "text-classification" in card
@@ -884,9 +840,7 @@ class TestCalculateCompleteness:
         """Score is higher with evaluation results."""
         metadata = create_model_metadata("bert")
         config_without = create_model_card_config(metadata)
-        evaluation = create_evaluation_results(
-            ["acc"], ["glue"], {"acc": 0.9}
-        )
+        evaluation = create_evaluation_results(["acc"], ["glue"], {"acc": 0.9})
         config_with = create_model_card_config(metadata, evaluation=evaluation)
         assert calculate_completeness(config_with) > calculate_completeness(
             config_without
@@ -1112,9 +1066,7 @@ class TestGetRecommendedModelCardConfig:
 
     def test_without_ethics(self) -> None:
         """Get config without ethics section."""
-        config = get_recommended_model_card_config(
-            "bert", include_ethics=False
-        )
+        config = get_recommended_model_card_config("bert", include_ethics=False)
         assert CardSection.ETHICS not in config.sections
 
     def test_empty_model_name_raises(self) -> None:
@@ -1131,10 +1083,16 @@ class TestGetRecommendedModelCardConfig:
 class TestPropertyBased:
     """Property-based tests."""
 
-    @given(st.text(min_size=1, max_size=50, alphabet=st.characters(
-        whitelist_categories=("L", "N"),
-        whitelist_characters=("-", "_"),
-    )))
+    @given(
+        st.text(
+            min_size=1,
+            max_size=50,
+            alphabet=st.characters(
+                whitelist_categories=("L", "N"),
+                whitelist_characters=("-", "_"),
+            ),
+        )
+    )
     @settings(max_examples=20)
     def test_model_name_preserved(self, name: str) -> None:
         """Model name is preserved in metadata."""
@@ -1166,14 +1124,20 @@ class TestPropertyBased:
         )
         assert results.scores["accuracy"] == score
 
-    @given(st.lists(
-        st.text(min_size=1, max_size=20, alphabet=st.characters(
-            whitelist_categories=("L", "N"),
-        )),
-        min_size=1,
-        max_size=5,
-        unique=True,
-    ))
+    @given(
+        st.lists(
+            st.text(
+                min_size=1,
+                max_size=20,
+                alphabet=st.characters(
+                    whitelist_categories=("L", "N"),
+                ),
+            ),
+            min_size=1,
+            max_size=5,
+            unique=True,
+        )
+    )
     @settings(max_examples=10)
     def test_tags_preserved(self, tags: list[str]) -> None:
         """Tags are preserved in metadata."""

@@ -620,8 +620,7 @@ def calculate_chunk_count(
 
     if overlap_size >= chunk_size:
         msg = (
-            f"overlap_size ({overlap_size}) must be less than "
-            f"chunk_size ({chunk_size})"
+            f"overlap_size ({overlap_size}) must be less than chunk_size ({chunk_size})"
         )
         raise ValueError(msg)
 

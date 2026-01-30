@@ -74,9 +74,7 @@ class TestSamplingConfig:
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, 0.7, 50, 0.9, 1.1, 1.0, 3
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, 0.7, 50, 0.9, 1.1, 1.0, 3)
         with pytest.raises(AttributeError):
             config.temperature = 0.5  # type: ignore[misc]
 
@@ -86,48 +84,36 @@ class TestValidateSamplingConfig:
 
     def test_valid_config(self) -> None:
         """Valid config passes validation."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, 0.7, 50, 0.9, 1.1, 1.0, 3
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, 0.7, 50, 0.9, 1.1, 1.0, 3)
         validate_sampling_config(config)
 
     def test_negative_temperature_raises(self) -> None:
         """Negative temperature raises ValueError."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, -0.1, 50, 0.9, 1.0, 1.0, 0
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, -0.1, 50, 0.9, 1.0, 1.0, 0)
         with pytest.raises(ValueError, match="temperature must be non-negative"):
             validate_sampling_config(config)
 
     def test_negative_top_k_raises(self) -> None:
         """Negative top_k raises ValueError."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, 0.7, -1, 0.9, 1.0, 1.0, 0
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, 0.7, -1, 0.9, 1.0, 1.0, 0)
         with pytest.raises(ValueError, match="top_k must be non-negative"):
             validate_sampling_config(config)
 
     def test_top_p_out_of_range_raises(self) -> None:
         """Top_p out of range raises ValueError."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, 0.7, 50, 1.5, 1.0, 1.0, 0
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, 0.7, 50, 1.5, 1.0, 1.0, 0)
         with pytest.raises(ValueError, match="top_p must be between"):
             validate_sampling_config(config)
 
     def test_low_repetition_penalty_raises(self) -> None:
         """Repetition penalty < 1.0 raises ValueError."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, 0.7, 50, 0.9, 0.5, 1.0, 0
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, 0.7, 50, 0.9, 0.5, 1.0, 0)
         with pytest.raises(ValueError, match="repetition_penalty must be"):
             validate_sampling_config(config)
 
     def test_negative_ngram_size_raises(self) -> None:
         """Negative ngram size raises ValueError."""
-        config = SamplingConfig(
-            SamplingStrategy.TOP_P, 0.7, 50, 0.9, 1.0, 1.0, -1
-        )
+        config = SamplingConfig(SamplingStrategy.TOP_P, 0.7, 50, 0.9, 1.0, 1.0, -1)
         with pytest.raises(ValueError, match="no_repeat_ngram_size must be"):
             validate_sampling_config(config)
 

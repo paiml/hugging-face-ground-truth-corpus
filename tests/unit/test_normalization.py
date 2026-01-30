@@ -463,9 +463,7 @@ class TestValidateNormConfig:
 
     def test_valid_none_config(self) -> None:
         """Valid none config passes."""
-        config = NormConfig(
-            NormType.NONE, None, None, None, None, NormPosition.PRE
-        )
+        config = NormConfig(NormType.NONE, None, None, None, None, NormPosition.PRE)
         validate_norm_config(config)
 
     def test_none_config_raises(self) -> None:
@@ -483,9 +481,7 @@ class TestValidateNormConfig:
 
     def test_missing_rms_norm_config_raises(self) -> None:
         """Missing rms_norm_config raises ValueError."""
-        config = NormConfig(
-            NormType.RMS_NORM, None, None, None, None, NormPosition.PRE
-        )
+        config = NormConfig(NormType.RMS_NORM, None, None, None, None, NormPosition.PRE)
         with pytest.raises(ValueError, match="rms_norm_config required"):
             validate_norm_config(config)
 
@@ -1079,9 +1075,7 @@ class TestEdgeCases:
 
     def test_rms_norm_none_config_zero_params(self) -> None:
         """RMS norm with None config returns zero params."""
-        config = NormConfig(
-            NormType.RMS_NORM, None, None, None, None, NormPosition.PRE
-        )
+        config = NormConfig(NormType.RMS_NORM, None, None, None, None, NormPosition.PRE)
         params = calculate_norm_params(config)
         assert params == 0
 
