@@ -1,7 +1,7 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.4.0
-**Status**: IMPLEMENTATION COMPLETE - RED TEAM AUDIT COMPLETE
+**Version**: 2.5.0
+**Status**: IMPLEMENTATION COMPLETE - P0 REMEDIATION COMPLETE
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
@@ -2015,6 +2015,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 2.2.0 | 2026-01-30 | Claude Code | Added deployment.quantization module for model quantization (GPTQ, AWQ), 1148 tests, 99% coverage |
 | 2.3.0 | 2026-01-30 | Claude Code | Added deployment.gguf module for GGUF export, 1214 tests, 98% coverage. **Implementation complete.** |
 | 2.4.0 | 2026-01-30 | Claude Code | **Red Team Audit**: Popperian falsification analysis. 4/5 claims falsified (F-001, F-002, F-005, F-007). Added Appendix C with findings and remediation matrix. |
+| 2.5.0 | 2026-01-30 | Claude Code | **P0 Remediation**: F-001 (126 float comparisons → pytest.approx), F-002 (NFC normalization added to preprocess_text). All adversarial tests pass. |
 
 ---
 
@@ -2086,14 +2087,29 @@ Following the Popperian falsification methodology defined in Section 11, a compr
 
 ### C.3 Remediation Priority Matrix
 
-| Priority | Issue | Effort | Blocking |
-|----------|-------|--------|----------|
-| P0 | F-001 Float comparisons | Low | CI stability |
-| P0 | F-002 Unicode normalization | Medium | Cross-platform |
-| P1 | F-005 Assertion quality | High | Quality assurance |
-| P1 | F-007 Any type elimination | High | Depyler pipeline |
+| Priority | Issue | Effort | Blocking | Status |
+|----------|-------|--------|----------|--------|
+| P0 | F-001 Float comparisons | Low | CI stability | **COMPLETE** |
+| P0 | F-002 Unicode normalization | Medium | Cross-platform | **COMPLETE** |
+| P1 | F-005 Assertion quality | High | Quality assurance | Pending |
+| P1 | F-007 Any type elimination | High | Depyler pipeline | Pending |
 
-### C.4 Popperian Assessment
+### C.4 Remediation Details
+
+#### F-001 Remediation (COMPLETE)
+
+- Replaced 126 direct float equality assertions with `pytest.approx()`
+- Affected 14 test files across the test suite
+- All floating point comparisons now use epsilon tolerance
+
+#### F-002 Remediation (COMPLETE)
+
+- Added mandatory Unicode NFC normalization to `preprocess_text()`
+- New parameter: `unicode_normalize=True` (default enabled)
+- NFC and NFD inputs now produce identical outputs
+- All 44 adversarial Unicode tests pass
+
+### C.5 Popperian Assessment
 
 Per Popper's *Logic of Scientific Discovery*: the specification has **higher epistemic value** post-audit because:
 
