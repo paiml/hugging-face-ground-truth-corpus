@@ -17,11 +17,13 @@
 | `hf_gtc.inference.device` | COMPLETE | 100% | 19 | - |
 | `hf_gtc.inference.pipelines` | COMPLETE | 100% | 14 | - |
 | `hf_gtc.preprocessing.tokenization` | COMPLETE | 100% | 27 | - |
+| `hf_gtc.preprocessing.datasets` | COMPLETE | 100% | 41 | PMAT-004 |
 | `hf_gtc.training.fine_tuning` | COMPLETE | 100% | 40 | - |
+| `hf_gtc.training.lora` | COMPLETE | 100% | 50 | PMAT-003 |
 | `hf_gtc.evaluation.metrics` | COMPLETE | 100% | 42 | PMAT-001 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
 
-**Total**: 205 tests, 100% coverage, 363 statements covered
+**Total**: 296 tests, 100% coverage, 552 statements covered
 
 ---
 
