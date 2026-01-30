@@ -1,11 +1,11 @@
 # HF Ground Truth Corpus Specification
 
-**Version**: 2.0.0
+**Version**: 2.1.0
 **Status**: IMPLEMENTATION IN PROGRESS
 **Author**: Claude Code / Noah
 **Date**: 2026-01-30
 **Repository**: https://github.com/paiml/hugging-face-ground-truth-corpus
-**PMAT Tickets**: PMAT-001 through PMAT-014
+**PMAT Tickets**: PMAT-001 through PMAT-015
 
 ---
 
@@ -27,13 +27,14 @@
 | `hf_gtc.training.lora` | COMPLETE | 100% | 50 | PMAT-003 |
 | `hf_gtc.training.callbacks` | COMPLETE | 99% | 54 | PMAT-006 |
 | `hf_gtc.training.trainer` | COMPLETE | 98% | 100 | PMAT-014 |
+| `hf_gtc.training.qlora` | COMPLETE | 100% | 75 | PMAT-015 |
 | `hf_gtc.evaluation.metrics` | COMPLETE | 100% | 42 | PMAT-001 |
 | `hf_gtc.evaluation.benchmarks` | COMPLETE | 99% | 72 | PMAT-011 |
 | `hf_gtc.evaluation.leaderboards` | COMPLETE | 99% | 87 | PMAT-013 |
 | `hf_gtc.deployment.optimization` | COMPLETE | 100% | 44 | PMAT-002 |
 | `hf_gtc.deployment.serving` | COMPLETE | 100% | 79 | PMAT-012 |
 
-**Total**: 994 tests, 99% coverage, 2149 statements covered
+**Total**: 1069 tests, 99% coverage, 2318 statements covered
 
 ---
 
@@ -2005,6 +2006,7 @@ python -c "from safetensors.torch import load_file; load_file('test_rs.safetenso
 | 1.8.0 | 2026-01-30 | Claude Code | Added deployment.serving module for model serving utilities, 807 tests, 99% coverage |
 | 1.9.0 | 2026-01-30 | Claude Code | Added evaluation.leaderboards module for HuggingFace leaderboard integration, 894 tests, 99% coverage |
 | 2.0.0 | 2026-01-30 | Claude Code | Added training.trainer module for trainer management utilities, 994 tests, 99% coverage |
+| 2.1.0 | 2026-01-30 | Claude Code | Added training.qlora module for QLoRA quantized fine-tuning, 1069 tests, 99% coverage |
 
 ---
 
