@@ -1,0 +1,12 @@
+[pmat]
+version = "2.15.0"
+auto_update = false
+
+[quality]
+min_coverage = 95.0
+max_complexity = 15
+max_cognitive_complexity = 10
+require_docs = true
+lint_compliance = true
+fail_on_violation = true
+allow_satd = false

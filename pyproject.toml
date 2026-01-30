@@ -1,0 +1,83 @@
+[project]
+name = "hf-ground-truth-corpus"
+version = "0.1.0"
+description = "HuggingFace Ground Truth Corpus - High-quality Python recipes for ML patterns"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Noah", email = "noah@example.com" }]
+keywords = ["huggingface", "machine-learning", "transformers", "ground-truth"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "transformers>=4.40.0",
+    "datasets>=2.18.0",
+    "accelerate>=0.28.0",
+    "huggingface-hub>=0.22.0",
+    "evaluate>=0.4.0",
+    "tokenizers>=0.15.0",
+    "torch>=2.2.0",
+    "safetensors>=0.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.5.0",
+    "hypothesis>=6.100.0",
+    "ruff>=0.8.0",
+    "bandit>=1.8.0",
+    "pre-commit>=3.6.0",
+]
+peft = ["peft>=0.10.0"]
+vision = ["Pillow>=10.0.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hf_gtc"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM", "RUF", "D"]
+ignore = ["D100", "D104"]  # Allow missing module/package docstrings for __init__.py
+
+[tool.ruff.lint.isort]
+known-first-party = ["hf_gtc"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--doctest-modules --cov=src/hf_gtc --cov-report=term-missing --cov-fail-under=95 -v"
+markers = ["slow: marks tests as slow"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["src/hf_gtc"]
+omit = ["*/tests/*", "*/__init__.py"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 95
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+]
