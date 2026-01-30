@@ -1111,7 +1111,7 @@ def get_recommended_speculative_config(model_size: str) -> SpeculativeConfig:
 
     params = configs[model_size]
     return create_speculative_config(
-        gamma_tokens=params["gamma_tokens"],
-        threshold=params["threshold"],
-        max_speculation_length=params["max_speculation_length"],
+        gamma_tokens=int(params["gamma_tokens"]),
+        threshold=float(params["threshold"]),
+        max_speculation_length=int(params["max_speculation_length"]),
     )

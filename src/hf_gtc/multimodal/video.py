@@ -699,7 +699,8 @@ def calculate_frame_indices(
         indices = []
         for i in range(num_frames):
             hash_input = f"{total_frames}_{num_frames}_{i}".encode()
-            hash_val = int(hashlib.md5(hash_input).hexdigest(), 16)
+            md5 = hashlib.md5(hash_input, usedforsecurity=False)  # nosec B324
+            hash_val = int(md5.hexdigest(), 16)
             idx = hash_val % total_frames
             indices.append(idx)
         return tuple(sorted(set(indices))[:num_frames])

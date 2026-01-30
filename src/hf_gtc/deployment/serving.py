@@ -1770,7 +1770,7 @@ def get_recommended_serving_config(
         batch_size = 32
 
     endpoint_config = create_endpoint_config(
-        host="0.0.0.0",
+        host="0.0.0.0",  # nosec B104 - default serving config, overridable
         port=8080,
         workers=workers,
         timeout_seconds=60 if model_size_gb > 30 else 30,

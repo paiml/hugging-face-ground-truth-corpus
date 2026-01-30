@@ -1376,28 +1376,33 @@ def aggregate_metrics(
         weights = [1.0 / len(results)] * len(results)
 
     # Normalize weights
-    total_weight = sum(weights)
+    assert weights is not None  # guaranteed by branches above
+    total_weight = float(sum(weights))
     if total_weight > 0:
         weights = [w / total_weight for w in weights]
 
     # Aggregate scores
-    agg_score = sum(r.score * w for r, w in zip(results, weights, strict=True))
+    agg_score = float(sum(r.score * w for r, w in zip(results, weights, strict=True)))
 
     # Aggregate precision, recall, f1 if available
-    agg_precision = None
-    agg_recall = None
-    agg_f1 = None
+    agg_precision: float | None = None
+    agg_recall: float | None = None
+    agg_f1: float | None = None
 
     if all(r.precision is not None for r in results):
-        agg_precision = sum(
-            r.precision * w for r, w in zip(results, weights, strict=True)
+        agg_precision = float(
+            sum(float(r.precision) * w for r, w in zip(results, weights, strict=True))
         )
 
     if all(r.recall is not None for r in results):
-        agg_recall = sum(r.recall * w for r, w in zip(results, weights, strict=True))
+        agg_recall = float(
+            sum(float(r.recall) * w for r, w in zip(results, weights, strict=True))
+        )
 
     if all(r.f1 is not None for r in results):
-        agg_f1 = sum(r.f1 * w for r, w in zip(results, weights, strict=True))
+        agg_f1 = float(
+            sum(float(r.f1) * w for r, w in zip(results, weights, strict=True))
+        )
 
     return MetricResult(
         score=agg_score,

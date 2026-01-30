@@ -977,16 +977,16 @@ def get_recommended_vectorstore_config(
     params = optimize_index_params(
         num_vectors=num_vectors,
         dimension=dimension,
-        recall_target=config["recall_target"],
-        latency_budget_ms=config["latency_budget_ms"],
+        recall_target=float(config["recall_target"]),
+        latency_budget_ms=float(config["latency_budget_ms"]),
     )
 
     return create_vectorstore_config(
-        store_type=config["store_type"],
-        index_type=params["index_type"],
-        distance_metric=config["distance_metric"],
+        store_type=str(config["store_type"]),
+        index_type=str(params["index_type"]),
+        distance_metric=str(config["distance_metric"]),
         dimension=dimension,
-        nlist=params["nlist"],
-        nprobe=params["nprobe"],
-        ef_search=params["ef_search"],
+        nlist=int(params["nlist"]),
+        nprobe=int(params["nprobe"]),
+        ef_search=int(params["ef_search"]),
     )

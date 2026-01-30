@@ -1039,14 +1039,14 @@ def set_rng_state(state: RNGState) -> dict[str, bool]:
     if state.python_state is not None:
         import random
 
-        random.setstate(pickle.loads(state.python_state))
+        random.setstate(pickle.loads(state.python_state))  # nosec B301 - trusted internal state
         results["python"] = True
 
     if state.numpy_state is not None:
         try:
             import numpy as np
 
-            np.random.set_state(pickle.loads(state.numpy_state))
+            np.random.set_state(pickle.loads(state.numpy_state))  # nosec B301
             results["numpy"] = True
         except ImportError:
             results["numpy"] = False
@@ -1055,7 +1055,7 @@ def set_rng_state(state: RNGState) -> dict[str, bool]:
         try:
             import torch
 
-            torch.set_rng_state(pickle.loads(state.torch_state))
+            torch.set_rng_state(pickle.loads(state.torch_state))  # nosec B301
             results["torch"] = True
         except ImportError:
             results["torch"] = False
@@ -1065,7 +1065,7 @@ def set_rng_state(state: RNGState) -> dict[str, bool]:
             import torch
 
             if torch.cuda.is_available():
-                torch.cuda.set_rng_state_all(pickle.loads(state.cuda_state))
+                torch.cuda.set_rng_state_all(pickle.loads(state.cuda_state))  # nosec B301
                 results["cuda"] = True
             else:
                 results["cuda"] = False

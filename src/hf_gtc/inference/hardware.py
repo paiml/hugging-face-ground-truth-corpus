@@ -741,7 +741,7 @@ def detect_available_devices() -> list[str]:
 
     # TPU detection (JAX)
     try:
-        import jax
+        import jax  # type: ignore[import-not-found]
 
         devices = jax.devices("tpu")
         if devices:
@@ -827,7 +827,7 @@ def get_optimal_device_map(
         else:
             # Offload to CPU
             layer_mapping[f"layer_{i}"] = -1  # -1 indicates CPU offload
-            offload_folder = "/tmp/offload"
+            offload_folder = "/tmp/offload"  # nosec B108 - standard offload path
 
     return DeviceMap(
         layer_mapping=layer_mapping,

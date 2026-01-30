@@ -470,12 +470,13 @@ def format_size(size_bytes: int) -> str:
     if size_bytes < 1024:
         return f"{size_bytes} B"
 
+    size: float = float(size_bytes)
     for unit in ("KB", "MB", "GB", "TB", "PB"):
-        size_bytes /= 1024
-        if size_bytes < 1024:
-            return f"{size_bytes:.2f} {unit}"
+        size /= 1024
+        if size < 1024:
+            return f"{size:.2f} {unit}"
 
-    return f"{size_bytes:.2f} EB"
+    return f"{size:.2f} EB"
 
 
 def get_recommended_dtype(model_size: str) -> DType:

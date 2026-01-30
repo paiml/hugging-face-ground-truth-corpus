@@ -927,8 +927,8 @@ def get_recommended_chunking_config(
     }
 
     adj = type_adjustments[document_type]
-    chunk_size = int(base["chunk_size"] * adj["size_mult"])
-    overlap_size = int(base["overlap_size"] * adj["size_mult"])
+    chunk_size = int(int(base["chunk_size"]) * float(adj["size_mult"]))
+    overlap_size = int(int(base["overlap_size"]) * float(adj["size_mult"]))
     strategy = adj["strategy"]
 
     return ChunkConfig(

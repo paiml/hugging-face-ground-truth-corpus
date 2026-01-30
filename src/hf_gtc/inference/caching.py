@@ -1067,33 +1067,28 @@ def get_recommended_cache_config(
         raise ValueError(msg)
 
     # Configuration recommendations by use case
-    configs = {
-        "chatbot": {
-            "cache_type": CacheType.SEMANTIC,
-            "eviction_policy": EvictionPolicy.LRU,
-            "ttl_seconds": 7200,  # 2 hours
-        },
-        "batch": {
-            "cache_type": CacheType.PREFIX,
-            "eviction_policy": EvictionPolicy.FIFO,
-            "ttl_seconds": 1800,  # 30 minutes
-        },
-        "api": {
-            "cache_type": CacheType.KV,
-            "eviction_policy": EvictionPolicy.LFU,
-            "ttl_seconds": 3600,  # 1 hour
-        },
-        "development": {
-            "cache_type": CacheType.PROMPT,
-            "eviction_policy": EvictionPolicy.TTL,
-            "ttl_seconds": 300,  # 5 minutes
-        },
+    cache_types: dict[str, CacheType] = {
+        "chatbot": CacheType.SEMANTIC,
+        "batch": CacheType.PREFIX,
+        "api": CacheType.KV,
+        "development": CacheType.PROMPT,
+    }
+    eviction_policies: dict[str, EvictionPolicy] = {
+        "chatbot": EvictionPolicy.LRU,
+        "batch": EvictionPolicy.FIFO,
+        "api": EvictionPolicy.LFU,
+        "development": EvictionPolicy.TTL,
+    }
+    ttl_values: dict[str, int] = {
+        "chatbot": 7200,  # 2 hours
+        "batch": 1800,  # 30 minutes
+        "api": 3600,  # 1 hour
+        "development": 300,  # 5 minutes
     }
 
-    params = configs[use_case]
     return CacheConfig(
-        cache_type=params["cache_type"],
+        cache_type=cache_types[use_case],
         max_size_mb=available_memory_mb,
-        eviction_policy=params["eviction_policy"],
-        ttl_seconds=params["ttl_seconds"],
+        eviction_policy=eviction_policies[use_case],
+        ttl_seconds=ttl_values[use_case],
     )

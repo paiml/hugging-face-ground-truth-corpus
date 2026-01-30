@@ -1290,7 +1290,7 @@ def get_recommended_rag_eval_config(
         config_params["evaluation_level"] = "sentence"
 
     return create_rag_eval_config(
-        retrieval_k=config_params["retrieval_k"],
-        grounding_type=config_params["grounding_type"],
-        evaluation_level=config_params["evaluation_level"],
+        retrieval_k=int(config_params["retrieval_k"]),
+        grounding_type=str(config_params["grounding_type"]),
+        evaluation_level=str(config_params["evaluation_level"]),
     )
