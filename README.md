@@ -109,6 +109,56 @@ src/hf_gtc/
 └── deployment/    # Optimization
 ```
 
+## Querying from Batuta / Aprender
+
+This corpus serves as **ground truth** for the Sovereign AI Stack. Query recipes and get Rust equivalents:
+
+```
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  YOUR QUESTION   │────▶│  BATUTA ORACLE   │────▶│  RUST SOLUTION   │
+│  "tokenize text" │     │  (RAG search)    │     │  via candle      │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+```
+
+### From Batuta (Oracle Queries)
+
+```bash
+# Natural language query
+batuta oracle "How do I tokenize text for BERT?"
+# Returns: hf_gtc/preprocessing/tokenization.py + candle equivalent
+
+# Query with Rust cross-reference
+batuta oracle --rust-source candle "attention mechanism"
+
+# Query by tag
+batuta oracle --tag training --tag memory-efficient
+```
+
+### From Aprender (Rust ML)
+
+```rust
+// Python recipe in hf_gtc:
+//   from hf_gtc.preprocessing import preprocess_text
+//   result = preprocess_text("  HELLO  ")  # "hello"
+
+// Equivalent Rust (via Depyler transpilation):
+let result = preprocess_text("  HELLO  ");  // "hello"
+```
+
+### Depyler Transpilation
+
+Qualified recipes (MQS ≥ 85) can be transpiled to Rust:
+
+```bash
+# Transpile Python recipes to Rust
+depyler transpile src/hf_gtc/ --output rust_output/ --verify
+
+# Verify semantic equivalence against candle
+depyler verify --python src/hf_gtc/preprocessing/ --rust candle-core/
+```
+
+See [docs/specifications/hf-ground-truth-corpus.md](docs/specifications/hf-ground-truth-corpus.md) for full integration details.
+
 ## Rust Ground Truth
 
 This project cross-references HuggingFace's Rust implementations for validation:
