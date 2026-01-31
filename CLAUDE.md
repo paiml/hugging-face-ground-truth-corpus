@@ -95,3 +95,23 @@ When implementing recipes with candle/safetensors equivalents:
 1. Cross-reference with `../candle` for tensor operations
 2. Cross-reference with `../safetensors` for serialization
 3. Ensure numeric results match within epsilon (1e-6)
+
+
+## Stack Documentation Search
+
+Query this corpus and the entire Sovereign AI Stack using batuta's RAG Oracle:
+
+```bash
+# Index all stack documentation (run once, persists to ~/.cache/batuta/rag/)
+batuta oracle --rag-index
+
+# Search for Python ML patterns with Rust equivalents
+batuta oracle --rag "tokenization for BERT"
+batuta oracle --rag "sentiment analysis pipeline"
+batuta oracle --rag "HuggingFace model loading"
+
+# Check index status
+batuta oracle --rag-stats
+```
+
+This corpus is indexed alongside Rust stack components, enabling cross-language pattern discovery.
