@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ScriptMode(Enum):
     """TorchScript compilation modes.
@@ -266,9 +268,7 @@ def validate_torchscript_config(config: TorchScriptConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
 
 def validate_trace_config(config: TraceConfig) -> None:
@@ -294,9 +294,7 @@ def validate_trace_config(config: TraceConfig) -> None:
         Traceback (most recent call last):
         ValueError: check_tolerance must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.check_tolerance <= 0:
         msg = f"check_tolerance must be positive, got {config.check_tolerance}"
@@ -320,9 +318,7 @@ def validate_optimization_config(config: OptimizationConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
 
 def validate_mobile_config(config: MobileConfig) -> None:
@@ -348,9 +344,7 @@ def validate_mobile_config(config: MobileConfig) -> None:
         Traceback (most recent call last):
         ValueError: backend must be one of
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     valid_backends = {"cpu", "vulkan", "metal", "nnapi"}
     if config.backend not in valid_backends:
@@ -713,7 +707,7 @@ def estimate_script_size(
     # Base: FP32 = 4 bytes per param
     base_bytes = model_params * 4
 
-    # Optimize for mobile typically uses INT8 quantization
+    # Mobile target uses INT8 quantization for reduced memory footprint
     if optimize_for == OptimizeFor.MOBILE:
         base_bytes = model_params * 1  # INT8
     elif optimize_for == OptimizeFor.INFERENCE:
@@ -810,9 +804,7 @@ def get_torchscript_config_dict(config: TorchScriptConfig) -> dict[str, Any]:
         >>> d["strict"]
         True
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "mode": config.mode.value,
@@ -842,9 +834,7 @@ def get_trace_config_dict(config: TraceConfig) -> dict[str, Any]:
         >>> d["check_inputs"]
         True
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "example_inputs": config.example_inputs,
@@ -873,9 +863,7 @@ def get_optimization_config_dict(config: OptimizationConfig) -> dict[str, Any]:
         >>> d["fuse_operations"]
         True
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "freeze_mode": config.freeze_mode.value,
@@ -905,9 +893,7 @@ def get_mobile_config_dict(config: MobileConfig) -> dict[str, Any]:
         >>> d["preserve_dtype"]
         True
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "optimize_for_mobile": config.optimize_for_mobile,
@@ -979,9 +965,7 @@ def format_compilation_stats(stats: CompilationStats) -> str:
         >>> "Fused ops:" in formatted
         True
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     size_mb = stats.model_size_bytes / (1024 * 1024)
     lines = [

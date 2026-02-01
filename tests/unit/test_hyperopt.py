@@ -142,8 +142,8 @@ class TestParameterSpace:
         )
         assert space.name == "learning_rate"
         assert space.param_type == ParameterType.CONTINUOUS
-        assert space.low == 0.0
-        assert space.high == 1.0
+        assert space.low == pytest.approx(0.0)
+        assert space.high == pytest.approx(1.0)
 
     def test_create_categorical_space(self) -> None:
         """Create categorical parameter space."""
@@ -203,9 +203,9 @@ class TestTrialResult:
             duration_seconds=120.5,
         )
         assert result.params == {"lr": 0.001}
-        assert result.objective_value == 0.05
+        assert result.objective_value == pytest.approx(0.05)
         assert result.trial_number == 1
-        assert result.duration_seconds == 120.5
+        assert result.duration_seconds == pytest.approx(120.5)
 
     def test_result_is_frozen(self) -> None:
         """Result is immutable."""
@@ -226,7 +226,7 @@ class TestHyperoptStats:
             convergence_curve=(0.1, 0.05, 0.02),
         )
         assert stats.total_trials == 50
-        assert stats.best_value == 0.02
+        assert stats.best_value == pytest.approx(0.02)
         assert stats.best_params == {"lr": 0.0005}
         assert stats.convergence_curve == (0.1, 0.05, 0.02)
 
@@ -428,8 +428,8 @@ class TestCreateParameterSpace:
         space = create_parameter_space("lr", "continuous", 0.0, 1.0)
         assert space.name == "lr"
         assert space.param_type == ParameterType.CONTINUOUS
-        assert space.low == 0.0
-        assert space.high == 1.0
+        assert space.low == pytest.approx(0.0)
+        assert space.high == pytest.approx(1.0)
 
     def test_create_discrete_space(self) -> None:
         """Create discrete space."""
@@ -538,9 +538,9 @@ class TestCreateTrialResult:
             trial_number=1,
         )
         assert result.params == {"lr": 0.001, "batch_size": 32}
-        assert result.objective_value == 0.05
+        assert result.objective_value == pytest.approx(0.05)
         assert result.trial_number == 1
-        assert result.duration_seconds == 0.0
+        assert result.duration_seconds == pytest.approx(0.0)
 
     def test_with_duration(self) -> None:
         """Create result with duration."""
@@ -550,7 +550,7 @@ class TestCreateTrialResult:
             trial_number=1,
             duration_seconds=120.5,
         )
-        assert result.duration_seconds == 120.5
+        assert result.duration_seconds == pytest.approx(120.5)
 
     def test_empty_params_raises(self) -> None:
         """Empty params raises ValueError."""
@@ -577,7 +577,7 @@ class TestCreateHyperoptStats:
             convergence_curve=(0.1, 0.05, 0.02),
         )
         assert stats.total_trials == 50
-        assert stats.best_value == 0.02
+        assert stats.best_value == pytest.approx(0.02)
         assert stats.best_params == {"lr": 0.0005}
 
     def test_negative_total_trials_raises(self) -> None:
@@ -755,12 +755,18 @@ class TestCalculateImprovement:
 
     def test_zero_best_value(self) -> None:
         """Zero best value returns 0."""
-        assert calculate_improvement(0.5, 0.0, ObjectiveDirection.MINIMIZE) == 0.0
-        assert calculate_improvement(0.5, 0.0, ObjectiveDirection.MAXIMIZE) == 0.0
+        assert calculate_improvement(
+            0.5, 0.0, ObjectiveDirection.MINIMIZE
+        ) == pytest.approx(0.0)
+        assert calculate_improvement(
+            0.5, 0.0, ObjectiveDirection.MAXIMIZE
+        ) == pytest.approx(0.0)
 
     def test_no_improvement(self) -> None:
         """Same value returns 0 improvement."""
-        assert calculate_improvement(0.1, 0.1, ObjectiveDirection.MINIMIZE) == 0.0
+        assert calculate_improvement(
+            0.1, 0.1, ObjectiveDirection.MINIMIZE
+        ) == pytest.approx(0.0)
 
 
 class TestEstimateRemainingTrials:

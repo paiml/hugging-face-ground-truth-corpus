@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class TFLiteQuantization(Enum):
     """TFLite quantization methods.
@@ -292,9 +294,7 @@ def validate_convert_config(config: TFLiteConvertConfig) -> None:
         Traceback (most recent call last):
         ValueError: supported_ops cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.supported_ops:
         msg = "supported_ops cannot be empty"
@@ -336,9 +336,7 @@ def validate_quantization_config(config: QuantizationConfig) -> None:
         Traceback (most recent call last):
         ValueError: output_type must be one of {'int8', 'uint8', 'float16'}
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.representative_dataset_size <= 0:
         msg = (
@@ -385,9 +383,7 @@ def validate_delegate_config(config: DelegateConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_threads must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_threads <= 0:
         msg = f"num_threads must be positive, got {config.num_threads}"
@@ -984,9 +980,7 @@ def format_conversion_stats(stats: ConversionStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     original_mb = stats.original_size / (1024 * 1024)
     converted_mb = stats.converted_size / (1024 * 1024)
@@ -1160,9 +1154,7 @@ def get_convert_config_dict(config: TFLiteConvertConfig) -> dict[str, Any]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "quantization": config.quantization.value,
@@ -1196,9 +1188,7 @@ def get_delegate_config_dict(config: DelegateConfig) -> dict[str, Any]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "delegate_type": config.delegate_type.value,

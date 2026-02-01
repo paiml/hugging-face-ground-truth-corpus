@@ -758,6 +758,30 @@ def parse_version(version_string: str) -> VersionInfo:
     )
 
 
+def _compare_ints(a: int, b: int) -> int:
+    """Compare two integers, returning -1, 0, or 1."""
+    if a < b:
+        return -1
+    if a > b:
+        return 1
+    return 0
+
+
+def _compare_pre_release(a: str | None, b: str | None) -> int:
+    """Compare pre-release identifiers per semver rules."""
+    if a is None and b is None:
+        return 0
+    if a is None:
+        return 1  # a is release, b is pre-release
+    if b is None:
+        return -1  # a is pre-release, b is release
+    if a < b:
+        return -1
+    if a > b:
+        return 1
+    return 0
+
+
 def compare_versions(version_a: VersionInfo, version_b: VersionInfo) -> int:
     """Compare two versions.
 
@@ -798,27 +822,68 @@ def compare_versions(version_a: VersionInfo, version_b: VersionInfo) -> int:
         -1
     """
     # Compare major.minor.patch
-    if version_a.major != version_b.major:
-        return -1 if version_a.major < version_b.major else 1
-    if version_a.minor != version_b.minor:
-        return -1 if version_a.minor < version_b.minor else 1
-    if version_a.patch != version_b.patch:
-        return -1 if version_a.patch < version_b.patch else 1
+    for a_val, b_val in (
+        (version_a.major, version_b.major),
+        (version_a.minor, version_b.minor),
+        (version_a.patch, version_b.patch),
+    ):
+        cmp = _compare_ints(a_val, b_val)
+        if cmp != 0:
+            return cmp
 
-    # Pre-release versions have lower precedence than normal versions
-    if version_a.pre_release is None and version_b.pre_release is None:
-        return 0
-    if version_a.pre_release is None:
-        return 1  # a is release, b is pre-release
-    if version_b.pre_release is None:
-        return -1  # a is pre-release, b is release
+    return _compare_pre_release(version_a.pre_release, version_b.pre_release)
 
-    # Compare pre-release identifiers
-    if version_a.pre_release < version_b.pre_release:
-        return -1
-    if version_a.pre_release > version_b.pre_release:
-        return 1
-    return 0
+
+def _increment_major(version: VersionInfo) -> VersionInfo:
+    """Increment major version."""
+    return VersionInfo(
+        major=version.major + 1,
+        minor=0,
+        patch=0,
+        pre_release=None,
+        build_metadata=None,
+    )
+
+
+def _increment_minor(version: VersionInfo) -> VersionInfo:
+    """Increment minor version."""
+    return VersionInfo(
+        major=version.major,
+        minor=version.minor + 1,
+        patch=0,
+        pre_release=None,
+        build_metadata=None,
+    )
+
+
+def _increment_patch(version: VersionInfo) -> VersionInfo:
+    """Increment patch version."""
+    return VersionInfo(
+        major=version.major,
+        minor=version.minor,
+        patch=version.patch + 1,
+        pre_release=None,
+        build_metadata=None,
+    )
+
+
+def _increment_pre_release(version: VersionInfo) -> VersionInfo:
+    """Increment pre-release version."""
+    if version.pre_release is None:
+        new_pre = "alpha.1"
+    else:
+        parts = version.pre_release.rsplit(".", 1)
+        if len(parts) == 2 and parts[1].isdigit():
+            new_pre = f"{parts[0]}.{int(parts[1]) + 1}"
+        else:
+            new_pre = f"{version.pre_release}.1"
+    return VersionInfo(
+        major=version.major,
+        minor=version.minor,
+        patch=version.patch,
+        pre_release=new_pre,
+        build_metadata=version.build_metadata,
+    )
 
 
 def increment_version(version: VersionInfo, change_type: str) -> VersionInfo:
@@ -865,49 +930,13 @@ def increment_version(version: VersionInfo, change_type: str) -> VersionInfo:
 
     ctype = ChangeType(change_type)
 
-    if ctype == ChangeType.MAJOR:
-        return VersionInfo(
-            major=version.major + 1,
-            minor=0,
-            patch=0,
-            pre_release=None,
-            build_metadata=None,
-        )
-    elif ctype == ChangeType.MINOR:
-        return VersionInfo(
-            major=version.major,
-            minor=version.minor + 1,
-            patch=0,
-            pre_release=None,
-            build_metadata=None,
-        )
-    elif ctype == ChangeType.PATCH:
-        return VersionInfo(
-            major=version.major,
-            minor=version.minor,
-            patch=version.patch + 1,
-            pre_release=None,
-            build_metadata=None,
-        )
-    else:  # PRE_RELEASE
-        # Increment pre-release or start new one
-        if version.pre_release is None:
-            new_pre = "alpha.1"
-        else:
-            # Try to increment numeric suffix
-            parts = version.pre_release.rsplit(".", 1)
-            if len(parts) == 2 and parts[1].isdigit():
-                new_pre = f"{parts[0]}.{int(parts[1]) + 1}"
-            else:
-                new_pre = f"{version.pre_release}.1"
-
-        return VersionInfo(
-            major=version.major,
-            minor=version.minor,
-            patch=version.patch,
-            pre_release=new_pre,
-            build_metadata=version.build_metadata,
-        )
+    incrementors = {
+        ChangeType.MAJOR: _increment_major,
+        ChangeType.MINOR: _increment_minor,
+        ChangeType.PATCH: _increment_patch,
+        ChangeType.PRE_RELEASE: _increment_pre_release,
+    }
+    return incrementors[ctype](version)
 
 
 def calculate_model_diff(

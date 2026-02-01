@@ -113,7 +113,7 @@ class TestDraftModelConfig:
         assert config.model_type == DraftModelType.SMALLER_SAME_FAMILY
         assert config.model_name == ""
         assert config.gamma_tokens == 5
-        assert config.temperature == 1.0
+        assert config.temperature == pytest.approx(1.0)
 
     def test_custom_values(self) -> None:
         """Test custom configuration values."""
@@ -352,7 +352,7 @@ class TestCreateDraftModelConfig:
         assert config.model_type == DraftModelType.SMALLER_SAME_FAMILY
         assert config.model_name == ""
         assert config.gamma_tokens == 5
-        assert config.temperature == 1.0
+        assert config.temperature == pytest.approx(1.0)
 
     def test_custom_values(self) -> None:
         """Test creation with custom values."""

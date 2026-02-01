@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class EditingMethod(Enum):
     """Methods for editing model knowledge.
@@ -464,9 +466,7 @@ def validate_rome_config(config: ROMEConfig) -> None:
         Traceback (most recent call last):
         ValueError: layers cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.layers:
         msg = "layers cannot be empty"
@@ -515,9 +515,7 @@ def validate_memit_config(config: MEMITConfig) -> None:
         Traceback (most recent call last):
         ValueError: layers cannot contain negative values
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.layers:
         msg = "layers cannot be empty"
@@ -614,9 +612,7 @@ def validate_editing_config(config: EditingConfig) -> None:
         Traceback (most recent call last):
         ValueError: rome_config is required when using ROME method
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.method == EditingMethod.ROME and config.rome_config is None:
         msg = "rome_config is required when using ROME method"
@@ -1187,9 +1183,7 @@ def format_editing_stats(stats: EditingStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = ["Model Editing Evaluation Results", "=" * 35]
 

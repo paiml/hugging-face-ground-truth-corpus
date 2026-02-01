@@ -223,7 +223,7 @@ class TestDebugStats:
         )
         assert stats.anomalies_detected == {"nan": 0, "inf": 1}
         assert stats.gradient_norm_history == (0.5, 0.6, 0.55)
-        assert stats.activation_stats["layer1"]["mean"] == 0.1
+        assert stats.activation_stats["layer1"]["mean"] == pytest.approx(0.1)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -567,36 +567,36 @@ class TestComputeGradientFlow:
         config = GradientFlowConfig(("layer1",), "mean", 100)
         grads = {"layer1": [1.0, 2.0, 3.0]}
         result = compute_gradient_flow(grads, config)
-        assert result["layer1"] == 2.0
+        assert result["layer1"] == pytest.approx(2.0)
 
     def test_max_reduction(self) -> None:
         """Compute with max reduction."""
         config = GradientFlowConfig(("layer1",), "max", 100)
         grads = {"layer1": [1.0, 2.0, 3.0]}
         result = compute_gradient_flow(grads, config)
-        assert result["layer1"] == 3.0
+        assert result["layer1"] == pytest.approx(3.0)
 
     def test_min_reduction(self) -> None:
         """Compute with min reduction."""
         config = GradientFlowConfig(("layer1",), "min", 100)
         grads = {"layer1": [1.0, 2.0, 3.0]}
         result = compute_gradient_flow(grads, config)
-        assert result["layer1"] == 1.0
+        assert result["layer1"] == pytest.approx(1.0)
 
     def test_multiple_layers(self) -> None:
         """Compute for multiple layers."""
         config = GradientFlowConfig(("layer1", "layer2"), "mean", 100)
         grads = {"layer1": [1.0, 2.0], "layer2": [3.0, 4.0]}
         result = compute_gradient_flow(grads, config)
-        assert result["layer1"] == 1.5
-        assert result["layer2"] == 3.5
+        assert result["layer1"] == pytest.approx(1.5)
+        assert result["layer2"] == pytest.approx(3.5)
 
     def test_negative_gradients(self) -> None:
         """Compute with negative gradients uses absolute values."""
         config = GradientFlowConfig(("layer1",), "mean", 100)
         grads = {"layer1": [-1.0, -2.0, -3.0]}
         result = compute_gradient_flow(grads, config)
-        assert result["layer1"] == 2.0
+        assert result["layer1"] == pytest.approx(2.0)
 
     def test_empty_gradients_raises(self) -> None:
         """Empty gradients raises ValueError."""
@@ -624,16 +624,16 @@ class TestComputeActivationStats:
         config = ActivationConfig(("layer1",), 50, True)
         acts = {"layer1": [1.0, 2.0, 3.0, 4.0, 5.0]}
         result = compute_activation_stats(acts, config)
-        assert result["layer1"]["mean"] == 3.0
-        assert result["layer1"]["min"] == 1.0
-        assert result["layer1"]["max"] == 5.0
+        assert result["layer1"]["mean"] == pytest.approx(3.0)
+        assert result["layer1"]["min"] == pytest.approx(1.0)
+        assert result["layer1"]["max"] == pytest.approx(5.0)
 
     def test_std_calculation(self) -> None:
         """Compute standard deviation correctly."""
         config = ActivationConfig(("layer1",), 50, True)
         acts = {"layer1": [2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0]}
         result = compute_activation_stats(acts, config)
-        assert result["layer1"]["mean"] == 5.0
+        assert result["layer1"]["mean"] == pytest.approx(5.0)
         assert abs(result["layer1"]["std"] - 2.0) < 0.01
 
     def test_sparsity_calculation(self) -> None:
@@ -641,15 +641,15 @@ class TestComputeActivationStats:
         config = ActivationConfig(("layer1",), 50, True)
         acts = {"layer1": [0.0, 0.0, 1.0, 2.0, 0.0]}
         result = compute_activation_stats(acts, config)
-        assert result["layer1"]["sparsity"] == 0.6
+        assert result["layer1"]["sparsity"] == pytest.approx(0.6)
 
     def test_multiple_layers(self) -> None:
         """Compute for multiple layers."""
         config = ActivationConfig(("layer1", "layer2"), 50, True)
         acts = {"layer1": [1.0, 2.0], "layer2": [3.0, 4.0]}
         result = compute_activation_stats(acts, config)
-        assert result["layer1"]["mean"] == 1.5
-        assert result["layer2"]["mean"] == 3.5
+        assert result["layer1"]["mean"] == pytest.approx(1.5)
+        assert result["layer2"]["mean"] == pytest.approx(3.5)
 
     def test_empty_activations_raises(self) -> None:
         """Empty activations raises ValueError."""
@@ -677,15 +677,15 @@ class TestAnalyzeLossLandscape:
         losses = [1.0, 0.9, 0.8, 0.7, 0.6]
         result = analyze_loss_landscape(losses)
         assert result["trend"] == -0.1
-        assert result["min_loss"] == 0.6
-        assert result["max_loss"] == 1.0
-        assert result["final_loss"] == 0.6
+        assert result["min_loss"] == pytest.approx(0.6)
+        assert result["max_loss"] == pytest.approx(1.0)
+        assert result["final_loss"] == pytest.approx(0.6)
 
     def test_increasing_loss(self) -> None:
         """Analyze increasing loss trend."""
         losses = [0.6, 0.7, 0.8, 0.9, 1.0]
         result = analyze_loss_landscape(losses)
-        assert result["trend"] == 0.1
+        assert result["trend"] == pytest.approx(0.1)
 
     def test_volatile_loss(self) -> None:
         """Analyze volatile loss."""

@@ -342,6 +342,22 @@ def validate_multitask_config(config: MultiTaskConfig) -> None:
         raise ValueError(msg)
 
 
+def _validate_dict_non_negative(d: dict[str, float], error_msg: str) -> None:
+    """Validate all values in a dict are non-negative."""
+    for v in d.values():
+        if v < 0:
+            raise ValueError(error_msg)
+
+
+def _validate_dict_range(
+    d: dict[str, float], low: float, high: float, error_msg: str
+) -> None:
+    """Validate all values in a dict are within [low, high]."""
+    for v in d.values():
+        if not low <= v <= high:
+            raise ValueError(error_msg)
+
+
 def validate_multitask_stats(stats: MultiTaskStats) -> None:
     """Validate multi-task statistics.
 
@@ -371,21 +387,16 @@ def validate_multitask_stats(stats: MultiTaskStats) -> None:
             ...
         ValueError: task losses must be non-negative
     """
-    for loss in stats.task_losses.values():
-        if loss < 0:
-            msg = "task losses must be non-negative"
-            raise ValueError(msg)
-    for acc in stats.task_accuracies.values():
-        if not 0 <= acc <= 1:
-            msg = "task accuracies must be between 0 and 1"
-            raise ValueError(msg)
+    _validate_dict_non_negative(stats.task_losses, "task losses must be non-negative")
+    _validate_dict_range(
+        stats.task_accuracies, 0, 1, "task accuracies must be between 0 and 1"
+    )
     if stats.gradient_conflicts < 0:
         msg = f"gradient_conflicts must be non-negative, got {stats.gradient_conflicts}"
         raise ValueError(msg)
-    for weight in stats.effective_weights.values():
-        if weight < 0:
-            msg = "effective weights must be non-negative"
-            raise ValueError(msg)
+    _validate_dict_non_negative(
+        stats.effective_weights, "effective weights must be non-negative"
+    )
 
 
 def create_task_config(
@@ -910,6 +921,7 @@ def detect_gradient_conflicts(
             raise ValueError(msg)
 
     def cosine_similarity(a: tuple[float, ...], b: tuple[float, ...]) -> float:
+        """Compute cosine similarity between two gradient vectors."""
         dot = sum(x * y for x, y in zip(a, b, strict=True))
         norm_a = math.sqrt(sum(x * x for x in a))
         norm_b = math.sqrt(sum(x * x for x in b))

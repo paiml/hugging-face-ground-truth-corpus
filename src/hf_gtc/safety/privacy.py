@@ -30,6 +30,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class PrivacyMechanism(Enum):
     """Differential privacy noise mechanism types.
@@ -287,9 +289,7 @@ def validate_dp_config(config: DPConfig) -> None:
         Traceback (most recent call last):
         ValueError: delta must be in [0, 1)
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.epsilon <= 0:
         msg = f"epsilon must be positive, got {config.epsilon}"
@@ -332,9 +332,7 @@ def validate_anonymization_config(config: AnonymizationConfig) -> None:
         Traceback (most recent call last):
         ValueError: k_value must be at least 2
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.k_value < 2:
         msg = f"k_value must be at least 2, got {config.k_value}"
@@ -360,9 +358,7 @@ def validate_privacy_config(config: PrivacyConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_dp_config(config.dp_config)
     validate_anonymization_config(config.anonymization_config)
@@ -1000,9 +996,7 @@ def format_privacy_stats(stats: PrivacyStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Privacy Budget Spent: {stats.privacy_budget_spent:.2f}",

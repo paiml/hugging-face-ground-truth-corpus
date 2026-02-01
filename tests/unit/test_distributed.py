@@ -344,12 +344,12 @@ class TestCalculateScalingEfficiency:
     def test_perfect_scaling(self) -> None:
         """Perfect linear scaling."""
         efficiency = calculate_scaling_efficiency(100.0, 800.0, 8)
-        assert efficiency == 1.0
+        assert efficiency == pytest.approx(1.0)
 
     def test_sub_linear_scaling(self) -> None:
         """Sub-linear scaling."""
         efficiency = calculate_scaling_efficiency(100.0, 750.0, 8)
-        assert efficiency == 0.9375
+        assert efficiency == pytest.approx(0.9375)
 
     def test_zero_single_gpu_raises(self) -> None:
         """Zero single GPU throughput raises ValueError."""
@@ -477,7 +477,7 @@ class TestMemoryEstimate:
             activation_memory_gb=8.0,
             total_memory_gb=16.0,
         )
-        assert est.total_memory_gb == 16.0
+        assert est.total_memory_gb == pytest.approx(16.0)
 
 
 class TestScalingMetrics:
@@ -491,7 +491,7 @@ class TestScalingMetrics:
             communication_overhead=0.15,
             gpu_utilization=0.92,
         )
-        assert metrics.scaling_efficiency == 0.85
+        assert metrics.scaling_efficiency == pytest.approx(0.85)
 
 
 class TestValidConstants:

@@ -274,7 +274,7 @@ class TestScalingConfig:
         )
         assert config.min_replicas == 1
         assert config.max_replicas == 10
-        assert config.target_utilization == 0.7
+        assert config.target_utilization == pytest.approx(0.7)
         assert config.scale_down_delay == 300
 
     def test_frozen(self) -> None:
@@ -322,10 +322,10 @@ class TestServingStats:
             p99_latency_ms=75.0,
             gpu_utilization=0.85,
         )
-        assert stats.requests_per_second == 150.0
-        assert stats.avg_latency_ms == 25.5
-        assert stats.p99_latency_ms == 75.0
-        assert stats.gpu_utilization == 0.85
+        assert stats.requests_per_second == pytest.approx(150.0)
+        assert stats.avg_latency_ms == pytest.approx(25.5)
+        assert stats.p99_latency_ms == pytest.approx(75.0)
+        assert stats.gpu_utilization == pytest.approx(0.85)
 
     def test_frozen(self) -> None:
         """Test that ServingStats is immutable."""
@@ -601,7 +601,7 @@ class TestCreateScalingConfig:
         config = create_scaling_config()
         assert config.min_replicas == 1
         assert config.max_replicas == 10
-        assert config.target_utilization == 0.7
+        assert config.target_utilization == pytest.approx(0.7)
         assert config.scale_down_delay == 300
 
     def test_custom_values(self) -> None:
@@ -1219,12 +1219,12 @@ class TestCalculateThroughputCapacity:
     def test_basic_calculation(self) -> None:
         """Test basic throughput calculation."""
         result = calculate_throughput_capacity(4, 32, 50.0)
-        assert result == 2560.0
+        assert result == pytest.approx(2560.0)
 
     def test_single_worker(self) -> None:
         """Test with single worker."""
         result = calculate_throughput_capacity(1, 1, 100.0)
-        assert result == 10.0
+        assert result == pytest.approx(10.0)
 
     def test_zero_workers_raises_error(self) -> None:
         """Test that zero workers raises ValueError."""
@@ -1280,7 +1280,7 @@ class TestCalculateCostPerRequest:
         """Test basic cost calculation."""
         cost = calculate_cost_per_request(2.0, 100.0)
         # $2/hour = $0.000555/second, / 100 requests = $5.55e-06
-        assert round(cost, 8) == 5.56e-06
+        assert round(cost, 8) == pytest.approx(5.56e-06)
 
     def test_zero_cost_raises_error(self) -> None:
         """Test that zero cost raises ValueError."""

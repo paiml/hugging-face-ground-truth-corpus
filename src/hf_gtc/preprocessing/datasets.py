@@ -371,6 +371,7 @@ def filter_by_length(
         raise ValueError(msg)
 
     def filter_fn(example: dict[str, Any]) -> bool:
+        """Return True if example length is within configured bounds."""
         length = len(example[column])
         if min_length is not None and length < min_length:
             return False

@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class FairnessMetric(Enum):
     """Fairness metrics for bias evaluation.
@@ -237,9 +239,7 @@ def validate_bias_detection_config(config: BiasDetectionConfig) -> None:
         Traceback (most recent call last):
         ValueError: protected_attributes cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.protected_attributes:
         msg = "protected_attributes cannot be empty"
@@ -413,9 +413,7 @@ def validate_stereotype_config(config: StereotypeConfig) -> None:
         Traceback (most recent call last):
         ValueError: sensitivity must be in [0, 1]
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0 <= config.sensitivity <= 1:
         msg = f"sensitivity must be in [0, 1], got {config.sensitivity}"
@@ -890,9 +888,7 @@ def detect_stereotypes(
         msg = "text cannot be None"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_stereotype_config(config)
 
@@ -1012,9 +1008,7 @@ def format_bias_audit(result: BiasAuditResult) -> str:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [
         "Bias Audit Report",

@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class ComparisonMethod(Enum):
     """Methods for statistical comparison of models.
@@ -431,9 +433,7 @@ def validate_comparison_config(config: ComparisonConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_bootstrap must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_bootstrap <= 0:
         msg = f"num_bootstrap must be positive, got {config.num_bootstrap}"
@@ -464,9 +464,7 @@ def validate_model_result(result: ModelResult) -> None:
         Traceback (most recent call last):
         ValueError: model_name cannot be empty
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if not result.model_name:
         msg = "model_name cannot be empty"
@@ -509,9 +507,7 @@ def validate_comparison_result(result: ComparisonResult) -> None:
         Traceback (most recent call last):
         ValueError: model_a cannot be empty
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if not result.model_a:
         msg = "model_a cannot be empty"
@@ -556,9 +552,7 @@ def validate_comparison_stats(stats: ComparisonStats) -> None:
         Traceback (most recent call last):
         ValueError: total_comparisons must be positive
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_comparisons <= 0:
         msg = f"total_comparisons must be positive, got {stats.total_comparisons}"
@@ -1301,9 +1295,7 @@ def run_significance_test(
         msg = "scores_b cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.method == ComparisonMethod.PAIRED_TTEST:
         return _paired_ttest(scores_a, scores_b)
@@ -1521,9 +1513,7 @@ def format_comparison_stats(stats: ComparisonStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     sig_rate = stats.significant_count / stats.total_comparisons * 100
 

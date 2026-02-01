@@ -158,8 +158,8 @@ class TestRerankerResult:
             rank=1,
         )
         assert result.document_id == "doc_1"
-        assert result.original_score == 0.75
-        assert result.reranked_score == 0.92
+        assert result.original_score == pytest.approx(0.75)
+        assert result.reranked_score == pytest.approx(0.92)
         assert result.rank == 1
 
     def test_result_is_frozen(self) -> None:
@@ -184,8 +184,8 @@ class TestHybridSearchConfig:
             sparse_weight=0.3,
             fusion_method=FusionMethod.WEIGHTED,
         )
-        assert config.dense_weight == 0.7
-        assert config.sparse_weight == 0.3
+        assert config.dense_weight == pytest.approx(0.7)
+        assert config.sparse_weight == pytest.approx(0.3)
         assert config.fusion_method == FusionMethod.WEIGHTED
 
     def test_config_is_frozen(self) -> None:
@@ -503,19 +503,19 @@ class TestCreateHybridSearchConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_hybrid_search_config()
-        assert config.dense_weight == 0.7
-        assert config.sparse_weight == 0.3
+        assert config.dense_weight == pytest.approx(0.7)
+        assert config.sparse_weight == pytest.approx(0.3)
         assert config.fusion_method == FusionMethod.WEIGHTED
 
     def test_custom_dense_weight(self) -> None:
         """Create config with custom dense_weight."""
         config = create_hybrid_search_config(dense_weight=0.8)
-        assert config.dense_weight == 0.8
+        assert config.dense_weight == pytest.approx(0.8)
 
     def test_custom_sparse_weight(self) -> None:
         """Create config with custom sparse_weight."""
         config = create_hybrid_search_config(sparse_weight=0.2)
-        assert config.sparse_weight == 0.2
+        assert config.sparse_weight == pytest.approx(0.2)
 
     @pytest.mark.parametrize(
         ("method", "expected"),
@@ -559,8 +559,8 @@ class TestCreateRerankerResult:
         """Create reranker result."""
         result = create_reranker_result("doc_1", 0.75, 0.92, 1)
         assert result.document_id == "doc_1"
-        assert result.original_score == 0.75
-        assert result.reranked_score == 0.92
+        assert result.original_score == pytest.approx(0.75)
+        assert result.reranked_score == pytest.approx(0.92)
         assert result.rank == 1
 
     def test_empty_document_id_raises(self) -> None:

@@ -25,6 +25,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class TaskType(Enum):
     """Types of evaluation tasks.
@@ -317,9 +319,7 @@ def validate_task_config(config: TaskConfig) -> None:
         Traceback (most recent call last):
         ValueError: batch_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_fewshot < 0:
         msg = f"num_fewshot cannot be negative, got {config.num_fewshot}"
@@ -363,9 +363,7 @@ def validate_harness_config(config: HarnessConfig) -> None:
         Traceback (most recent call last):
         ValueError: tasks cannot contain empty strings
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if len(config.tasks) == 0:
         msg = "tasks cannot be empty"
@@ -412,9 +410,7 @@ def validate_evaluation_result(result: EvaluationResult) -> None:
         Traceback (most recent call last):
         ValueError: task_name cannot be empty
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if not result.task_name:
         msg = "task_name cannot be empty"
@@ -466,9 +462,7 @@ def validate_harness_stats(stats: HarnessStats) -> None:
         Traceback (most recent call last):
         ValueError: total_tasks must be positive
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_tasks <= 0:
         msg = f"total_tasks must be positive, got {stats.total_tasks}"
@@ -910,9 +904,7 @@ def run_evaluation_task(
         msg = "task_name cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if inference_fn is None:
         msg = "inference_fn cannot be None"
@@ -1273,9 +1265,7 @@ def format_harness_stats(stats: HarnessStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Evaluation Harness Statistics",

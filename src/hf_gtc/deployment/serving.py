@@ -25,6 +25,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class ServerStatus(Enum):
     """Status of a model server.
@@ -443,9 +445,7 @@ def validate_server_config(config: ServerConfig) -> None:
         Traceback (most recent call last):
         ValueError: port must be between 1 and 65535
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 1 <= config.port <= 65535:
         msg = f"port must be between 1 and 65535, got {config.port}"
@@ -487,9 +487,7 @@ def create_server(config: ServerConfig) -> ModelServer:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_server_config(config)
     return ModelServer(config=config)

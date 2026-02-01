@@ -85,6 +85,97 @@ def get_category_from_path(module_path: str) -> str:
     return "unknown"
 
 
+def _format_arg_with_annotation(arg: ast.arg) -> str:
+    """Format a single function argument, including its type annotation if present.
+
+    Args:
+        arg: AST argument node.
+
+    Returns:
+        Formatted argument string (e.g., "x: int").
+    """
+    result = arg.arg
+    if arg.annotation:
+        result += f": {ast.unparse(arg.annotation)}"
+    return result
+
+
+def _collect_positional_args(node: ast.FunctionDef) -> list[str]:
+    """Collect formatted positional arguments with defaults.
+
+    Args:
+        node: AST FunctionDef node.
+
+    Returns:
+        List of formatted argument strings.
+    """
+    parts = []
+    defaults_offset = len(node.args.args) - len(node.args.defaults)
+    for i, arg in enumerate(node.args.args):
+        arg_str = _format_arg_with_annotation(arg)
+        default_idx = i - defaults_offset
+        if default_idx >= 0:
+            default = node.args.defaults[default_idx]
+            arg_str += f" = {ast.unparse(default)}"
+        parts.append(arg_str)
+    return parts
+
+
+def _collect_vararg(node: ast.FunctionDef) -> str | None:
+    """Collect the *args parameter if present.
+
+    Args:
+        node: AST FunctionDef node.
+
+    Returns:
+        Formatted vararg string, bare "*" separator, or None.
+    """
+    if node.args.vararg:
+        return _format_arg_with_annotation(node.args.vararg).replace(
+            node.args.vararg.arg, f"*{node.args.vararg.arg}", 1
+        )
+    if node.args.kwonlyargs:
+        return "*"
+    return None
+
+
+def _collect_kwonly_args(node: ast.FunctionDef) -> list[str]:
+    """Collect formatted keyword-only arguments with defaults.
+
+    Args:
+        node: AST FunctionDef node.
+
+    Returns:
+        List of formatted keyword-only argument strings.
+    """
+    parts = []
+    kw_defaults_dict = {
+        i: d for i, d in enumerate(node.args.kw_defaults) if d is not None
+    }
+    for i, kwarg in enumerate(node.args.kwonlyargs):
+        kw_str = _format_arg_with_annotation(kwarg)
+        if i in kw_defaults_dict:
+            kw_str += f" = {ast.unparse(kw_defaults_dict[i])}"
+        parts.append(kw_str)
+    return parts
+
+
+def _collect_kwarg(node: ast.FunctionDef) -> str | None:
+    """Collect the **kwargs parameter if present.
+
+    Args:
+        node: AST FunctionDef node.
+
+    Returns:
+        Formatted kwargs string, or None.
+    """
+    if not node.args.kwarg:
+        return None
+    return _format_arg_with_annotation(node.args.kwarg).replace(
+        node.args.kwarg.arg, f"**{node.args.kwarg.arg}", 1
+    )
+
+
 def extract_function_signature(node: ast.FunctionDef) -> str:
     """Extract function signature as a string.
 
@@ -103,49 +194,16 @@ def extract_function_signature(node: ast.FunctionDef) -> str:
         >>> "x: int" in sig
         True
     """
-    args_parts = []
+    args_parts = _collect_positional_args(node)
 
-    # Process regular arguments
-    defaults_offset = len(node.args.args) - len(node.args.defaults)
-    for i, arg in enumerate(node.args.args):
-        arg_str = arg.arg
-        if arg.annotation:
-            arg_str += f": {ast.unparse(arg.annotation)}"
-
-        # Check for default value
-        default_idx = i - defaults_offset
-        if default_idx >= 0:
-            default = node.args.defaults[default_idx]
-            arg_str += f" = {ast.unparse(default)}"
-
-        args_parts.append(arg_str)
-
-    # Process *args
-    if node.args.vararg:
-        vararg = f"*{node.args.vararg.arg}"
-        if node.args.vararg.annotation:
-            vararg += f": {ast.unparse(node.args.vararg.annotation)}"
+    vararg = _collect_vararg(node)
+    if vararg is not None:
         args_parts.append(vararg)
-    elif node.args.kwonlyargs:
-        args_parts.append("*")
 
-    # Process keyword-only arguments
-    kw_defaults_dict = {
-        i: d for i, d in enumerate(node.args.kw_defaults) if d is not None
-    }
-    for i, kwarg in enumerate(node.args.kwonlyargs):
-        kw_str = kwarg.arg
-        if kwarg.annotation:
-            kw_str += f": {ast.unparse(kwarg.annotation)}"
-        if i in kw_defaults_dict:
-            kw_str += f" = {ast.unparse(kw_defaults_dict[i])}"
-        args_parts.append(kw_str)
+    args_parts.extend(_collect_kwonly_args(node))
 
-    # Process **kwargs
-    if node.args.kwarg:
-        kwarg = f"**{node.args.kwarg.arg}"
-        if node.args.kwarg.annotation:
-            kwarg += f": {ast.unparse(node.args.kwarg.annotation)}"
+    kwarg = _collect_kwarg(node)
+    if kwarg is not None:
         args_parts.append(kwarg)
 
     # Build signature
@@ -204,6 +262,60 @@ def extract_functions(tree: ast.Module) -> list[FunctionInfo]:
     return functions
 
 
+def _collect_docstrings(tree: ast.Module) -> list[tuple[str, int]]:
+    """Collect all docstrings from an AST module with their base line numbers.
+
+    Args:
+        tree: Parsed AST module.
+
+    Returns:
+        List of (docstring_text, base_line_number) tuples.
+    """
+    docstrings: list[tuple[str, int]] = []
+
+    module_doc = ast.get_docstring(tree)
+    if module_doc:
+        docstrings.append((module_doc, 1))
+
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            doc = ast.get_docstring(node)
+            if doc:
+                docstrings.append((doc, node.lineno))
+
+    return docstrings
+
+
+def _parse_docstring_examples(
+    parser: doctest.DocTestParser,
+    docstring: str,
+    base_lineno: int,
+) -> list[DoctestInfo]:
+    """Parse doctest examples from a single docstring.
+
+    Args:
+        parser: Configured DocTestParser instance.
+        docstring: The docstring text to parse.
+        base_lineno: Line number where the docstring starts.
+
+    Returns:
+        List of DoctestInfo objects extracted from the docstring.
+    """
+    try:
+        examples = parser.get_examples(docstring)
+    except Exception:
+        return []
+
+    return [
+        DoctestInfo(
+            source=ex.source,
+            expected=ex.want,
+            line_number=base_lineno + ex.lineno,
+        )
+        for ex in examples
+    ]
+
+
 def extract_doctests(content: str) -> list[DoctestInfo]:
     """Extract all doctests from module content.
 
@@ -233,44 +345,17 @@ def extract_doctests(content: str) -> list[DoctestInfo]:
         >>> tests[0].expected.strip()
         '2'
     """
-    parser = doctest.DocTestParser()
-    doctests = []
-
     try:
         tree = ast.parse(content)
     except SyntaxError:
-        return doctests
+        return []
 
-    # Collect all docstrings from the AST
-    docstrings = []
+    parser = doctest.DocTestParser()
+    docstrings = _collect_docstrings(tree)
 
-    # Module docstring
-    module_doc = ast.get_docstring(tree)
-    if module_doc:
-        docstrings.append((module_doc, 1))
-
-    # Function and class docstrings
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            doc = ast.get_docstring(node)
-            if doc:
-                docstrings.append((doc, node.lineno))
-
-    # Extract examples from each docstring
+    doctests: list[DoctestInfo] = []
     for docstring, base_lineno in docstrings:
-        try:
-            examples = parser.get_examples(docstring)
-            for ex in examples:
-                doctests.append(
-                    DoctestInfo(
-                        source=ex.source,
-                        expected=ex.want,
-                        line_number=base_lineno + ex.lineno,
-                    )
-                )
-        except Exception:
-            # Skip malformed doctests
-            pass
+        doctests.extend(_parse_docstring_examples(parser, docstring, base_lineno))
 
     return doctests
 
@@ -388,6 +473,81 @@ def extract_module(module_path: str, content: str, coverage: float = 0.0) -> Mod
     )
 
 
+def _functions_to_structs(functions: list[FunctionInfo]) -> list[dict[str, object]]:
+    """Convert FunctionInfo list to list of dictionaries for Arrow conversion.
+
+    Args:
+        functions: List of FunctionInfo objects.
+
+    Returns:
+        List of dictionaries suitable for Arrow struct conversion.
+    """
+    return [
+        {
+            "name": fn.name,
+            "signature": fn.signature,
+            "docstring": fn.docstring,
+            "line_number": fn.line_number,
+        }
+        for fn in functions
+    ]
+
+
+def _doctests_to_structs(doctests: list[DoctestInfo]) -> list[dict[str, object]]:
+    """Convert DoctestInfo list to list of dictionaries for Arrow conversion.
+
+    Args:
+        doctests: List of DoctestInfo objects.
+
+    Returns:
+        List of dictionaries suitable for Arrow struct conversion.
+    """
+    return [
+        {
+            "source": dt.source,
+            "expected": dt.expected,
+            "line_number": dt.line_number,
+        }
+        for dt in doctests
+    ]
+
+
+def _build_corpus_schema() -> pa.Schema:
+    """Build the Arrow schema for the corpus Parquet file.
+
+    Returns:
+        PyArrow schema matching spec 4.6.3.
+    """
+    function_type = pa.struct(
+        [
+            ("name", pa.string()),
+            ("signature", pa.string()),
+            ("docstring", pa.string()),
+            ("line_number", pa.int32()),
+        ]
+    )
+
+    doctest_type = pa.struct(
+        [
+            ("source", pa.string()),
+            ("expected", pa.string()),
+            ("line_number", pa.int32()),
+        ]
+    )
+
+    return pa.schema(
+        [
+            ("module", pa.string()),
+            ("category", pa.string()),
+            ("content", pa.string()),
+            ("functions", pa.list_(function_type)),
+            ("doctests", pa.list_(doctest_type)),
+            ("coverage", pa.float32()),
+            ("test_count", pa.int32()),
+        ]
+    )
+
+
 def modules_to_arrow(modules: list[ModuleInfo]) -> pa.Table:
     """Convert module info list to Arrow table.
 
@@ -411,78 +571,14 @@ def modules_to_arrow(modules: list[ModuleInfo]) -> pa.Table:
         >>> table.num_rows
         1
     """
-    # Build arrays for each column
-    module_paths = []
-    categories = []
-    contents = []
-    function_arrays = []
-    doctest_arrays = []
-    coverages = []
-    test_counts = []
+    module_paths = [mod.module_path for mod in modules]
+    categories = [mod.category for mod in modules]
+    contents = [mod.content for mod in modules]
+    coverages = [mod.coverage for mod in modules]
+    test_counts = [mod.test_count for mod in modules]
+    function_arrays = [_functions_to_structs(mod.functions) for mod in modules]
+    doctest_arrays = [_doctests_to_structs(mod.doctests) for mod in modules]
 
-    for mod in modules:
-        module_paths.append(mod.module_path)
-        categories.append(mod.category)
-        contents.append(mod.content)
-        coverages.append(mod.coverage)
-        test_counts.append(mod.test_count)
-
-        # Convert functions to struct array
-        func_structs = []
-        for fn in mod.functions:
-            func_structs.append(
-                {
-                    "name": fn.name,
-                    "signature": fn.signature,
-                    "docstring": fn.docstring,
-                    "line_number": fn.line_number,
-                }
-            )
-        function_arrays.append(func_structs)
-
-        # Convert doctests to struct array
-        doctest_structs = []
-        for dt in mod.doctests:
-            doctest_structs.append(
-                {
-                    "source": dt.source,
-                    "expected": dt.expected,
-                    "line_number": dt.line_number,
-                }
-            )
-        doctest_arrays.append(doctest_structs)
-
-    # Define schema matching spec 4.6.3
-    function_type = pa.struct(
-        [
-            ("name", pa.string()),
-            ("signature", pa.string()),
-            ("docstring", pa.string()),
-            ("line_number", pa.int32()),
-        ]
-    )
-
-    doctest_type = pa.struct(
-        [
-            ("source", pa.string()),
-            ("expected", pa.string()),
-            ("line_number", pa.int32()),
-        ]
-    )
-
-    schema = pa.schema(
-        [
-            ("module", pa.string()),
-            ("category", pa.string()),
-            ("content", pa.string()),
-            ("functions", pa.list_(function_type)),
-            ("doctests", pa.list_(doctest_type)),
-            ("coverage", pa.float32()),
-            ("test_count", pa.int32()),
-        ]
-    )
-
-    # Create table
     return pa.table(
         {
             "module": module_paths,
@@ -493,7 +589,7 @@ def modules_to_arrow(modules: list[ModuleInfo]) -> pa.Table:
             "coverage": coverages,
             "test_count": test_counts,
         },
-        schema=schema,
+        schema=_build_corpus_schema(),
     )
 
 

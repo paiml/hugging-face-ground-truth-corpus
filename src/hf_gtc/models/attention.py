@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class AttentionType(Enum):
     """Attention mechanism types.
@@ -237,9 +239,7 @@ def validate_attention_config(config: AttentionConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_heads must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_heads <= 0:
         msg = f"num_heads must be positive, got {config.num_heads}"
@@ -278,9 +278,7 @@ def validate_flash_attention_config(config: FlashAttentionConfig) -> None:
         Traceback (most recent call last):
         ValueError: window_size must be -1 or positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.window_size < -1 or config.window_size == 0:
         msg = f"window_size must be -1 or positive, got {config.window_size}"
@@ -315,9 +313,7 @@ def validate_grouped_query_config(config: GroupedQueryConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_kv_heads must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_kv_heads <= 0:
         msg = f"num_kv_heads must be positive, got {config.num_kv_heads}"
@@ -857,9 +853,7 @@ def format_attention_stats(stats: AttentionStats) -> str:
         >>> "Throughput:" in formatted
         True
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     def format_flops(flops: float) -> str:
         """Format FLOPs with appropriate unit."""

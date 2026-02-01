@@ -983,6 +983,7 @@ def format_pruning_stats(stats: PruningStats) -> str:
     """
 
     def format_params(n: int) -> str:
+        """Format parameter count with human-readable suffix (K/M/B)."""
         if n >= 1_000_000_000:
             return f"{n / 1_000_000_000:.2f}B"
         elif n >= 1_000_000:

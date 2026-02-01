@@ -17,10 +17,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     pass
+
+from hf_gtc._validation import validate_not_none
 
 
 class NormType(Enum):
@@ -312,9 +314,7 @@ def validate_layer_norm_config(config: LayerNormConfig) -> None:
         Traceback (most recent call last):
         ValueError: normalized_shape cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.normalized_shape:
         msg = "normalized_shape cannot be empty"
@@ -354,9 +354,7 @@ def validate_rms_norm_config(config: RMSNormConfig) -> None:
         Traceback (most recent call last):
         ValueError: hidden_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.hidden_size <= 0:
         msg = f"hidden_size must be positive, got {config.hidden_size}"
@@ -393,9 +391,7 @@ def validate_group_norm_config(config: GroupNormConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_channels must be divisible by num_groups
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_groups <= 0:
         msg = f"num_groups must be positive, got {config.num_groups}"
@@ -442,9 +438,7 @@ def validate_batch_norm_config(config: BatchNormConfig) -> None:
         Traceback (most recent call last):
         ValueError: momentum must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_features <= 0:
         msg = f"num_features must be positive, got {config.num_features}"
@@ -457,6 +451,27 @@ def validate_batch_norm_config(config: BatchNormConfig) -> None:
     if not 0 <= config.momentum <= 1:
         msg = f"momentum must be between 0 and 1, got {config.momentum}"
         raise ValueError(msg)
+
+
+_NORM_CONFIG_VALIDATORS: dict[NormType, tuple[str, Any]] = {
+    NormType.LAYER_NORM: ("layer_norm_config", validate_layer_norm_config),
+    NormType.RMS_NORM: ("rms_norm_config", validate_rms_norm_config),
+    NormType.GROUP_NORM: ("group_norm_config", validate_group_norm_config),
+    NormType.BATCH_NORM: ("batch_norm_config", validate_batch_norm_config),
+}
+
+
+def _validate_norm_subconfig(config: NormConfig) -> None:
+    """Validate the sub-configuration for a specific normalization type."""
+    entry = _NORM_CONFIG_VALIDATORS.get(config.norm_type)
+    if entry is None:
+        return
+    attr_name, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {config.norm_type.value} type"
+        raise ValueError(msg)
+    validator(sub_config)
 
 
 def validate_norm_config(config: NormConfig) -> None:
@@ -487,36 +502,12 @@ def validate_norm_config(config: NormConfig) -> None:
         Traceback (most recent call last):
         ValueError: layer_norm_config required for LAYER_NORM type
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.norm_type == NormType.NONE:
         return
 
-    if config.norm_type == NormType.LAYER_NORM:
-        if config.layer_norm_config is None:
-            msg = "layer_norm_config required for LAYER_NORM type"
-            raise ValueError(msg)
-        validate_layer_norm_config(config.layer_norm_config)
-
-    elif config.norm_type == NormType.RMS_NORM:
-        if config.rms_norm_config is None:
-            msg = "rms_norm_config required for RMS_NORM type"
-            raise ValueError(msg)
-        validate_rms_norm_config(config.rms_norm_config)
-
-    elif config.norm_type == NormType.GROUP_NORM:
-        if config.group_norm_config is None:
-            msg = "group_norm_config required for GROUP_NORM type"
-            raise ValueError(msg)
-        validate_group_norm_config(config.group_norm_config)
-
-    elif config.norm_type == NormType.BATCH_NORM:
-        if config.batch_norm_config is None:
-            msg = "batch_norm_config required for BATCH_NORM type"
-            raise ValueError(msg)
-        validate_batch_norm_config(config.batch_norm_config)
+    _validate_norm_subconfig(config)
 
 
 def create_layer_norm_config(
@@ -787,6 +778,51 @@ def create_norm_config(
     return config
 
 
+def _layer_norm_params(config: NormConfig) -> int:
+    """Calculate learnable parameters for layer normalization."""
+    if config.layer_norm_config is None:
+        return 0
+    if not config.layer_norm_config.elementwise_affine:
+        return 0
+    total_dim = 1
+    for dim in config.layer_norm_config.normalized_shape:
+        total_dim *= dim
+    return total_dim * 2
+
+
+def _rms_norm_params(config: NormConfig) -> int:
+    """Calculate learnable parameters for RMS normalization."""
+    if config.rms_norm_config is None:
+        return 0
+    return config.rms_norm_config.hidden_size
+
+
+def _group_norm_params(config: NormConfig) -> int:
+    """Calculate learnable parameters for group normalization."""
+    if config.group_norm_config is None:
+        return 0
+    if not config.group_norm_config.affine:
+        return 0
+    return config.group_norm_config.num_channels * 2
+
+
+def _batch_norm_params(config: NormConfig) -> int:
+    """Calculate learnable parameters for batch normalization."""
+    if config.batch_norm_config is None:
+        return 0
+    if not config.batch_norm_config.affine:
+        return 0
+    return config.batch_norm_config.num_features * 2
+
+
+_NORM_PARAM_CALCULATORS: dict[NormType, Any] = {
+    NormType.LAYER_NORM: _layer_norm_params,
+    NormType.RMS_NORM: _rms_norm_params,
+    NormType.GROUP_NORM: _group_norm_params,
+    NormType.BATCH_NORM: _batch_norm_params,
+}
+
+
 def calculate_norm_params(config: NormConfig) -> int:
     """Calculate the number of learnable parameters for normalization.
 
@@ -812,50 +848,11 @@ def calculate_norm_params(config: NormConfig) -> int:
         >>> calculate_norm_params(config)
         0
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    if config.norm_type == NormType.NONE:
-        return 0
-
-    if config.norm_type == NormType.LAYER_NORM:
-        if config.layer_norm_config is None:
-            return 0
-        if not config.layer_norm_config.elementwise_affine:
-            return 0
-        # gamma + beta for each dimension
-        total_dim = 1
-        for dim in config.layer_norm_config.normalized_shape:
-            total_dim *= dim
-        return total_dim * 2
-
-    if config.norm_type == NormType.RMS_NORM:
-        if config.rms_norm_config is None:
-            return 0
-        # Only gamma (weight) for RMSNorm
-        return config.rms_norm_config.hidden_size
-
-    if config.norm_type == NormType.GROUP_NORM:
-        if config.group_norm_config is None:
-            return 0
-        if not config.group_norm_config.affine:
-            return 0
-        # gamma + beta for each channel
-        return config.group_norm_config.num_channels * 2
-
-    if config.norm_type == NormType.BATCH_NORM:
-        if config.batch_norm_config is None:
-            return 0
-        if not config.batch_norm_config.affine:
-            return 0
-        # gamma + beta for each feature
-        return config.batch_norm_config.num_features * 2
-
-    if config.norm_type == NormType.INSTANCE_NORM:
-        # Instance norm typically doesn't have learnable params by default
-        return 0
-
+    calculator = _NORM_PARAM_CALCULATORS.get(config.norm_type)
+    if calculator is not None:
+        return calculator(config)
     return 0
 
 
@@ -895,9 +892,7 @@ def estimate_norm_memory(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if batch_size <= 0:
         msg = f"batch_size must be positive, got {batch_size}"
@@ -1082,9 +1077,7 @@ def format_norm_stats(stats: NormStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     memory_kb = stats.memory_bytes / 1024
 

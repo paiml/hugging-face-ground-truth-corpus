@@ -188,7 +188,7 @@ class TestFlashAttentionConfig:
         """Create config with window size."""
         config = FlashAttentionConfig(4096, True, 0.125)
         assert config.window_size == 4096
-        assert config.softmax_scale == 0.125
+        assert config.softmax_scale == pytest.approx(0.125)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -226,9 +226,9 @@ class TestAttentionStats:
             flops=1e12,
             throughput=10000.0,
         )
-        assert stats.memory_usage_mb == 1024.0
+        assert stats.memory_usage_mb == pytest.approx(1024.0)
         assert stats.flops == 1e12
-        assert stats.throughput == 10000.0
+        assert stats.throughput == pytest.approx(10000.0)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -377,7 +377,7 @@ class TestCreateAttentionConfig:
         assert config.attention_type == AttentionType.STANDARD
         assert config.num_heads == 32
         assert config.head_dim == 128
-        assert config.dropout == 0.0
+        assert config.dropout == pytest.approx(0.0)
         assert config.use_bias is True
 
     def test_custom_config_with_string(self) -> None:
@@ -392,7 +392,7 @@ class TestCreateAttentionConfig:
         assert config.attention_type == AttentionType.FLASH
         assert config.num_heads == 16
         assert config.head_dim == 64
-        assert config.dropout == 0.1
+        assert config.dropout == pytest.approx(0.1)
         assert config.use_bias is False
 
     def test_custom_config_with_enum(self) -> None:
@@ -434,7 +434,7 @@ class TestCreateFlashAttentionConfig:
         )
         assert config.window_size == 4096
         assert config.causal is False
-        assert config.softmax_scale == 0.125
+        assert config.softmax_scale == pytest.approx(0.125)
 
     def test_invalid_window_raises(self) -> None:
         """Invalid window raises ValueError."""
@@ -875,16 +875,16 @@ class TestCreateAttentionStats:
     def test_basic_creation(self) -> None:
         """Create basic stats."""
         stats = create_attention_stats(512.0, 1e12, 5000.0)
-        assert stats.memory_usage_mb == 512.0
+        assert stats.memory_usage_mb == pytest.approx(512.0)
         assert stats.flops == 1e12
-        assert stats.throughput == 5000.0
+        assert stats.throughput == pytest.approx(5000.0)
 
     def test_zero_values(self) -> None:
         """Zero values are valid."""
         stats = create_attention_stats(0.0, 0.0, 0.0)
-        assert stats.memory_usage_mb == 0.0
-        assert stats.flops == 0.0
-        assert stats.throughput == 0.0
+        assert stats.memory_usage_mb == pytest.approx(0.0)
+        assert stats.flops == pytest.approx(0.0)
+        assert stats.throughput == pytest.approx(0.0)
 
     def test_negative_memory_raises(self) -> None:
         """Negative memory raises ValueError."""

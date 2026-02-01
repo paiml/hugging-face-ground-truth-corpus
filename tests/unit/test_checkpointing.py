@@ -134,7 +134,7 @@ class TestCheckpointConfig:
         )
         assert config.strategy == CheckpointStrategy.SELECTIVE
         assert config.granularity == CheckpointGranularity.BLOCK
-        assert config.checkpoint_ratio == 0.5
+        assert config.checkpoint_ratio == pytest.approx(0.5)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -197,9 +197,9 @@ class TestMemoryStats:
             savings_percentage=62.5,
             recomputation_overhead_pct=33.0,
         )
-        assert stats.baseline_memory_gb == 32.0
-        assert stats.memory_saved_gb == 20.0
-        assert stats.savings_percentage == 62.5
+        assert stats.baseline_memory_gb == pytest.approx(32.0)
+        assert stats.memory_saved_gb == pytest.approx(20.0)
+        assert stats.savings_percentage == pytest.approx(62.5)
 
 
 class TestValidateCheckpointConfig:
@@ -306,7 +306,7 @@ class TestCreateCheckpointConfig:
         config = create_checkpoint_config()
         assert config.strategy == CheckpointStrategy.SELECTIVE
         assert config.granularity == CheckpointGranularity.BLOCK
-        assert config.checkpoint_ratio == 0.5
+        assert config.checkpoint_ratio == pytest.approx(0.5)
 
     def test_custom_strategy(self) -> None:
         """Create config with custom strategy."""
@@ -332,7 +332,7 @@ class TestCreateCheckpointConfig:
         """None strategy with zero ratio is valid."""
         config = create_checkpoint_config(strategy="none", checkpoint_ratio=0.0)
         assert config.strategy == CheckpointStrategy.NONE
-        assert config.checkpoint_ratio == 0.0
+        assert config.checkpoint_ratio == pytest.approx(0.0)
 
 
 class TestCreateOffloadConfig:
@@ -410,7 +410,7 @@ class TestCalculateMemorySavings:
     def test_none_strategy_no_savings(self) -> None:
         """None strategy gives no savings."""
         baseline, ckpt, saved = calculate_memory_savings(7.0, 32, "none", 0.0)
-        assert saved == 0.0
+        assert saved == pytest.approx(0.0)
         assert baseline == ckpt
 
     def test_zero_model_params_raises(self) -> None:
@@ -452,7 +452,7 @@ class TestEstimateRecomputationOverhead:
     def test_none_strategy_no_overhead(self) -> None:
         """None strategy has no overhead."""
         overhead = estimate_recomputation_overhead("none", 0.0, 32)
-        assert overhead == 0.0
+        assert overhead == pytest.approx(0.0)
 
     def test_selective_partial_overhead(self) -> None:
         """Selective strategy has partial overhead."""
@@ -484,7 +484,7 @@ class TestCalculateOptimalCheckpointRatio:
         """Ample memory results in low checkpoint ratio."""
         # 1B model with 80GB GPU = plenty of headroom
         ratio = calculate_optimal_checkpoint_ratio(80.0, 1.0, 32)
-        assert ratio == 0.0  # No checkpointing needed
+        assert ratio == pytest.approx(0.0)  # No checkpointing needed
 
     def test_limited_memory_high_ratio(self) -> None:
         """Limited memory results in high checkpoint ratio."""

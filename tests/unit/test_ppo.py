@@ -1235,7 +1235,7 @@ class TestCalculatePPOLoss:
         loss, clip_frac = calculate_ppo_loss(log_probs, old_log_probs, advantages)
         # ratio = 1 for all, so loss = -mean(advantages) = -(1.0 + 0.5 - 0.5)/3
         assert loss == pytest.approx(-0.3333, rel=1e-3)
-        assert clip_frac == 0.0
+        assert clip_frac == pytest.approx(0.0)
 
     def test_clipping_occurs(self) -> None:
         """Test that clipping occurs when ratio is outside range."""
@@ -1290,7 +1290,7 @@ class TestCalculatePPOLoss:
             log_probs, old_log_probs, advantages, clip_range=0.1
         )
         assert loss == pytest.approx(-1.0)
-        assert clip_frac == 0.0
+        assert clip_frac == pytest.approx(0.0)
 
 
 class TestExpSafe:

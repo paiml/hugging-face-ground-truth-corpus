@@ -335,6 +335,27 @@ def validate_slerp_config(config: SLERPConfig) -> None:
         raise ValueError(msg)
 
 
+def _validate_merge_method(config: MergeConfig) -> None:
+    """Validate method-specific merge configuration."""
+    method_validators = {
+        MergeMethod.TIES: ("ties_config", "TIES", validate_ties_config),
+        MergeMethod.DARE: ("dare_config", "DARE", validate_dare_config),
+        MergeMethod.SLERP: ("slerp_config", "SLERP", validate_slerp_config),
+    }
+    entry = method_validators.get(config.method)
+    if entry is None:
+        return
+    attr_name, method_label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {method_label} method"
+        raise ValueError(msg)
+    validator(sub_config)
+    if config.method == MergeMethod.SLERP and len(config.weights) != 2:
+        msg = f"SLERP requires exactly 2 models, got {len(config.weights)}"
+        raise ValueError(msg)
+
+
 def validate_merge_config(config: MergeConfig) -> None:
     """Validate merge configuration parameters.
 
@@ -380,27 +401,8 @@ def validate_merge_config(config: MergeConfig) -> None:
             msg = f"weights must be non-negative, got {w}"
             raise ValueError(msg)
 
-    # Validate method-specific configs
-    if config.method == MergeMethod.TIES:
-        if config.ties_config is None:
-            msg = "ties_config required for TIES method"
-            raise ValueError(msg)
-        validate_ties_config(config.ties_config)
-
-    elif config.method == MergeMethod.DARE:
-        if config.dare_config is None:
-            msg = "dare_config required for DARE method"
-            raise ValueError(msg)
-        validate_dare_config(config.dare_config)
-
-    elif config.method == MergeMethod.SLERP:
-        if config.slerp_config is None:
-            msg = "slerp_config required for SLERP method"
-            raise ValueError(msg)
-        validate_slerp_config(config.slerp_config)
-        if len(config.weights) != 2:
-            msg = f"SLERP requires exactly 2 models, got {len(config.weights)}"
-            raise ValueError(msg)
+    # Validate method-specific configs via dispatch
+    _validate_merge_method(config)
 
 
 def create_ties_config(

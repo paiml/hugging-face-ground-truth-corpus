@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class DPOVariant(Enum):
     """Supported DPO algorithm variants.
@@ -327,9 +329,7 @@ def validate_dpo_config(config: DPOConfig) -> None:
         Traceback (most recent call last):
         ValueError: beta must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.beta <= 0:
         msg = f"beta must be positive, got {config.beta}"

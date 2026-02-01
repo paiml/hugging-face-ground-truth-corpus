@@ -376,6 +376,28 @@ def validate_llamacpp_config(config: LlamaCppConfig) -> None:
         raise ValueError(msg)
 
 
+def _validate_engine_type_config(config: EngineConfig) -> None:
+    """Validate engine-specific sub-config based on engine type."""
+    engine_validators: dict[EngineType, tuple[str, str, object]] = {
+        EngineType.VLLM: ("vllm_config", "VLLM engine", validate_vllm_config),
+        EngineType.TGI: ("tgi_config", "TGI engine", validate_tgi_config),
+        EngineType.LLAMACPP: (
+            "llamacpp_config",
+            "LLAMACPP engine",
+            validate_llamacpp_config,
+        ),
+    }
+    entry = engine_validators.get(config.engine_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} is required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
+
+
 def validate_engine_config(config: EngineConfig) -> None:
     """Validate engine configuration.
 
@@ -403,23 +425,7 @@ def validate_engine_config(config: EngineConfig) -> None:
         ValueError: tensor_parallel_size must be positive
     """
     # Validate engine-specific config based on type
-    if config.engine_type == EngineType.VLLM:
-        if config.vllm_config is None:
-            msg = "vllm_config is required for VLLM engine"
-            raise ValueError(msg)
-        validate_vllm_config(config.vllm_config)
-
-    elif config.engine_type == EngineType.TGI:
-        if config.tgi_config is None:
-            msg = "tgi_config is required for TGI engine"
-            raise ValueError(msg)
-        validate_tgi_config(config.tgi_config)
-
-    elif config.engine_type == EngineType.LLAMACPP:
-        if config.llamacpp_config is None:
-            msg = "llamacpp_config is required for LLAMACPP engine"
-            raise ValueError(msg)
-        validate_llamacpp_config(config.llamacpp_config)
+    _validate_engine_type_config(config)
 
     # Check quantization compatibility
     if config.engine_type == EngineType.LLAMACPP and config.quantization not in (

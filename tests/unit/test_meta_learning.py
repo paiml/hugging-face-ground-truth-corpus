@@ -138,8 +138,8 @@ class TestMAMLConfig:
             inner_steps=5,
             first_order=False,
         )
-        assert config.inner_lr == 0.01
-        assert config.outer_lr == 0.001
+        assert config.inner_lr == pytest.approx(0.01)
+        assert config.outer_lr == pytest.approx(0.001)
         assert config.inner_steps == 5
         assert config.first_order is False
 
@@ -242,10 +242,10 @@ class TestMetaLearningStats:
             adaptation_steps=5.0,
             generalization_gap=0.10,
         )
-        assert stats.meta_train_accuracy == 0.85
-        assert stats.meta_test_accuracy == 0.75
-        assert stats.adaptation_steps == 5.0
-        assert stats.generalization_gap == 0.10
+        assert stats.meta_train_accuracy == pytest.approx(0.85)
+        assert stats.meta_test_accuracy == pytest.approx(0.75)
+        assert stats.adaptation_steps == pytest.approx(5.0)
+        assert stats.generalization_gap == pytest.approx(0.10)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -464,8 +464,8 @@ class TestCreateMAMLConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_maml_config()
-        assert config.inner_lr == 0.01
-        assert config.outer_lr == 0.001
+        assert config.inner_lr == pytest.approx(0.01)
+        assert config.outer_lr == pytest.approx(0.001)
         assert config.inner_steps == 5
         assert config.first_order is False
 
@@ -477,8 +477,8 @@ class TestCreateMAMLConfig:
             inner_steps=10,
             first_order=True,
         )
-        assert config.inner_lr == 0.05
-        assert config.outer_lr == 0.01
+        assert config.inner_lr == pytest.approx(0.05)
+        assert config.outer_lr == pytest.approx(0.01)
         assert config.inner_steps == 10
         assert config.first_order is True
 
@@ -576,7 +576,7 @@ class TestCreateMetaLearningConfig:
         )
         assert config.method == MetaLearningMethod.MAML
         assert config.maml_config is not None
-        assert config.maml_config.inner_lr == 0.05
+        assert config.maml_config.inner_lr == pytest.approx(0.05)
 
     def test_protonet_config(self) -> None:
         """Create ProtoNet config."""
@@ -617,10 +617,10 @@ class TestCreateMetaLearningStats:
     def test_default_stats(self) -> None:
         """Create default stats."""
         stats = create_meta_learning_stats()
-        assert stats.meta_train_accuracy == 0.0
-        assert stats.meta_test_accuracy == 0.0
-        assert stats.adaptation_steps == 0.0
-        assert stats.generalization_gap == 0.0
+        assert stats.meta_train_accuracy == pytest.approx(0.0)
+        assert stats.meta_test_accuracy == pytest.approx(0.0)
+        assert stats.adaptation_steps == pytest.approx(0.0)
+        assert stats.generalization_gap == pytest.approx(0.0)
 
     def test_custom_stats(self) -> None:
         """Create custom stats."""
@@ -630,8 +630,8 @@ class TestCreateMetaLearningStats:
             adaptation_steps=5.0,
             generalization_gap=0.10,
         )
-        assert stats.meta_train_accuracy == 0.85
-        assert stats.meta_test_accuracy == 0.75
+        assert stats.meta_train_accuracy == pytest.approx(0.85)
+        assert stats.meta_test_accuracy == pytest.approx(0.75)
 
     def test_train_accuracy_out_of_range_raises(self) -> None:
         """Train accuracy > 1 raises ValueError."""
@@ -799,7 +799,7 @@ class TestComputeEpisodeAccuracy:
         query_embeddings = ((0.9, 0.1), (0.1, 0.9), (0.8, 0.2))
         query_labels = (0, 1, 0)
         acc = compute_episode_accuracy(query_embeddings, query_labels, prototypes)
-        assert acc == 1.0
+        assert acc == pytest.approx(1.0)
 
     def test_zero_accuracy(self) -> None:
         """All wrong predictions give accuracy 0.0."""
@@ -807,7 +807,7 @@ class TestComputeEpisodeAccuracy:
         query_embeddings = ((0.1, 0.9), (0.9, 0.1))
         query_labels = (0, 1)  # Swapped labels
         acc = compute_episode_accuracy(query_embeddings, query_labels, prototypes)
-        assert acc == 0.0
+        assert acc == pytest.approx(0.0)
 
     def test_partial_accuracy(self) -> None:
         """Partial correct predictions."""
@@ -815,7 +815,7 @@ class TestComputeEpisodeAccuracy:
         query_embeddings = ((0.9, 0.1), (0.9, 0.1))  # Both near prototype 0
         query_labels = (0, 1)  # One correct, one wrong
         acc = compute_episode_accuracy(query_embeddings, query_labels, prototypes)
-        assert acc == 0.5
+        assert acc == pytest.approx(0.5)
 
     def test_cosine_distance(self) -> None:
         """Test with cosine distance."""
@@ -825,7 +825,7 @@ class TestComputeEpisodeAccuracy:
         acc = compute_episode_accuracy(
             query_embeddings, query_labels, prototypes, distance_metric="cosine"
         )
-        assert acc == 1.0
+        assert acc == pytest.approx(1.0)
 
     def test_empty_query_embeddings_raises(self) -> None:
         """Empty query embeddings raises ValueError."""

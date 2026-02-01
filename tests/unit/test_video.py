@@ -133,7 +133,7 @@ class TestVideoConfig:
         assert config.model_type == VideoModelType.VIDEOMAE
         assert config.num_frames == 16
         assert config.frame_size == 224
-        assert config.fps == 30.0
+        assert config.fps == pytest.approx(30.0)
 
     def test_frozen(self) -> None:
         """Test config is immutable."""
@@ -154,8 +154,8 @@ class TestFrameConfig:
             stride=1,
         )
         assert config.sampling_strategy == FrameSamplingStrategy.UNIFORM
-        assert config.start_time == 0.0
-        assert config.end_time == 10.0
+        assert config.start_time == pytest.approx(0.0)
+        assert config.end_time == pytest.approx(10.0)
         assert config.stride == 1
 
     def test_end_time_none(self) -> None:
@@ -214,7 +214,7 @@ class TestVideoClassificationConfig:
         )
         assert config.num_labels == 400
         assert config.label_names == ("walking", "running", "jumping")
-        assert config.threshold == 0.5
+        assert config.threshold == pytest.approx(0.5)
 
     def test_empty_label_names(self) -> None:
         """Test with empty label names."""
@@ -243,9 +243,9 @@ class TestVideoStats:
             fps=30.0,
             resolution=(1920, 1080),
         )
-        assert stats.duration_seconds == 120.0
+        assert stats.duration_seconds == pytest.approx(120.0)
         assert stats.total_frames == 3600
-        assert stats.fps == 30.0
+        assert stats.fps == pytest.approx(30.0)
         assert stats.resolution == (1920, 1080)
 
     def test_frozen(self) -> None:
@@ -353,7 +353,7 @@ class TestCreateVideoConfig:
         assert config.model_type == VideoModelType.VIDEOMAE
         assert config.num_frames == 16
         assert config.frame_size == 224
-        assert config.fps == 30.0
+        assert config.fps == pytest.approx(30.0)
 
     def test_custom_num_frames(self) -> None:
         """Test custom num_frames."""
@@ -368,7 +368,7 @@ class TestCreateVideoConfig:
     def test_custom_fps(self) -> None:
         """Test custom fps."""
         config = create_video_config(fps=24.0)
-        assert config.fps == 24.0
+        assert config.fps == pytest.approx(24.0)
 
     @pytest.mark.parametrize(
         "model_type,expected",
@@ -413,19 +413,19 @@ class TestCreateFrameConfig:
         """Test default values."""
         config = create_frame_config()
         assert config.sampling_strategy == FrameSamplingStrategy.UNIFORM
-        assert config.start_time == 0.0
+        assert config.start_time == pytest.approx(0.0)
         assert config.end_time is None
         assert config.stride == 1
 
     def test_custom_start_time(self) -> None:
         """Test custom start_time."""
         config = create_frame_config(start_time=5.0)
-        assert config.start_time == 5.0
+        assert config.start_time == pytest.approx(5.0)
 
     def test_custom_end_time(self) -> None:
         """Test custom end_time."""
         config = create_frame_config(end_time=15.0)
-        assert config.end_time == 15.0
+        assert config.end_time == pytest.approx(15.0)
 
     def test_custom_stride(self) -> None:
         """Test custom stride."""
@@ -835,7 +835,7 @@ class TestCreateVideoClassificationConfig:
         config = create_video_classification_config(num_labels=400)
         assert config.num_labels == 400
         assert config.label_names == ()
-        assert config.threshold == 0.5
+        assert config.threshold == pytest.approx(0.5)
 
     def test_with_label_names(self) -> None:
         """Test with label names."""
@@ -847,7 +847,7 @@ class TestCreateVideoClassificationConfig:
     def test_custom_threshold(self) -> None:
         """Test custom threshold."""
         config = create_video_classification_config(num_labels=10, threshold=0.7)
-        assert config.threshold == 0.7
+        assert config.threshold == pytest.approx(0.7)
 
     def test_zero_num_labels(self) -> None:
         """Test zero num_labels."""
@@ -872,12 +872,12 @@ class TestCreateVideoClassificationConfig:
     def test_threshold_boundary_zero(self) -> None:
         """Test threshold at 0.0 boundary."""
         config = create_video_classification_config(num_labels=10, threshold=0.0)
-        assert config.threshold == 0.0
+        assert config.threshold == pytest.approx(0.0)
 
     def test_threshold_boundary_one(self) -> None:
         """Test threshold at 1.0 boundary."""
         config = create_video_classification_config(num_labels=10, threshold=1.0)
-        assert config.threshold == 1.0
+        assert config.threshold == pytest.approx(1.0)
 
     def test_label_names_exceed_num_labels(self) -> None:
         """Test label_names exceeds num_labels."""
@@ -893,9 +893,9 @@ class TestCreateVideoStats:
     def test_basic_stats(self) -> None:
         """Test basic stats creation."""
         stats = create_video_stats(60.0, 1800, 30.0, (1920, 1080))
-        assert stats.duration_seconds == 60.0
+        assert stats.duration_seconds == pytest.approx(60.0)
         assert stats.total_frames == 1800
-        assert stats.fps == 30.0
+        assert stats.fps == pytest.approx(30.0)
         assert stats.resolution == (1920, 1080)
 
     def test_zero_duration(self) -> None:
@@ -958,7 +958,7 @@ class TestGetRecommendedVideoConfig:
         assert config.model_type == VideoModelType.VIDEOMAE
         assert config.num_frames == 16
         assert config.frame_size == 224
-        assert config.fps == 30.0
+        assert config.fps == pytest.approx(30.0)
 
     def test_timesformer_config(self) -> None:
         """Test TimeSformer recommended config."""

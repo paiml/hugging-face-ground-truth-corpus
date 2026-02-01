@@ -249,7 +249,7 @@ class TestArchitectureStats:
         )
         assert stats.total_params == 110_000_000
         assert stats.trainable_params == 110_000_000
-        assert stats.memory_footprint_mb == 420.0
+        assert stats.memory_footprint_mb == pytest.approx(420.0)
 
     def test_stats_is_frozen(self) -> None:
         """Test stats is immutable."""

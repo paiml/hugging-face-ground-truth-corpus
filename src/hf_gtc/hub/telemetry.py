@@ -320,7 +320,13 @@ def validate_metric_config(config: MetricConfig) -> None:
         msg = f"description cannot exceed 512 characters, got {len(config.description)}"
         raise ValueError(msg)
 
-    for label in config.labels:
+    _validate_metric_labels(config.labels)
+    _validate_metric_buckets(config)
+
+
+def _validate_metric_labels(labels: tuple[str, ...]) -> None:
+    """Validate metric labels."""
+    for label in labels:
         if not label:
             msg = "labels cannot contain empty strings"
             raise ValueError(msg)
@@ -328,17 +334,18 @@ def validate_metric_config(config: MetricConfig) -> None:
             msg = f"label cannot exceed 64 characters, got '{label}'"
             raise ValueError(msg)
 
+
+def _validate_metric_buckets(config: MetricConfig) -> None:
+    """Validate metric buckets."""
     if config.buckets is not None:
         if len(config.buckets) == 0:
             msg = "buckets cannot be empty if specified"
             raise ValueError(msg)
-        # Verify buckets are sorted
         sorted_buckets = tuple(sorted(config.buckets))
         if config.buckets != sorted_buckets:
             msg = "buckets must be sorted in ascending order"
             raise ValueError(msg)
 
-    # Histogram requires buckets
     if config.metric_type == MetricType.HISTOGRAM and config.buckets is None:
         msg = "histogram metric requires buckets to be specified"
         raise ValueError(msg)

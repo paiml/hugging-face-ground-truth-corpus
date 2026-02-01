@@ -150,7 +150,7 @@ class TestPruningConfig:
             scope=PruningScope.GLOBAL_UNSTRUCTURED,
         )
         assert config.method == PruningMethod.MAGNITUDE
-        assert config.target_sparsity == 0.5
+        assert config.target_sparsity == pytest.approx(0.5)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -175,8 +175,8 @@ class TestIterativePruningConfig:
             pruning_steps=10,
             rewind_epoch=0,
         )
-        assert config.initial_sparsity == 0.0
-        assert config.final_sparsity == 0.9
+        assert config.initial_sparsity == pytest.approx(0.0)
+        assert config.final_sparsity == pytest.approx(0.9)
         assert config.pruning_steps == 10
 
     def test_config_is_frozen(self) -> None:
@@ -198,7 +198,7 @@ class TestLotteryTicketConfig:
         )
         assert config.rewind_epoch == 0
         assert config.num_iterations == 15
-        assert config.target_sparsity == 0.9
+        assert config.target_sparsity == pytest.approx(0.9)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -219,7 +219,7 @@ class TestPruningStats:
             speedup_factor=1.8,
         )
         assert stats.original_params == 110_000_000
-        assert stats.sparsity == 0.5
+        assert stats.sparsity == pytest.approx(0.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -426,7 +426,7 @@ class TestCreatePruningConfig:
         """Create default config."""
         config = create_pruning_config()
         assert config.method == PruningMethod.MAGNITUDE
-        assert config.target_sparsity == 0.5
+        assert config.target_sparsity == pytest.approx(0.5)
         assert config.schedule == PruningSchedule.ONE_SHOT
         assert config.scope == PruningScope.GLOBAL_UNSTRUCTURED
 
@@ -439,7 +439,7 @@ class TestCreatePruningConfig:
             scope="structured_heads",
         )
         assert config.method == PruningMethod.MOVEMENT
-        assert config.target_sparsity == 0.7
+        assert config.target_sparsity == pytest.approx(0.7)
         assert config.schedule == PruningSchedule.ITERATIVE
         assert config.scope == PruningScope.STRUCTURED_HEADS
 
@@ -482,8 +482,8 @@ class TestCreateIterativePruningConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_iterative_pruning_config()
-        assert config.initial_sparsity == 0.0
-        assert config.final_sparsity == 0.9
+        assert config.initial_sparsity == pytest.approx(0.0)
+        assert config.final_sparsity == pytest.approx(0.9)
         assert config.pruning_steps == 10
         assert config.rewind_epoch == 0
 
@@ -495,8 +495,8 @@ class TestCreateIterativePruningConfig:
             pruning_steps=20,
             rewind_epoch=1,
         )
-        assert config.initial_sparsity == 0.3
-        assert config.final_sparsity == 0.95
+        assert config.initial_sparsity == pytest.approx(0.3)
+        assert config.final_sparsity == pytest.approx(0.95)
         assert config.pruning_steps == 20
         assert config.rewind_epoch == 1
 
@@ -519,7 +519,7 @@ class TestCreateLotteryTicketConfig:
         config = create_lottery_ticket_config()
         assert config.rewind_epoch == 0
         assert config.num_iterations == 15
-        assert config.target_sparsity == 0.9
+        assert config.target_sparsity == pytest.approx(0.9)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -530,7 +530,7 @@ class TestCreateLotteryTicketConfig:
         )
         assert config.rewind_epoch == 1
         assert config.num_iterations == 20
-        assert config.target_sparsity == 0.95
+        assert config.target_sparsity == pytest.approx(0.95)
 
     def test_invalid_iterations_raises(self) -> None:
         """Invalid iterations raises ValueError."""
@@ -549,7 +549,7 @@ class TestCreatePruningStats:
     def test_auto_calculate_sparsity(self) -> None:
         """Auto-calculate sparsity."""
         stats = create_pruning_stats(100, 50)
-        assert stats.sparsity == 0.5
+        assert stats.sparsity == pytest.approx(0.5)
 
     def test_auto_calculate_speedup(self) -> None:
         """Auto-calculate speedup."""
@@ -564,8 +564,8 @@ class TestCreatePruningStats:
             sparsity=0.9,
             speedup_factor=2.5,
         )
-        assert stats.sparsity == 0.9
-        assert stats.speedup_factor == 2.5
+        assert stats.sparsity == pytest.approx(0.9)
+        assert stats.speedup_factor == pytest.approx(2.5)
 
     def test_zero_original_raises(self) -> None:
         """Zero original params raises ValueError."""
@@ -671,19 +671,19 @@ class TestCalculateSparsity:
 
     def test_half_sparsity(self) -> None:
         """Calculate 50% sparsity."""
-        assert calculate_sparsity(100, 50) == 0.5
+        assert calculate_sparsity(100, 50) == pytest.approx(0.5)
 
     def test_high_sparsity(self) -> None:
         """Calculate 90% sparsity."""
-        assert calculate_sparsity(1000, 100) == 0.9
+        assert calculate_sparsity(1000, 100) == pytest.approx(0.9)
 
     def test_no_sparsity(self) -> None:
         """Calculate 0% sparsity."""
-        assert calculate_sparsity(100, 100) == 0.0
+        assert calculate_sparsity(100, 100) == pytest.approx(0.0)
 
     def test_full_sparsity(self) -> None:
         """Calculate 100% sparsity."""
-        assert calculate_sparsity(100, 0) == 1.0
+        assert calculate_sparsity(100, 0) == pytest.approx(1.0)
 
     def test_zero_original_raises(self) -> None:
         """Zero original params raises ValueError."""
@@ -721,7 +721,7 @@ class TestEstimateSpeedup:
 
     def test_no_sparsity_no_speedup(self) -> None:
         """Zero sparsity gives speedup of 1."""
-        assert estimate_speedup(0.0) == 1.0
+        assert estimate_speedup(0.0) == pytest.approx(1.0)
 
     def test_half_sparsity_speedup(self) -> None:
         """50% sparsity gives speedup > 1."""
@@ -823,7 +823,7 @@ class TestScheduleSparsity:
     def test_linear_start(self) -> None:
         """Linear schedule at start."""
         sparsity = schedule_sparsity(0, 1000, 0.0, 0.9, PruningSchedule.LINEAR)
-        assert sparsity == 0.0
+        assert sparsity == pytest.approx(0.0)
 
     def test_linear_middle(self) -> None:
         """Linear schedule at middle."""
@@ -838,12 +838,12 @@ class TestScheduleSparsity:
     def test_one_shot_before_end(self) -> None:
         """One-shot returns initial before end."""
         sparsity = schedule_sparsity(500, 1000, 0.0, 0.9, PruningSchedule.ONE_SHOT)
-        assert sparsity == 0.0
+        assert sparsity == pytest.approx(0.0)
 
     def test_one_shot_at_end(self) -> None:
         """One-shot returns final at end."""
         sparsity = schedule_sparsity(1000, 1000, 0.0, 0.9, PruningSchedule.ONE_SHOT)
-        assert sparsity == 0.9
+        assert sparsity == pytest.approx(0.9)
 
     def test_cubic_slower_start(self) -> None:
         """Cubic has slower start than linear."""
@@ -939,26 +939,26 @@ class TestGetRecommendedPruningConfig:
     def test_default_config(self) -> None:
         """Get default recommended config."""
         config = get_recommended_pruning_config()
-        assert config.target_sparsity == 0.5
+        assert config.target_sparsity == pytest.approx(0.5)
         assert config.method == PruningMethod.MAGNITUDE
 
     def test_small_model_classification(self) -> None:
         """Small model for classification."""
         config = get_recommended_pruning_config("small", "classification")
-        assert config.target_sparsity == 0.3
+        assert config.target_sparsity == pytest.approx(0.3)
         assert config.schedule == PruningSchedule.ONE_SHOT
 
     def test_large_model_generation(self) -> None:
         """Large model for generation."""
         config = get_recommended_pruning_config("large", "generation")
-        assert config.target_sparsity == 0.7
+        assert config.target_sparsity == pytest.approx(0.7)
         assert config.method == PruningMethod.GRADUAL
         assert config.schedule == PruningSchedule.ITERATIVE
 
     def test_xl_model_embedding(self) -> None:
         """XL model for embedding."""
         config = get_recommended_pruning_config("xl", "embedding")
-        assert config.target_sparsity == 0.8
+        assert config.target_sparsity == pytest.approx(0.8)
         assert config.method == PruningMethod.STRUCTURED
         assert config.scope == PruningScope.STRUCTURED_NEURONS
 

@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class AdapterType(Enum):
     """Supported adapter types for parameter-efficient fine-tuning.
@@ -358,9 +360,7 @@ def validate_lora_config(config: LoRAConfig) -> None:
         Traceback (most recent call last):
         ValueError: r must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.r <= 0:
         msg = f"r must be positive, got {config.r}"
@@ -413,9 +413,7 @@ def validate_qlora_config(config: QLoRAConfig) -> None:
         Traceback (most recent call last):
         ValueError: bits must be 4 or 8
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.bits not in (4, 8):
         msg = f"bits must be 4 or 8, got {config.bits}"
@@ -468,9 +466,7 @@ def validate_adalora_config(config: AdaLoRAConfig) -> None:
         Traceback (most recent call last):
         ValueError: init_r must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.init_r <= 0:
         msg = f"init_r must be positive, got {config.init_r}"
@@ -534,9 +530,7 @@ def validate_ia3_config(config: IA3Config) -> None:
         Traceback (most recent call last):
         ValueError: target_modules cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if len(config.target_modules) == 0:
         msg = "target_modules cannot be empty"
@@ -571,9 +565,7 @@ def validate_prefix_config(config: PrefixTuningConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_virtual_tokens must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_virtual_tokens <= 0:
         msg = f"num_virtual_tokens must be positive, got {config.num_virtual_tokens}"
@@ -582,6 +574,42 @@ def validate_prefix_config(config: PrefixTuningConfig) -> None:
     if config.encoder_hidden_size <= 0:
         msg = f"encoder_hidden_size must be positive, got {config.encoder_hidden_size}"
         raise ValueError(msg)
+
+
+def _validate_adapter_subconfig(
+    config: AdapterConfig,
+    attr_name: str,
+    adapter_label: str,
+    validator: Any,
+) -> None:
+    """Validate a single adapter sub-configuration exists and is valid."""
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {adapter_label}"
+        raise ValueError(msg)
+    validator(sub_config)
+
+
+# Maps adapter types to their required (attr_name, label, validator) entries
+_ADAPTER_VALIDATIONS: dict[AdapterType, list[tuple[str, str, Any]]] = {
+    AdapterType.LORA: [
+        ("lora_config", "lora", validate_lora_config),
+    ],
+    AdapterType.QLORA: [
+        ("lora_config", "qlora", validate_lora_config),
+        ("qlora_config", "qlora adapter type", validate_qlora_config),
+    ],
+    AdapterType.ADALORA: [
+        ("lora_config", "adalora", validate_lora_config),
+        ("adalora_config", "adalora adapter type", validate_adalora_config),
+    ],
+    AdapterType.IA3: [
+        ("ia3_config", "ia3 adapter type", validate_ia3_config),
+    ],
+    AdapterType.PREFIX_TUNING: [
+        ("prefix_config", "prefix_tuning adapter type", validate_prefix_config),
+    ],
+}
 
 
 def validate_adapter_config(config: AdapterConfig) -> None:
@@ -603,40 +631,11 @@ def validate_adapter_config(config: AdapterConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    lora_types = (AdapterType.LORA, AdapterType.QLORA, AdapterType.ADALORA)
-    if config.adapter_type in lora_types:
-        if config.lora_config is None:
-            msg = f"lora_config required for {config.adapter_type.value}"
-            raise ValueError(msg)
-        validate_lora_config(config.lora_config)
-
-    if config.adapter_type == AdapterType.QLORA:
-        if config.qlora_config is None:
-            msg = "qlora_config required for qlora adapter type"
-            raise ValueError(msg)
-        validate_qlora_config(config.qlora_config)
-
-    if config.adapter_type == AdapterType.ADALORA:
-        if config.adalora_config is None:
-            msg = "adalora_config required for adalora adapter type"
-            raise ValueError(msg)
-        validate_adalora_config(config.adalora_config)
-
-    if config.adapter_type == AdapterType.IA3:
-        if config.ia3_config is None:
-            msg = "ia3_config required for ia3 adapter type"
-            raise ValueError(msg)
-        validate_ia3_config(config.ia3_config)
-
-    if config.adapter_type == AdapterType.PREFIX_TUNING:
-        if config.prefix_config is None:
-            msg = "prefix_config required for prefix_tuning adapter type"
-            raise ValueError(msg)
-        validate_prefix_config(config.prefix_config)
+    validations = _ADAPTER_VALIDATIONS.get(config.adapter_type, [])
+    for attr_name, label, validator in validations:
+        _validate_adapter_subconfig(config, attr_name, label, validator)
 
     if config.base_model_params <= 0:
         msg = f"base_model_params must be positive, got {config.base_model_params}"
@@ -1391,9 +1390,7 @@ def format_adapter_stats(stats: AdapterStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Adapter Type: {stats.adapter_type.value}",

@@ -194,7 +194,7 @@ class TestTelemetryConfig:
         )
         assert config.log_config.level == LogLevel.INFO
         assert config.batch_size == 100
-        assert config.flush_interval == 30.0
+        assert config.flush_interval == pytest.approx(30.0)
 
     def test_frozen(self) -> None:
         """Test that TelemetryConfig is immutable."""
@@ -620,7 +620,7 @@ class TestCreateTelemetryConfig:
         config = create_telemetry_config()
         assert config.export_format == ExportFormat.JSON
         assert config.batch_size == 100
-        assert config.flush_interval == 30.0
+        assert config.flush_interval == pytest.approx(30.0)
 
     def test_with_log_config(self) -> None:
         """Test creation with custom log config."""
@@ -752,7 +752,7 @@ class TestRecordMetric:
         """Test basic metric recording."""
         config = create_metric_config("counter", "requests")
         val = record_metric(config, 1.0)
-        assert val.value == 1.0
+        assert val.value == pytest.approx(1.0)
         assert val.config.name == "requests"
 
     def test_with_labels(self) -> None:
@@ -811,7 +811,7 @@ class TestAggregateMetrics:
             record_metric(config, 3.0),
         ]
         result = aggregate_metrics(vals)
-        assert result["requests"]["_total"] == 6.0
+        assert result["requests"]["_total"] == pytest.approx(6.0)
 
     def test_gauge_aggregation(self) -> None:
         """Test gauge values use last value."""
@@ -822,7 +822,7 @@ class TestAggregateMetrics:
             record_metric(config, 22.0),
         ]
         result = aggregate_metrics(vals)
-        assert result["temperature"]["_total"] == 22.0
+        assert result["temperature"]["_total"] == pytest.approx(22.0)
 
     def test_with_labels(self) -> None:
         """Test aggregation with labels."""
@@ -895,7 +895,7 @@ class TestCalculatePercentiles:
         """Test basic percentile calculation."""
         vals = list(range(1, 11))
         result = calculate_percentiles(vals, [50.0])
-        assert result[50.0] == 5.5
+        assert result[50.0] == pytest.approx(5.5)
 
     def test_default_percentiles(self) -> None:
         """Test default percentile values."""
@@ -924,7 +924,7 @@ class TestCalculatePercentiles:
     def test_single_value(self) -> None:
         """Test percentiles with single value."""
         result = calculate_percentiles([42.0], [50.0])
-        assert result[50.0] == 42.0
+        assert result[50.0] == pytest.approx(42.0)
 
 
 class TestFormatTelemetryStats:
@@ -965,7 +965,7 @@ class TestGetRecommendedTelemetryConfig:
         config = get_recommended_telemetry_config("development")
         assert config.log_config.level == LogLevel.DEBUG
         assert config.batch_size == 10
-        assert config.flush_interval == 5.0
+        assert config.flush_interval == pytest.approx(5.0)
         assert config.export_format == ExportFormat.JSON
 
     def test_production_config(self) -> None:
@@ -973,7 +973,7 @@ class TestGetRecommendedTelemetryConfig:
         config = get_recommended_telemetry_config("production")
         assert config.log_config.level == LogLevel.INFO
         assert config.batch_size == 100
-        assert config.flush_interval == 30.0
+        assert config.flush_interval == pytest.approx(30.0)
         assert config.export_format == ExportFormat.PROMETHEUS
 
     def test_debugging_config(self) -> None:
@@ -982,7 +982,7 @@ class TestGetRecommendedTelemetryConfig:
         assert config.log_config.level == LogLevel.DEBUG
         assert config.log_config.include_context is True
         assert config.batch_size == 1
-        assert config.flush_interval == 1.0
+        assert config.flush_interval == pytest.approx(1.0)
 
     def test_invalid_use_case_raises(self) -> None:
         """Test that invalid use_case raises ValueError."""
@@ -1023,7 +1023,7 @@ class TestMetricValue:
             labels={},
             timestamp=datetime.now(UTC),
         )
-        assert val.value == 1.0
+        assert val.value == pytest.approx(1.0)
         assert val.config.name == "test"
 
     def test_frozen(self) -> None:

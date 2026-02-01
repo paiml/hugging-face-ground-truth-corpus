@@ -146,7 +146,7 @@ class TestEWCConfig:
             normalize_fisher=True,
             online=False,
         )
-        assert config.lambda_ewc == 1000.0
+        assert config.lambda_ewc == pytest.approx(1000.0)
         assert config.fisher_samples == 200
         assert config.normalize_fisher is True
         assert config.online is False
@@ -194,7 +194,7 @@ class TestContinualConfig:
         )
         assert config.method == ContinualMethod.EWC
         assert config.replay_config is None
-        assert config.regularization_strength == 0.5
+        assert config.regularization_strength == pytest.approx(0.5)
         assert config.task_boundary is True
 
     def test_config_with_replay(self) -> None:
@@ -228,9 +228,9 @@ class TestForgettingMetrics:
             plasticity=0.95,
         )
         assert metrics.backward_transfer == -0.05
-        assert metrics.forward_transfer == 0.10
-        assert metrics.forgetting_rate == 0.03
-        assert metrics.plasticity == 0.95
+        assert metrics.forward_transfer == pytest.approx(0.10)
+        assert metrics.forgetting_rate == pytest.approx(0.03)
+        assert metrics.plasticity == pytest.approx(0.95)
 
     def test_metrics_is_frozen(self) -> None:
         """Metrics is immutable."""
@@ -371,7 +371,7 @@ class TestCreateEWCConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_ewc_config()
-        assert config.lambda_ewc == 1000.0
+        assert config.lambda_ewc == pytest.approx(1000.0)
         assert config.fisher_samples == 200
         assert config.normalize_fisher is True
         assert config.online is False
@@ -384,7 +384,7 @@ class TestCreateEWCConfig:
             normalize_fisher=False,
             online=True,
         )
-        assert config.lambda_ewc == 5000.0
+        assert config.lambda_ewc == pytest.approx(5000.0)
         assert config.fisher_samples == 500
         assert config.normalize_fisher is False
         assert config.online is True
@@ -450,7 +450,7 @@ class TestCreateContinualConfig:
         """Create default config."""
         config = create_continual_config()
         assert config.method == ContinualMethod.EWC
-        assert config.regularization_strength == 0.5
+        assert config.regularization_strength == pytest.approx(0.5)
         assert config.task_boundary is True
         assert config.replay_config is None
 
@@ -494,10 +494,10 @@ class TestCreateForgettingMetrics:
     def test_default_metrics(self) -> None:
         """Create default metrics."""
         metrics = create_forgetting_metrics()
-        assert metrics.backward_transfer == 0.0
-        assert metrics.forward_transfer == 0.0
-        assert metrics.forgetting_rate == 0.0
-        assert metrics.plasticity == 1.0
+        assert metrics.backward_transfer == pytest.approx(0.0)
+        assert metrics.forward_transfer == pytest.approx(0.0)
+        assert metrics.forgetting_rate == pytest.approx(0.0)
+        assert metrics.plasticity == pytest.approx(1.0)
 
     def test_custom_metrics(self) -> None:
         """Create custom metrics."""
@@ -508,7 +508,7 @@ class TestCreateForgettingMetrics:
             plasticity=0.95,
         )
         assert metrics.backward_transfer == -0.05
-        assert metrics.plasticity == 0.95
+        assert metrics.plasticity == pytest.approx(0.95)
 
     def test_negative_forgetting_rate_raises(self) -> None:
         """Negative forgetting_rate raises ValueError."""

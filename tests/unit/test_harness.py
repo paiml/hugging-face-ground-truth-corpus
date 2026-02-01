@@ -817,7 +817,7 @@ class TestRunEvaluationTask:
         result = run_evaluation_task("test_task", config, failing_inference, data)
         assert result.task_name == "test_task"
         assert "error" in result.metrics
-        assert result.metrics["error"] == 0.0
+        assert result.metrics["error"] == pytest.approx(0.0)
 
 
 class TestAggregateResults:

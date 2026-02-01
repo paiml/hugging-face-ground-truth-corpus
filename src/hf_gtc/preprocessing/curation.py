@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class CurationStep(Enum):
     """Steps in a dataset curation pipeline.
@@ -266,9 +268,7 @@ def validate_cleaning_config(config: CleaningConfig) -> None:
         Traceback (most recent call last):
         ValueError: methods cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.methods:
         msg = "methods cannot be empty"
@@ -314,9 +314,7 @@ def validate_decontamination_config(config: DecontaminationConfig) -> None:
         Traceback (most recent call last):
         ValueError: test_datasets cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.test_datasets:
         msg = "test_datasets cannot be empty"
@@ -371,9 +369,7 @@ def validate_curation_pipeline(config: CurationPipeline) -> None:
         Traceback (most recent call last):
         ValueError: steps cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.steps:
         msg = "steps cannot be empty"
@@ -423,9 +419,7 @@ def validate_curation_stats(stats: CurationStats) -> None:
         Traceback (most recent call last):
         ValueError: final_size cannot be greater than original_size
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.original_size < 0:
         msg = f"original_size must be non-negative, got {stats.original_size}"
@@ -1176,9 +1170,7 @@ def format_curation_stats(stats: CurationStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     retention_rate = (
         stats.final_size / stats.original_size * 100 if stats.original_size > 0 else 0.0

@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from transformers import BatchEncoding, PreTrainedTokenizerBase
 
+from hf_gtc._validation import validate_not_none
+
 
 class TokenizerType(Enum):
     """Types of tokenization algorithms.
@@ -233,9 +235,7 @@ def validate_tokenizer_config(config: TokenizerConfig) -> None:
         Traceback (most recent call last):
         ValueError: vocab_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.vocab_size <= 0:
         msg = f"vocab_size must be positive, got {config.vocab_size}"
@@ -279,9 +279,7 @@ def validate_vocab_stats(stats: VocabStats) -> None:
         Traceback (most recent call last):
         ValueError: vocab_size must be positive
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.vocab_size <= 0:
         msg = f"vocab_size must be positive, got {stats.vocab_size}"
@@ -333,9 +331,7 @@ def validate_tokenization_result(result: TokenizationResult) -> None:
         Traceback (most recent call last):
         ValueError: tokens, token_ids, offsets, and special_mask must have same length
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lengths = {
         len(result.tokens),
@@ -991,9 +987,7 @@ def format_vocab_stats(stats: VocabStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Vocabulary Statistics",

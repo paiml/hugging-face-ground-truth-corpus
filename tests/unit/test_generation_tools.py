@@ -266,7 +266,7 @@ class TestToolStats:
         assert stats.total_calls == 10
         assert stats.successful_calls == 8
         assert stats.failed_calls == 2
-        assert stats.total_time_ms == 500.0
+        assert stats.total_time_ms == pytest.approx(500.0)
         assert stats.calls_by_tool["search"] == 5
 
     def test_stats_is_frozen(self) -> None:
@@ -549,7 +549,7 @@ class TestCreateToolStats:
         assert stats.total_calls == 0
         assert stats.successful_calls == 0
         assert stats.failed_calls == 0
-        assert stats.total_time_ms == 0.0
+        assert stats.total_time_ms == pytest.approx(0.0)
         assert stats.calls_by_tool == {}
 
     def test_with_values(self) -> None:
@@ -876,7 +876,7 @@ class TestParseToolCalls:
         text = "calculate(value=3.14)"
         calls = parse_tool_calls(text, ("calculate",), ParsingStrategy.REGEX)
         assert len(calls) == 1
-        assert calls[0].arguments["value"] == 3.14
+        assert calls[0].arguments["value"] == pytest.approx(3.14)
 
     def test_parse_structured_json(self) -> None:
         """Parse structured falls back to JSON."""

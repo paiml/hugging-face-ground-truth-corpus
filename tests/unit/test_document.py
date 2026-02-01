@@ -174,7 +174,7 @@ class TestOCRConfig:
         )
         assert config.backend == OCRBackend.TESSERACT
         assert config.language == "en"
-        assert config.confidence_threshold == 0.5
+        assert config.confidence_threshold == pytest.approx(0.5)
         assert config.dpi == 300
 
     def test_frozen(self) -> None:
@@ -240,7 +240,7 @@ class TestDocumentStats:
         assert stats.num_pages == 5
         assert stats.num_words == 1000
         assert stats.num_boxes == 250
-        assert stats.processing_time == 2.5
+        assert stats.processing_time == pytest.approx(2.5)
 
     def test_frozen(self) -> None:
         """Test stats is immutable."""
@@ -417,7 +417,7 @@ class TestCreateOCRConfig:
         config = create_ocr_config()
         assert config.backend == OCRBackend.TESSERACT
         assert config.language == "en"
-        assert config.confidence_threshold == 0.5
+        assert config.confidence_threshold == pytest.approx(0.5)
         assert config.dpi == 300
 
     @pytest.mark.parametrize(
@@ -437,7 +437,7 @@ class TestCreateOCRConfig:
     def test_custom_confidence_threshold(self) -> None:
         """Test custom confidence_threshold."""
         config = create_ocr_config(confidence_threshold=0.8)
-        assert config.confidence_threshold == 0.8
+        assert config.confidence_threshold == pytest.approx(0.8)
 
     def test_custom_dpi(self) -> None:
         """Test custom dpi."""
@@ -910,7 +910,7 @@ class TestGetDefaultOCRConfig:
         """Test TESSERACT defaults."""
         config = get_default_ocr_config(OCRBackend.TESSERACT)
         assert config.language == "en"
-        assert config.confidence_threshold == 0.5
+        assert config.confidence_threshold == pytest.approx(0.5)
         assert config.dpi == 300
 
     def test_easyocr_defaults(self) -> None:

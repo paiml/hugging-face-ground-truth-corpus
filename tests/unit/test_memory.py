@@ -182,7 +182,7 @@ class TestEntityConfig:
         )
         assert config.entity_extraction_model == "gpt-3.5-turbo"
         assert config.max_entities == 50
-        assert config.decay_rate == 0.1
+        assert config.decay_rate == pytest.approx(0.1)
 
     def test_frozen(self) -> None:
         """Test that EntityConfig is immutable."""
@@ -595,7 +595,7 @@ class TestCreateEntityConfig:
         config = create_entity_config()
         assert config.entity_extraction_model == "gpt-3.5-turbo"
         assert config.max_entities == 50
-        assert config.decay_rate == 0.1
+        assert config.decay_rate == pytest.approx(0.1)
 
     def test_custom_entity_extraction_model(self) -> None:
         """Create config with custom entity_extraction_model."""
@@ -610,7 +610,7 @@ class TestCreateEntityConfig:
     def test_custom_decay_rate(self) -> None:
         """Create config with custom decay_rate."""
         config = create_entity_config(decay_rate=0.05)
-        assert config.decay_rate == 0.05
+        assert config.decay_rate == pytest.approx(0.05)
 
     def test_empty_entity_extraction_model_raises(self) -> None:
         """Empty entity_extraction_model raises ValueError."""

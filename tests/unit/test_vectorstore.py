@@ -607,17 +607,17 @@ class TestCalculateRecallAtK:
     def test_basic_recall(self) -> None:
         """Basic recall calculation."""
         recall = calculate_recall_at_k(8, 10, 10)
-        assert recall == 0.8
+        assert recall == pytest.approx(0.8)
 
     def test_perfect_recall(self) -> None:
         """Perfect recall is 1.0."""
         recall = calculate_recall_at_k(5, 5, 10)
-        assert recall == 1.0
+        assert recall == pytest.approx(1.0)
 
     def test_zero_recall(self) -> None:
         """Zero recall when no relevant items found."""
         recall = calculate_recall_at_k(0, 10, 5)
-        assert recall == 0.0
+        assert recall == pytest.approx(0.0)
 
     def test_negative_relevant_raises(self) -> None:
         """Negative relevant_retrieved raises ValueError."""

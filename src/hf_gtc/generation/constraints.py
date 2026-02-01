@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ConstraintType(Enum):
     """Types of output constraints.
@@ -400,6 +402,36 @@ def validate_grammar_constraint(constraint: GrammarConstraint) -> None:
         raise ValueError(msg)
 
 
+def _validate_constraint_type_config(config: ConstraintConfig) -> None:
+    """Validate constraint sub-config based on constraint type."""
+    constraint_validators: dict[ConstraintType, tuple[str, str, object]] = {
+        ConstraintType.JSON_SCHEMA: (
+            "json_constraint",
+            "JSON_SCHEMA type",
+            validate_json_schema_constraint,
+        ),
+        ConstraintType.REGEX: (
+            "regex_constraint",
+            "REGEX type",
+            validate_regex_constraint,
+        ),
+        ConstraintType.GRAMMAR: (
+            "grammar_constraint",
+            "GRAMMAR type",
+            validate_grammar_constraint,
+        ),
+    }
+    entry = constraint_validators.get(config.constraint_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} is required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
+
+
 def validate_constraint_config(config: ConstraintConfig) -> None:
     """Validate a constraint configuration.
 
@@ -440,28 +472,9 @@ def validate_constraint_config(config: ConstraintConfig) -> None:
         Traceback (most recent call last):
         ValueError: json_constraint is required for JSON_SCHEMA type
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    # Check required constraints based on type
-    if config.constraint_type == ConstraintType.JSON_SCHEMA:
-        if config.json_constraint is None:
-            msg = "json_constraint is required for JSON_SCHEMA type"
-            raise ValueError(msg)
-        validate_json_schema_constraint(config.json_constraint)
-
-    elif config.constraint_type == ConstraintType.REGEX:
-        if config.regex_constraint is None:
-            msg = "regex_constraint is required for REGEX type"
-            raise ValueError(msg)
-        validate_regex_constraint(config.regex_constraint)
-
-    elif config.constraint_type == ConstraintType.GRAMMAR:
-        if config.grammar_constraint is None:
-            msg = "grammar_constraint is required for GRAMMAR type"
-            raise ValueError(msg)
-        validate_grammar_constraint(config.grammar_constraint)
+    _validate_constraint_type_config(config)
 
 
 def create_json_schema_constraint(
@@ -957,9 +970,7 @@ def validate_output(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.constraint_type == ConstraintType.JSON_SCHEMA:
         return _validate_json_schema(output, config.json_constraint)
@@ -1077,6 +1088,33 @@ def _validate_grammar(
     return True, ()
 
 
+def _validate_regex_output(
+    output: str,
+    constraint: object | None,
+    compiled_pattern: re.Pattern[str],
+) -> tuple[bool, tuple[str, ...]]:
+    """Validate output against a compiled regex constraint."""
+    if constraint is None:
+        return True, ()
+
+    errors: list[str] = []
+
+    if len(output) > constraint.max_length:
+        errors.append(
+            f"Output length {len(output)} exceeds max {constraint.max_length}"
+        )
+
+    match = (
+        compiled_pattern.fullmatch(output)
+        if constraint.full_match
+        else compiled_pattern.search(output)
+    )
+    if not match:
+        errors.append(f"Output does not match pattern: {constraint.pattern}")
+
+    return len(errors) == 0, tuple(errors)
+
+
 class CompiledConstraint:
     """Compiled constraint for efficient repeated validation.
 
@@ -1133,26 +1171,9 @@ class CompiledConstraint:
             self.config.constraint_type == ConstraintType.REGEX
             and self.compiled_pattern
         ):
-            constraint = self.config.regex_constraint
-            if constraint is None:
-                return True, ()
-
-            errors: list[str] = []
-
-            if len(output) > constraint.max_length:
-                errors.append(
-                    f"Output length {len(output)} exceeds max {constraint.max_length}"
-                )
-
-            if constraint.full_match:
-                match = self.compiled_pattern.fullmatch(output)
-            else:
-                match = self.compiled_pattern.search(output)
-
-            if not match:
-                errors.append(f"Output does not match pattern: {constraint.pattern}")
-
-            return len(errors) == 0, tuple(errors)
+            return _validate_regex_output(
+                output, self.config.regex_constraint, self.compiled_pattern
+            )
 
         return validate_output(output, self.config)
 
@@ -1192,9 +1213,7 @@ def compile_constraint(config: ConstraintConfig) -> CompiledConstraint:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     compiled_pattern = None
     if config.constraint_type == ConstraintType.REGEX and config.regex_constraint:
@@ -1238,9 +1257,7 @@ def estimate_constraint_overhead(config: ConstraintConfig) -> float:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     # Base overhead estimates per constraint type
     overhead_map = {
@@ -1352,9 +1369,7 @@ def format_constraint_stats(stats: ConstraintStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     total = stats.valid_outputs + stats.invalid_outputs
     success_rate = (stats.valid_outputs / total * 100) if total > 0 else 0.0

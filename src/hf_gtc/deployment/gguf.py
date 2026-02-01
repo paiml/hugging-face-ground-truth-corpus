@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class GGUFQuantType(Enum):
     """GGUF quantization types.
@@ -230,9 +232,7 @@ def validate_gguf_config(config: GGUFConfig) -> None:
         Traceback (most recent call last):
         ValueError: concurrency must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.concurrency <= 0:
         msg = f"concurrency must be positive, got {config.concurrency}"
@@ -521,9 +521,7 @@ def format_gguf_export_result(result: GGUFExportResult) -> str:
         >>> "Compression:" in formatted
         True
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [
         f"Output: {result.output_path}",
@@ -775,9 +773,7 @@ def get_gguf_config_dict(config: GGUFConfig) -> dict[str, Any]:
         >>> d["concurrency"]
         4
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     result: dict[str, Any] = {
         "quant_type": config.quant_type.value,
@@ -816,18 +812,7 @@ def get_gguf_metadata_dict(metadata: GGUFMetadata) -> dict[str, str]:
         msg = "metadata cannot be None"
         raise ValueError(msg)
 
-    result: dict[str, str] = {}
-    if metadata.name:
-        result["name"] = metadata.name
-    if metadata.author:
-        result["author"] = metadata.author
-    if metadata.version:
-        result["version"] = metadata.version
-    if metadata.description:
-        result["description"] = metadata.description
-    if metadata.license:
-        result["license"] = metadata.license
-    if metadata.url:
-        result["url"] = metadata.url
-
-    return result
+    fields = ("name", "author", "version", "description", "license", "url")
+    return {
+        field: getattr(metadata, field) for field in fields if getattr(metadata, field)
+    }

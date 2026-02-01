@@ -185,10 +185,10 @@ class TestMemoryEstimate:
             kv_cache_mb=1000.0,
             total_mb=17000.0,
         )
-        assert estimate.parameters_mb == 14000.0
-        assert estimate.activations_mb == 2000.0
-        assert estimate.kv_cache_mb == 1000.0
-        assert estimate.total_mb == 17000.0
+        assert estimate.parameters_mb == pytest.approx(14000.0)
+        assert estimate.activations_mb == pytest.approx(2000.0)
+        assert estimate.kv_cache_mb == pytest.approx(1000.0)
+        assert estimate.total_mb == pytest.approx(17000.0)
 
     def test_frozen(self) -> None:
         """Test that MemoryEstimate is immutable."""
@@ -212,8 +212,8 @@ class TestMemoryBudget:
             cpu_memory_gb=64.0,
             allow_offload=True,
         )
-        assert budget.gpu_memory_gb == 24.0
-        assert budget.cpu_memory_gb == 64.0
+        assert budget.gpu_memory_gb == pytest.approx(24.0)
+        assert budget.cpu_memory_gb == pytest.approx(64.0)
         assert budget.allow_offload is True
 
     def test_frozen(self) -> None:
@@ -270,10 +270,10 @@ class TestMemoryStats:
             reserved_mb=22000.0,
             utilization=0.82,
         )
-        assert stats.peak_memory_mb == 20000.0
-        assert stats.allocated_mb == 18000.0
-        assert stats.reserved_mb == 22000.0
-        assert stats.utilization == 0.82
+        assert stats.peak_memory_mb == pytest.approx(20000.0)
+        assert stats.allocated_mb == pytest.approx(18000.0)
+        assert stats.reserved_mb == pytest.approx(22000.0)
+        assert stats.utilization == pytest.approx(0.82)
 
     def test_frozen(self) -> None:
         """Test that MemoryStats is immutable."""
@@ -437,23 +437,23 @@ class TestCreateMemoryEstimate:
     def test_default_estimate(self) -> None:
         """Create estimate with defaults."""
         estimate = create_memory_estimate(14000.0)
-        assert estimate.parameters_mb == 14000.0
-        assert estimate.activations_mb == 0.0
-        assert estimate.kv_cache_mb == 0.0
-        assert estimate.total_mb == 14000.0
+        assert estimate.parameters_mb == pytest.approx(14000.0)
+        assert estimate.activations_mb == pytest.approx(0.0)
+        assert estimate.kv_cache_mb == pytest.approx(0.0)
+        assert estimate.total_mb == pytest.approx(14000.0)
 
     def test_custom_estimate(self) -> None:
         """Create estimate with custom values."""
         estimate = create_memory_estimate(14000.0, 2000.0, 1000.0)
-        assert estimate.parameters_mb == 14000.0
-        assert estimate.activations_mb == 2000.0
-        assert estimate.kv_cache_mb == 1000.0
-        assert estimate.total_mb == 17000.0
+        assert estimate.parameters_mb == pytest.approx(14000.0)
+        assert estimate.activations_mb == pytest.approx(2000.0)
+        assert estimate.kv_cache_mb == pytest.approx(1000.0)
+        assert estimate.total_mb == pytest.approx(17000.0)
 
     def test_explicit_total(self) -> None:
         """Create estimate with explicit total."""
         estimate = create_memory_estimate(14000.0, 2000.0, 1000.0, total_mb=20000.0)
-        assert estimate.total_mb == 20000.0
+        assert estimate.total_mb == pytest.approx(20000.0)
 
     def test_negative_params_raises(self) -> None:
         """Negative parameters raises ValueError."""
@@ -467,14 +467,14 @@ class TestCreateMemoryBudget:
     def test_default_budget(self) -> None:
         """Create budget with defaults."""
         budget = create_memory_budget()
-        assert budget.gpu_memory_gb == 24.0
-        assert budget.cpu_memory_gb == 64.0
+        assert budget.gpu_memory_gb == pytest.approx(24.0)
+        assert budget.cpu_memory_gb == pytest.approx(64.0)
         assert budget.allow_offload is True
 
     def test_custom_budget(self) -> None:
         """Create budget with custom values."""
         budget = create_memory_budget(gpu_memory_gb=48.0, allow_offload=False)
-        assert budget.gpu_memory_gb == 48.0
+        assert budget.gpu_memory_gb == pytest.approx(48.0)
         assert budget.allow_offload is False
 
     def test_negative_gpu_raises(self) -> None:
@@ -508,7 +508,7 @@ class TestCreateMemoryConfig:
         """Create config with custom budget."""
         budget = create_memory_budget(gpu_memory_gb=48.0)
         config = create_memory_config(budget=budget)
-        assert config.budget.gpu_memory_gb == 48.0
+        assert config.budget.gpu_memory_gb == pytest.approx(48.0)
 
     def test_invalid_strategy_raises(self) -> None:
         """Invalid strategy raises ValueError."""
@@ -527,24 +527,24 @@ class TestCreateMemoryStats:
     def test_basic_stats(self) -> None:
         """Create basic stats."""
         stats = create_memory_stats(20000.0, 18000.0, 22000.0)
-        assert stats.peak_memory_mb == 20000.0
-        assert stats.allocated_mb == 18000.0
-        assert stats.reserved_mb == 22000.0
+        assert stats.peak_memory_mb == pytest.approx(20000.0)
+        assert stats.allocated_mb == pytest.approx(18000.0)
+        assert stats.reserved_mb == pytest.approx(22000.0)
 
     def test_auto_utilization(self) -> None:
         """Utilization is computed if not provided."""
         stats = create_memory_stats(20000.0, 18000.0, 20000.0)
-        assert stats.utilization == 0.9
+        assert stats.utilization == pytest.approx(0.9)
 
     def test_explicit_utilization(self) -> None:
         """Explicit utilization is used."""
         stats = create_memory_stats(20000.0, 18000.0, 22000.0, utilization=0.5)
-        assert stats.utilization == 0.5
+        assert stats.utilization == pytest.approx(0.5)
 
     def test_zero_reserved_utilization(self) -> None:
         """Zero reserved gives zero utilization."""
         stats = create_memory_stats(0.0, 0.0, 0.0)
-        assert stats.utilization == 0.0
+        assert stats.utilization == pytest.approx(0.0)
 
     def test_negative_peak_raises(self) -> None:
         """Negative peak raises ValueError."""
@@ -716,7 +716,7 @@ class TestEstimateTrainingMemory:
         assert estimate.parameters_mb > 0
         assert estimate.activations_mb > 0
         # Training has no KV cache
-        assert estimate.kv_cache_mb == 0.0
+        assert estimate.kv_cache_mb == pytest.approx(0.0)
 
     def test_training_more_than_inference(self) -> None:
         """Training uses more memory than inference."""
@@ -963,23 +963,23 @@ class TestConvertMemoryUnits:
 
     def test_mb_to_gb(self) -> None:
         """Convert MB to GB."""
-        assert convert_memory_units(1024, "mb", "gb") == 1.0
+        assert convert_memory_units(1024, "mb", "gb") == pytest.approx(1.0)
 
     def test_gb_to_mb(self) -> None:
         """Convert GB to MB."""
-        assert convert_memory_units(1, "gb", "mb") == 1024.0
+        assert convert_memory_units(1, "gb", "mb") == pytest.approx(1024.0)
 
     def test_kb_to_bytes(self) -> None:
         """Convert KB to bytes."""
-        assert convert_memory_units(1, "kb", "bytes") == 1024.0
+        assert convert_memory_units(1, "kb", "bytes") == pytest.approx(1024.0)
 
     def test_bytes_to_kb(self) -> None:
         """Convert bytes to KB."""
-        assert convert_memory_units(1024, "bytes", "kb") == 1.0
+        assert convert_memory_units(1024, "bytes", "kb") == pytest.approx(1.0)
 
     def test_same_unit(self) -> None:
         """Same unit returns same value."""
-        assert convert_memory_units(100, "mb", "mb") == 100.0
+        assert convert_memory_units(100, "mb", "mb") == pytest.approx(100.0)
 
     def test_invalid_from_unit_raises(self) -> None:
         """Invalid from_unit raises ValueError."""

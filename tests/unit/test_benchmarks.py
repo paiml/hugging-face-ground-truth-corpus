@@ -246,13 +246,13 @@ class TestHumanEvalConfig:
         """Test default values."""
         config = HumanEvalConfig()
         assert config.k_values == (1, 10, 100)
-        assert config.timeout_seconds == 10.0
+        assert config.timeout_seconds == pytest.approx(10.0)
 
     def test_custom_values(self) -> None:
         """Test with custom values."""
         config = HumanEvalConfig(k_values=(1, 5), timeout_seconds=5.0)
         assert config.k_values == (1, 5)
-        assert config.timeout_seconds == 5.0
+        assert config.timeout_seconds == pytest.approx(5.0)
 
     def test_frozen(self) -> None:
         """Test that config is immutable."""
@@ -693,7 +693,7 @@ class TestCreateHumanEvalConfig:
         """Test with custom values."""
         config = create_humaneval_config(k_values=(1, 5), timeout_seconds=5.0)
         assert config.k_values == (1, 5)
-        assert config.timeout_seconds == 5.0
+        assert config.timeout_seconds == pytest.approx(5.0)
 
 
 class TestCreateBenchmarkResult:

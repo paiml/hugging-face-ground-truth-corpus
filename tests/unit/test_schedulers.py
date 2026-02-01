@@ -146,7 +146,7 @@ class TestWarmupConfig:
             warmup_type=WarmupType.LINEAR,
         )
         assert config.warmup_steps == 100
-        assert config.warmup_ratio == 0.0
+        assert config.warmup_ratio == pytest.approx(0.0)
         assert config.warmup_type == WarmupType.LINEAR
 
     def test_config_is_frozen(self) -> None:
@@ -166,9 +166,9 @@ class TestCosineConfig:
             min_lr_ratio=0.0,
             eta_min=0.0,
         )
-        assert config.num_cycles == 1.0
-        assert config.min_lr_ratio == 0.0
-        assert config.eta_min == 0.0
+        assert config.num_cycles == pytest.approx(1.0)
+        assert config.min_lr_ratio == pytest.approx(0.0)
+        assert config.eta_min == pytest.approx(0.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -183,7 +183,7 @@ class TestPolynomialConfig:
     def test_create_polynomial_config(self) -> None:
         """Create polynomial config."""
         config = PolynomialConfig(power=2.0, lr_end=1e-6)
-        assert config.power == 2.0
+        assert config.power == pytest.approx(2.0)
         assert config.lr_end == 1e-6
 
     def test_config_is_frozen(self) -> None:
@@ -236,7 +236,7 @@ class TestSchedulerStats:
         assert stats.current_lr == 5e-5
         assert stats.step == 500
         assert stats.warmup_complete is True
-        assert stats.decay_progress == 0.5
+        assert stats.decay_progress == pytest.approx(0.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -443,7 +443,7 @@ class TestCreateWarmupConfig:
         """Create default warmup config."""
         config = create_warmup_config()
         assert config.warmup_steps == 0
-        assert config.warmup_ratio == 0.0
+        assert config.warmup_ratio == pytest.approx(0.0)
         assert config.warmup_type == WarmupType.LINEAR
 
     def test_with_steps(self) -> None:
@@ -454,7 +454,7 @@ class TestCreateWarmupConfig:
     def test_with_ratio(self) -> None:
         """Create config with warmup ratio."""
         config = create_warmup_config(warmup_ratio=0.1)
-        assert config.warmup_ratio == 0.1
+        assert config.warmup_ratio == pytest.approx(0.1)
 
     def test_with_string_type(self) -> None:
         """Create config with string warmup type."""
@@ -478,15 +478,15 @@ class TestCreateCosineConfig:
     def test_default_config(self) -> None:
         """Create default cosine config."""
         config = create_cosine_config()
-        assert config.num_cycles == 1.0
-        assert config.min_lr_ratio == 0.0
-        assert config.eta_min == 0.0
+        assert config.num_cycles == pytest.approx(1.0)
+        assert config.min_lr_ratio == pytest.approx(0.0)
+        assert config.eta_min == pytest.approx(0.0)
 
     def test_with_custom_values(self) -> None:
         """Create config with custom values."""
         config = create_cosine_config(num_cycles=3.0, min_lr_ratio=0.1, eta_min=1e-6)
-        assert config.num_cycles == 3.0
-        assert config.min_lr_ratio == 0.1
+        assert config.num_cycles == pytest.approx(3.0)
+        assert config.min_lr_ratio == pytest.approx(0.1)
         assert config.eta_min == 1e-6
 
     def test_invalid_cycles_raises(self) -> None:
@@ -501,13 +501,13 @@ class TestCreatePolynomialConfig:
     def test_default_config(self) -> None:
         """Create default polynomial config."""
         config = create_polynomial_config()
-        assert config.power == 1.0
-        assert config.lr_end == 0.0
+        assert config.power == pytest.approx(1.0)
+        assert config.lr_end == pytest.approx(0.0)
 
     def test_with_custom_values(self) -> None:
         """Create config with custom values."""
         config = create_polynomial_config(power=2.0, lr_end=1e-6)
-        assert config.power == 2.0
+        assert config.power == pytest.approx(2.0)
         assert config.lr_end == 1e-6
 
     def test_invalid_power_raises(self) -> None:
@@ -549,14 +549,14 @@ class TestCreateLRSchedulerConfig:
         cosine = create_cosine_config(num_cycles=3.0)
         config = create_lr_scheduler_config(cosine_config=cosine)
         assert config.cosine_config is not None
-        assert config.cosine_config.num_cycles == 3.0
+        assert config.cosine_config.num_cycles == pytest.approx(3.0)
 
     def test_with_polynomial_config(self) -> None:
         """Create config with polynomial config."""
         poly = create_polynomial_config(power=2.0)
         config = create_lr_scheduler_config(polynomial_config=poly)
         assert config.polynomial_config is not None
-        assert config.polynomial_config.power == 2.0
+        assert config.polynomial_config.power == pytest.approx(2.0)
 
     def test_invalid_total_steps_raises(self) -> None:
         """Invalid total_steps raises ValueError."""
@@ -570,10 +570,10 @@ class TestCreateSchedulerStats:
     def test_default_stats(self) -> None:
         """Create default scheduler stats."""
         stats = create_scheduler_stats()
-        assert stats.current_lr == 0.0
+        assert stats.current_lr == pytest.approx(0.0)
         assert stats.step == 0
         assert stats.warmup_complete is False
-        assert stats.decay_progress == 0.0
+        assert stats.decay_progress == pytest.approx(0.0)
 
     def test_with_custom_values(self) -> None:
         """Create stats with custom values."""
@@ -586,7 +586,7 @@ class TestCreateSchedulerStats:
         assert stats.current_lr == 5e-5
         assert stats.step == 500
         assert stats.warmup_complete is True
-        assert stats.decay_progress == 0.5
+        assert stats.decay_progress == pytest.approx(0.5)
 
     def test_invalid_lr_raises(self) -> None:
         """Invalid current_lr raises ValueError."""
@@ -692,7 +692,7 @@ class TestCalculateWarmupLR:
     def test_linear_warmup_start(self) -> None:
         """Linear warmup starts at 0."""
         lr = calculate_warmup_lr(0, 100, 1e-4)
-        assert lr == 0.0
+        assert lr == pytest.approx(0.0)
 
     def test_linear_warmup_mid(self) -> None:
         """Linear warmup at midpoint."""

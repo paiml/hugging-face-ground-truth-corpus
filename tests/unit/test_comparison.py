@@ -72,15 +72,15 @@ class TestSignificanceLevel:
 
     def test_p01_value(self) -> None:
         """Test P01 value."""
-        assert SignificanceLevel.P01.value == 0.01
+        assert SignificanceLevel.P01.value == pytest.approx(0.01)
 
     def test_p05_value(self) -> None:
         """Test P05 value."""
-        assert SignificanceLevel.P05.value == 0.05
+        assert SignificanceLevel.P05.value == pytest.approx(0.05)
 
     def test_p10_value(self) -> None:
         """Test P10 value."""
-        assert SignificanceLevel.P10.value == 0.10
+        assert SignificanceLevel.P10.value == pytest.approx(0.10)
 
 
 class TestEffectSize:
@@ -175,7 +175,7 @@ class TestComparisonResult:
         )
         assert result.model_a == "model_1"
         assert result.is_significant is True
-        assert result.p_value == 0.03
+        assert result.p_value == pytest.approx(0.03)
 
     def test_frozen(self) -> None:
         """Test that ComparisonResult is immutable."""
@@ -679,7 +679,7 @@ class TestCalculateEffectSize:
         """Test with equal scores."""
         scores = [0.5, 0.5, 0.5, 0.5, 0.5]
         effect = calculate_effect_size(scores, scores)
-        assert effect == 0.0
+        assert effect == pytest.approx(0.0)
 
     def test_none_scores_a_raises_error(self) -> None:
         """Test that None scores_a raises ValueError."""
@@ -1098,21 +1098,21 @@ class TestEdgeCases:
         scores = [0.5, 0.5, 0.5, 0.5, 0.5]
         config = ComparisonConfig(method=ComparisonMethod.PAIRED_TTEST)
         _stat, pval = run_significance_test(scores, scores, config)
-        assert pval == 1.0
+        assert pval == pytest.approx(1.0)
 
     def test_identical_binary_mcnemar(self) -> None:
         """Test McNemar with identical binary scores."""
         scores = [1, 0, 1, 0, 1]
         config = ComparisonConfig(method=ComparisonMethod.MCNEMAR)
         _stat, pval = run_significance_test(scores, scores, config)
-        assert pval == 1.0
+        assert pval == pytest.approx(1.0)
 
     def test_wilcoxon_no_differences(self) -> None:
         """Test Wilcoxon with no differences."""
         scores = [0.5, 0.5, 0.5, 0.5, 0.5]
         config = ComparisonConfig(method=ComparisonMethod.WILCOXON)
         _stat, pval = run_significance_test(scores, scores, config)
-        assert pval == 1.0
+        assert pval == pytest.approx(1.0)
 
     def test_large_effect_size(self) -> None:
         """Test with large effect size."""

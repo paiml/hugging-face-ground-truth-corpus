@@ -26,6 +26,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class LossType(Enum):
     """Types of loss functions.
@@ -321,9 +323,7 @@ def validate_focal_loss_config(config: FocalLossConfig) -> None:
         Traceback (most recent call last):
         ValueError: alpha must be between 0.0 and 1.0
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.alpha <= 1.0:
         msg = f"alpha must be between 0.0 and 1.0, got {config.alpha}"
@@ -358,9 +358,7 @@ def validate_contrastive_loss_config(config: ContrastiveLossConfig) -> None:
         Traceback (most recent call last):
         ValueError: temperature must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.temperature <= 0:
         msg = f"temperature must be positive, got {config.temperature}"
@@ -394,13 +392,40 @@ def validate_label_smoothing_config(config: LabelSmoothingConfig) -> None:
         Traceback (most recent call last):
         ValueError: smoothing must be between 0.0 and 1.0
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.smoothing <= 1.0:
         msg = f"smoothing must be between 0.0 and 1.0, got {config.smoothing}"
         raise ValueError(msg)
+
+
+def _validate_loss_type_config(config: LossConfig) -> None:
+    """Validate that the correct sub-config is present for the loss type."""
+    loss_type_validators: dict[
+        LossType,
+        tuple[str, str, object],
+    ] = {
+        LossType.FOCAL: ("focal_config", "focal loss", validate_focal_loss_config),
+        LossType.CONTRASTIVE: (
+            "contrastive_config",
+            "contrastive loss",
+            validate_contrastive_loss_config,
+        ),
+        LossType.TRIPLET: (
+            "contrastive_config",
+            "triplet loss",
+            validate_contrastive_loss_config,
+        ),
+    }
+    entry = loss_type_validators.get(config.loss_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
 
 
 def validate_loss_config(config: LossConfig) -> None:
@@ -428,27 +453,9 @@ def validate_loss_config(config: LossConfig) -> None:
         Traceback (most recent call last):
         ValueError: focal_config required for focal loss
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    if config.loss_type == LossType.FOCAL:
-        if config.focal_config is None:
-            msg = "focal_config required for focal loss"
-            raise ValueError(msg)
-        validate_focal_loss_config(config.focal_config)
-
-    if config.loss_type == LossType.CONTRASTIVE:
-        if config.contrastive_config is None:
-            msg = "contrastive_config required for contrastive loss"
-            raise ValueError(msg)
-        validate_contrastive_loss_config(config.contrastive_config)
-
-    if config.loss_type == LossType.TRIPLET:
-        if config.contrastive_config is None:
-            msg = "contrastive_config required for triplet loss"
-            raise ValueError(msg)
-        validate_contrastive_loss_config(config.contrastive_config)
+    _validate_loss_type_config(config)
 
     if config.weight is not None:
         for w in config.weight:
@@ -480,9 +487,7 @@ def validate_loss_stats(stats: LossStats) -> None:
         Traceback (most recent call last):
         ValueError: num_samples must be positive
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.num_samples <= 0:
         msg = f"num_samples must be positive, got {stats.num_samples}"
@@ -1250,9 +1255,7 @@ def format_loss_stats(stats: LossStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Loss: {stats.loss_value:.4f}",

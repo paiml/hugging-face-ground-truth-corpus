@@ -247,7 +247,7 @@ class TestRegistryStats:
             transitions_count=500,
         )
         assert stats.total_models == 100
-        assert stats.storage_used_gb == 250.5
+        assert stats.storage_used_gb == pytest.approx(250.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -418,7 +418,7 @@ class TestCreateModelVersion:
             description="Production release",
         )
         assert version.stage == ModelStage.PRODUCTION
-        assert version.metrics["accuracy"] == 0.98
+        assert version.metrics["accuracy"] == pytest.approx(0.98)
         assert version.tags == ("optimized",)
 
     def test_tuple_tags(self) -> None:
@@ -538,7 +538,7 @@ class TestCreateRegistryStats:
         """Create default stats."""
         stats = create_registry_stats()
         assert stats.total_models == 0
-        assert stats.storage_used_gb == 0.0
+        assert stats.storage_used_gb == pytest.approx(0.0)
 
     def test_custom_stats(self) -> None:
         """Create custom stats."""
@@ -888,8 +888,8 @@ class TestCompareVersions:
             metrics={"accuracy": 0.90, "f1": 0.85},
         )
         comparison = compare_versions(v1, v2)
-        assert comparison["accuracy"]["diff"] == 0.05
-        assert comparison["f1"]["diff"] == 0.05
+        assert comparison["accuracy"]["diff"] == pytest.approx(0.05)
+        assert comparison["f1"]["diff"] == pytest.approx(0.05)
 
     def test_compare_with_missing_metrics(self) -> None:
         """Compare when metrics differ between versions."""
@@ -898,8 +898,8 @@ class TestCompareVersions:
         comparison = compare_versions(v1, v2)
         assert "accuracy" in comparison
         assert "loss" in comparison
-        assert comparison["accuracy"]["version_b"] == 0.0
-        assert comparison["loss"]["version_a"] == 0.0
+        assert comparison["accuracy"]["version_b"] == pytest.approx(0.0)
+        assert comparison["loss"]["version_a"] == pytest.approx(0.0)
 
     def test_compare_empty_metrics(self) -> None:
         """Compare versions with empty metrics."""
@@ -913,7 +913,7 @@ class TestCompareVersions:
         v1 = create_model_version("v1.0.0", metrics={"accuracy": 0.90})
         v2 = create_model_version("v2.0.0", metrics={"accuracy": 0.90})
         comparison = compare_versions(v1, v2)
-        assert comparison["accuracy"]["diff"] == 0.0
+        assert comparison["accuracy"]["diff"] == pytest.approx(0.0)
 
 
 class TestFormatRegistryStats:

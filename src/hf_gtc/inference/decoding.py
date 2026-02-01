@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class DecodingMethod(Enum):
     """Decoding method for text generation.
@@ -325,9 +327,7 @@ def validate_beam_config(config: BeamConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_return_sequences cannot exceed num_beams
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_beams <= 0:
         msg = f"num_beams must be positive, got {config.num_beams}"
@@ -382,9 +382,7 @@ def validate_sampling_config(config: SamplingConfig) -> None:
         Traceback (most recent call last):
         ValueError: top_p must be in (0.0, 1.0]
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.temperature <= 0:
         msg = f"temperature must be positive, got {config.temperature}"
@@ -432,9 +430,7 @@ def validate_contrastive_config(config: ContrastiveConfig) -> None:
         Traceback (most recent call last):
         ValueError: top_k must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not (0.0 <= config.penalty_alpha <= 1.0):
         msg = f"penalty_alpha must be in [0.0, 1.0], got {config.penalty_alpha}"
@@ -443,6 +439,39 @@ def validate_contrastive_config(config: ContrastiveConfig) -> None:
     if config.top_k <= 0:
         msg = f"top_k must be positive, got {config.top_k}"
         raise ValueError(msg)
+
+
+_SAMPLING_METHODS = frozenset(
+    {
+        DecodingMethod.SAMPLING,
+        DecodingMethod.NUCLEUS,
+        DecodingMethod.TOP_K,
+        DecodingMethod.TYPICAL,
+    }
+)
+
+
+def _validate_decoding_method_config(config: DecodingConfig) -> None:
+    """Validate method-specific decoding sub-configs."""
+    if config.method == DecodingMethod.BEAM:
+        if config.beam_config is None:
+            msg = "beam_config required for beam decoding"
+            raise ValueError(msg)
+        validate_beam_config(config.beam_config)
+        return
+
+    if config.method in _SAMPLING_METHODS:
+        if config.sampling_config is None:
+            msg = "sampling_config required for sampling-based decoding"
+            raise ValueError(msg)
+        validate_sampling_config(config.sampling_config)
+        return
+
+    if config.method == DecodingMethod.CONTRASTIVE:
+        if config.contrastive_config is None:
+            msg = "contrastive_config required for contrastive decoding"
+            raise ValueError(msg)
+        validate_contrastive_config(config.contrastive_config)
 
 
 def validate_decoding_config(config: DecodingConfig) -> None:
@@ -477,9 +506,7 @@ def validate_decoding_config(config: DecodingConfig) -> None:
         Traceback (most recent call last):
         ValueError: beam_config required for beam decoding
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_length <= 0:
         msg = f"max_length must be positive, got {config.max_length}"
@@ -489,29 +516,7 @@ def validate_decoding_config(config: DecodingConfig) -> None:
         msg = f"repetition_penalty must be positive, got {config.repetition_penalty}"
         raise ValueError(msg)
 
-    # Validate method-specific configs
-    if config.method == DecodingMethod.BEAM:
-        if config.beam_config is None:
-            msg = "beam_config required for beam decoding"
-            raise ValueError(msg)
-        validate_beam_config(config.beam_config)
-
-    if config.method in (
-        DecodingMethod.SAMPLING,
-        DecodingMethod.NUCLEUS,
-        DecodingMethod.TOP_K,
-        DecodingMethod.TYPICAL,
-    ):
-        if config.sampling_config is None:
-            msg = "sampling_config required for sampling-based decoding"
-            raise ValueError(msg)
-        validate_sampling_config(config.sampling_config)
-
-    if config.method == DecodingMethod.CONTRASTIVE:
-        if config.contrastive_config is None:
-            msg = "contrastive_config required for contrastive decoding"
-            raise ValueError(msg)
-        validate_contrastive_config(config.contrastive_config)
+    _validate_decoding_method_config(config)
 
 
 def validate_decoding_stats(stats: DecodingStats) -> None:
@@ -539,9 +544,7 @@ def validate_decoding_stats(stats: DecodingStats) -> None:
         Traceback (most recent call last):
         ValueError: tokens_generated cannot be negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.tokens_generated < 0:
         msg = f"tokens_generated cannot be negative, got {stats.tokens_generated}"
@@ -1258,9 +1261,7 @@ def format_decoding_stats(stats: DecodingStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Decoding Statistics:",

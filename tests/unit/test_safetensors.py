@@ -446,27 +446,27 @@ class TestCalculateMemorySavings:
     def test_f32_to_f16(self) -> None:
         """Test F32 to F16 conversion."""
         savings = calculate_memory_savings("F32", "F16")
-        assert savings == 0.5
+        assert savings == pytest.approx(0.5)
 
     def test_f32_to_f32(self) -> None:
         """Test same dtype (no change)."""
         savings = calculate_memory_savings("F32", "F32")
-        assert savings == 1.0
+        assert savings == pytest.approx(1.0)
 
     def test_f16_to_f32(self) -> None:
         """Test F16 to F32 (increase)."""
         savings = calculate_memory_savings("F16", "F32")
-        assert savings == 2.0
+        assert savings == pytest.approx(2.0)
 
     def test_f32_to_i8(self) -> None:
         """Test F32 to I8 conversion."""
         savings = calculate_memory_savings("F32", "I8")
-        assert savings == 0.25
+        assert savings == pytest.approx(0.25)
 
     def test_i64_to_i32(self) -> None:
         """Test I64 to I32 conversion."""
         savings = calculate_memory_savings("I64", "I32")
-        assert savings == 0.5
+        assert savings == pytest.approx(0.5)
 
     def test_invalid_original_dtype(self) -> None:
         """Test invalid original dtype."""

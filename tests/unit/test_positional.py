@@ -142,7 +142,7 @@ class TestSinusoidalConfig:
         config = SinusoidalConfig(max_length=512, embed_dim=768, base=10000.0)
         assert config.max_length == 512
         assert config.embed_dim == 768
-        assert config.base == 10000.0
+        assert config.base == pytest.approx(10000.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -153,7 +153,7 @@ class TestSinusoidalConfig:
     def test_default_base(self) -> None:
         """Default base value."""
         config = SinusoidalConfig(max_length=512, embed_dim=768)
-        assert config.base == 10000.0
+        assert config.base == pytest.approx(10000.0)
 
 
 class TestRoPEConfig:
@@ -186,7 +186,7 @@ class TestRoPEConfig:
             scaling_factor=2.0,
         )
         assert config.scaling_type == RoPEScaling.LINEAR
-        assert config.scaling_factor == 2.0
+        assert config.scaling_factor == pytest.approx(2.0)
 
 
 class TestALiBiConfig:
@@ -458,7 +458,7 @@ class TestCreateSinusoidalConfig:
         config = create_sinusoidal_config()
         assert config.max_length == 512
         assert config.embed_dim == 768
-        assert config.base == 10000.0
+        assert config.base == pytest.approx(10000.0)
 
     def test_custom_max_length(self) -> None:
         """Create config with custom max length."""
@@ -473,7 +473,7 @@ class TestCreateSinusoidalConfig:
     def test_custom_base(self) -> None:
         """Create config with custom base."""
         config = create_sinusoidal_config(base=20000.0)
-        assert config.base == 20000.0
+        assert config.base == pytest.approx(20000.0)
 
     def test_zero_max_length_raises(self) -> None:
         """Zero max length raises ValueError."""
@@ -489,9 +489,9 @@ class TestCreateRoPEConfig:
         config = create_rope_config()
         assert config.dim == 64
         assert config.max_position == 4096
-        assert config.base == 10000.0
+        assert config.base == pytest.approx(10000.0)
         assert config.scaling_type is None
-        assert config.scaling_factor == 1.0
+        assert config.scaling_factor == pytest.approx(1.0)
 
     def test_custom_dim(self) -> None:
         """Create config with custom dim."""
@@ -507,7 +507,7 @@ class TestCreateRoPEConfig:
         """Create config with scaling type."""
         config = create_rope_config(scaling_type="linear", scaling_factor=2.0)
         assert config.scaling_type == RoPEScaling.LINEAR
-        assert config.scaling_factor == 2.0
+        assert config.scaling_factor == pytest.approx(2.0)
 
     def test_invalid_scaling_type_raises(self) -> None:
         """Invalid scaling type raises ValueError."""
@@ -741,15 +741,15 @@ class TestCalculateSinusoidalEmbeddings:
         """Position 0 has sin(0)=0 for even indices."""
         embeddings = calculate_sinusoidal_embeddings(2, 4)
         # Even indices are sin values, which at position 0 should be 0
-        assert embeddings[0][0] == 0.0
-        assert embeddings[0][2] == 0.0
+        assert embeddings[0][0] == pytest.approx(0.0)
+        assert embeddings[0][2] == pytest.approx(0.0)
 
     def test_position_zero_cos_values(self) -> None:
         """Position 0 has cos(0)=1 for odd indices."""
         embeddings = calculate_sinusoidal_embeddings(2, 4)
         # Odd indices are cos values, which at position 0 should be 1
-        assert embeddings[0][1] == 1.0
-        assert embeddings[0][3] == 1.0
+        assert embeddings[0][1] == pytest.approx(1.0)
+        assert embeddings[0][3] == pytest.approx(1.0)
 
     def test_zero_max_length_raises(self) -> None:
         """Zero max length raises ValueError."""
@@ -918,7 +918,7 @@ class TestEstimatePositionMemory:
     def test_none_memory(self) -> None:
         """No positional encoding uses no memory."""
         mem = estimate_position_memory("none", 4096)
-        assert mem == 0.0
+        assert mem == pytest.approx(0.0)
 
     def test_invalid_pos_type_raises(self) -> None:
         """Invalid pos type raises ValueError."""

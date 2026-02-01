@@ -141,9 +141,9 @@ class TestBM25Config:
     def test_create_config(self) -> None:
         """Create BM25 config."""
         config = BM25Config(k1=1.5, b=0.75, epsilon=0.25)
-        assert config.k1 == 1.5
-        assert config.b == 0.75
-        assert config.epsilon == 0.25
+        assert config.k1 == pytest.approx(1.5)
+        assert config.b == pytest.approx(0.75)
+        assert config.epsilon == pytest.approx(0.25)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -193,8 +193,8 @@ class TestHybridConfig:
             fusion_method=FusionMethod.RRF,
             top_k=10,
         )
-        assert config.dense_weight == 0.7
-        assert config.sparse_weight == 0.3
+        assert config.dense_weight == pytest.approx(0.7)
+        assert config.sparse_weight == pytest.approx(0.3)
         assert config.fusion_method == FusionMethod.RRF
         assert config.top_k == 10
 
@@ -241,10 +241,10 @@ class TestHybridStats:
             hybrid_recall=0.85,
             fusion_improvement=0.10,
         )
-        assert stats.dense_recall == 0.75
-        assert stats.sparse_recall == 0.70
-        assert stats.hybrid_recall == 0.85
-        assert stats.fusion_improvement == 0.10
+        assert stats.dense_recall == pytest.approx(0.75)
+        assert stats.sparse_recall == pytest.approx(0.70)
+        assert stats.hybrid_recall == pytest.approx(0.85)
+        assert stats.fusion_improvement == pytest.approx(0.10)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -425,24 +425,24 @@ class TestCreateBM25Config:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_bm25_config()
-        assert config.k1 == 1.5
-        assert config.b == 0.75
-        assert config.epsilon == 0.25
+        assert config.k1 == pytest.approx(1.5)
+        assert config.b == pytest.approx(0.75)
+        assert config.epsilon == pytest.approx(0.25)
 
     def test_custom_k1(self) -> None:
         """Create config with custom k1."""
         config = create_bm25_config(k1=2.0)
-        assert config.k1 == 2.0
+        assert config.k1 == pytest.approx(2.0)
 
     def test_custom_b(self) -> None:
         """Create config with custom b."""
         config = create_bm25_config(b=0.5)
-        assert config.b == 0.5
+        assert config.b == pytest.approx(0.5)
 
     def test_custom_epsilon(self) -> None:
         """Create config with custom epsilon."""
         config = create_bm25_config(epsilon=0.1)
-        assert config.epsilon == 0.1
+        assert config.epsilon == pytest.approx(0.1)
 
     def test_negative_k1_raises(self) -> None:
         """Negative k1 raises ValueError."""
@@ -486,7 +486,7 @@ class TestCreateSparseConfig:
         """Create config with custom BM25 config."""
         bm25 = create_bm25_config(k1=2.0)
         config = create_sparse_config(bm25_config=bm25)
-        assert config.bm25_config.k1 == 2.0
+        assert config.bm25_config.k1 == pytest.approx(2.0)
 
     def test_invalid_method_raises(self) -> None:
         """Invalid method raises ValueError."""
@@ -505,16 +505,16 @@ class TestCreateHybridConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_hybrid_config()
-        assert config.dense_weight == 0.7
-        assert config.sparse_weight == 0.3
+        assert config.dense_weight == pytest.approx(0.7)
+        assert config.sparse_weight == pytest.approx(0.3)
         assert config.fusion_method == FusionMethod.RRF
         assert config.top_k == 10
 
     def test_custom_weights(self) -> None:
         """Create config with custom weights."""
         config = create_hybrid_config(dense_weight=0.6, sparse_weight=0.4)
-        assert config.dense_weight == 0.6
-        assert config.sparse_weight == 0.4
+        assert config.dense_weight == pytest.approx(0.6)
+        assert config.sparse_weight == pytest.approx(0.4)
 
     @pytest.mark.parametrize(
         ("method", "expected"),
@@ -756,7 +756,7 @@ class TestCalculateBM25Score:
         score = calculate_bm25_score(
             tf=0, df=100, doc_len=500, avg_doc_len=400.0, num_docs=10000
         )
-        assert score == 0.0
+        assert score == pytest.approx(0.0)
 
     def test_higher_tf_higher_score(self) -> None:
         """Higher term frequency gives higher score."""

@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class DynamicsMetric(Enum):
     """Metrics for analyzing training dynamics.
@@ -388,9 +390,7 @@ def validate_dynamics_stats(stats: DynamicsStats) -> None:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if not 0 <= stats.stability_score <= 1:
         msg = f"stability_score must be in [0, 1], got {stats.stability_score}"
@@ -715,44 +715,57 @@ def _detect_trend(values: list[float], window_size: int = 10) -> TrendType:
     if len(values) < 2:
         return TrendType.PLATEAU
 
-    # Use recent window for analysis
     recent = values[-min(window_size, len(values)) :]
-
-    # Calculate differences
     diffs = [recent[i + 1] - recent[i] for i in range(len(recent) - 1)]
 
     if not diffs:
         return TrendType.PLATEAU
 
-    # Count directions
-    decreasing_count = sum(1 for d in diffs if d < 0)
-    increasing_count = sum(1 for d in diffs if d > 0)
-    total = len(diffs)
+    stats = _compute_trend_stats(recent, diffs)
+    return _classify_trend(recent, stats)
 
-    # Calculate variance for oscillation detection
+
+def _compute_trend_stats(recent: list[float], diffs: list[float]) -> dict[str, float]:
+    """Compute statistics used for trend classification."""
+    decreasing = sum(1 for d in diffs if d < 0)
+    increasing = sum(1 for d in diffs if d > 0)
+    total = len(diffs)
     mean_val = sum(recent) / len(recent)
     variance = sum((v - mean_val) ** 2 for v in recent) / len(recent)
-    std_dev = math.sqrt(variance) if variance > 0 else 0
+    std_dev = math.sqrt(variance) if variance > 0 else 0.0
+    avg_increase = sum(d for d in diffs if d > 0) / max(increasing, 1)
+    return {
+        "decreasing": decreasing,
+        "increasing": increasing,
+        "total": total,
+        "mean_val": mean_val,
+        "std_dev": std_dev,
+        "avg_increase": avg_increase,
+    }
 
-    # Check for divergence (exponential growth)
-    if len(recent) >= 3:
-        avg_increase = sum(d for d in diffs if d > 0) / max(increasing_count, 1)
-        if increasing_count > 0.8 * total and avg_increase > mean_val * 0.1:
-            return TrendType.DIVERGING
 
-    # Determine trend
-    if (
-        std_dev > mean_val * 0.3
-        and abs(decreasing_count - increasing_count) < total * 0.3
-    ):
+def _classify_trend(recent: list[float], s: dict[str, float]) -> TrendType:
+    """Classify a trend based on precomputed statistics."""
+    total = s["total"]
+    inc = s["increasing"]
+    dec = s["decreasing"]
+    mean_val = s["mean_val"]
+    std_dev = s["std_dev"]
+
+    # Check for divergence
+    if len(recent) >= 3 and inc > 0.8 * total and s["avg_increase"] > mean_val * 0.1:
+        return TrendType.DIVERGING
+
+    # Check for oscillation
+    if std_dev > mean_val * 0.3 and abs(dec - inc) < total * 0.3:
         return TrendType.OSCILLATING
 
-    if decreasing_count > 0.7 * total:
+    if dec > 0.7 * total:
         return TrendType.DECREASING
-    if increasing_count > 0.7 * total:
+    if inc > 0.7 * total:
         return TrendType.INCREASING
 
-    # Check for plateau (small relative change)
+    # Check for plateau
     total_change = abs(recent[-1] - recent[0])
     if mean_val != 0 and total_change / abs(mean_val) < 0.05:
         return TrendType.PLATEAU
@@ -1081,9 +1094,7 @@ def format_dynamics_report(
         msg = "curve cannot be None"
         raise ValueError(msg)
 
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "=" * 50,

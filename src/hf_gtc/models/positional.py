@@ -313,6 +313,31 @@ def validate_alibi_config(config: ALiBiConfig) -> None:
         raise ValueError(msg)
 
 
+def _validate_positional_type_config(config: PositionalConfig) -> None:
+    """Validate positional sub-config based on type."""
+    pos_validators: dict[PositionalType, tuple[str, str, object]] = {
+        PositionalType.ROTARY: (
+            "rope_config",
+            "ROTARY positional type",
+            validate_rope_config,
+        ),
+        PositionalType.ALIBI: (
+            "alibi_config",
+            "ALIBI positional type",
+            validate_alibi_config,
+        ),
+    }
+    entry = pos_validators.get(config.pos_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
+
+
 def validate_positional_config(config: PositionalConfig) -> None:
     """Validate positional configuration.
 
@@ -345,17 +370,7 @@ def validate_positional_config(config: PositionalConfig) -> None:
         msg = f"max_length must be positive, got {config.max_length}"
         raise ValueError(msg)
 
-    if config.pos_type == PositionalType.ROTARY:
-        if config.rope_config is None:
-            msg = "rope_config required for ROTARY positional type"
-            raise ValueError(msg)
-        validate_rope_config(config.rope_config)
-
-    if config.pos_type == PositionalType.ALIBI:
-        if config.alibi_config is None:
-            msg = "alibi_config required for ALIBI positional type"
-            raise ValueError(msg)
-        validate_alibi_config(config.alibi_config)
+    _validate_positional_type_config(config)
 
 
 def create_sinusoidal_config(

@@ -729,6 +729,15 @@ def detect_available_devices() -> list[str]:
     """
     available: list[str] = ["cpu"]  # CPU always available
 
+    _detect_torch_devices(available)
+    _detect_tpu(available)
+    _detect_xpu(available)
+
+    return available
+
+
+def _detect_torch_devices(available: list[str]) -> None:
+    """Detect CUDA and MPS via PyTorch."""
     try:
         import torch
 
@@ -739,7 +748,9 @@ def detect_available_devices() -> list[str]:
     except ImportError:
         pass
 
-    # TPU detection (JAX)
+
+def _detect_tpu(available: list[str]) -> None:
+    """Detect TPU via JAX."""
     try:
         import jax  # type: ignore[import-not-found]
 
@@ -749,7 +760,9 @@ def detect_available_devices() -> list[str]:
     except (ImportError, RuntimeError):
         pass
 
-    # XPU detection (Intel)
+
+def _detect_xpu(available: list[str]) -> None:
+    """Detect Intel XPU via PyTorch."""
     try:
         import torch
 
@@ -757,8 +770,6 @@ def detect_available_devices() -> list[str]:
             available.append("xpu")
     except (ImportError, AttributeError):
         pass
-
-    return available
 
 
 def get_optimal_device_map(

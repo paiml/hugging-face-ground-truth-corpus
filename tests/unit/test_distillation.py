@@ -242,7 +242,7 @@ class TestDistillationLossConfig:
             normalize_features=True,
         )
         assert config.loss_type == DistillationLoss.KL_DIVERGENCE
-        assert config.temperature == 4.0
+        assert config.temperature == pytest.approx(4.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -287,7 +287,7 @@ class TestDistillationConfig:
             warmup_steps=100,
         )
         assert config.method == DistillationMethod.RESPONSE_BASED
-        assert config.temperature == 4.0
+        assert config.temperature == pytest.approx(4.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -317,7 +317,7 @@ class TestDistillationStats:
             compression_ratio=0.25,
         )
         assert stats.total_steps == 1000
-        assert stats.compression_ratio == 0.25
+        assert stats.compression_ratio == pytest.approx(0.25)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -573,8 +573,8 @@ class TestCreateDistillationConfig:
         """Create default config."""
         config = create_distillation_config()
         assert config.method == DistillationMethod.RESPONSE_BASED
-        assert config.temperature == 4.0
-        assert config.alpha == 0.5
+        assert config.temperature == pytest.approx(4.0)
+        assert config.alpha == pytest.approx(0.5)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -584,8 +584,8 @@ class TestCreateDistillationConfig:
             alpha=0.8,
         )
         assert config.method == DistillationMethod.FEATURE_BASED
-        assert config.temperature == 2.0
-        assert config.alpha == 0.8
+        assert config.temperature == pytest.approx(2.0)
+        assert config.alpha == pytest.approx(0.8)
 
     def test_with_enum_method(self) -> None:
         """Create with enum method."""
@@ -687,8 +687,8 @@ class TestCreateLossConfig:
         """Create default config."""
         config = create_loss_config()
         assert config.loss_type == DistillationLoss.KL_DIVERGENCE
-        assert config.temperature == 4.0
-        assert config.alpha == 0.5
+        assert config.temperature == pytest.approx(4.0)
+        assert config.alpha == pytest.approx(0.5)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -698,7 +698,7 @@ class TestCreateLossConfig:
             beta=0.5,
         )
         assert config.loss_type == DistillationLoss.MSE
-        assert config.beta == 0.5
+        assert config.beta == pytest.approx(0.5)
 
     def test_with_enum_loss_type(self) -> None:
         """Create with enum loss type."""
@@ -744,7 +744,7 @@ class TestCreateDistillationStats:
         """Create default stats."""
         stats = create_distillation_stats()
         assert stats.total_steps == 0
-        assert stats.compression_ratio == 1.0
+        assert stats.compression_ratio == pytest.approx(1.0)
 
     def test_custom_stats(self) -> None:
         """Create custom stats."""
@@ -754,7 +754,7 @@ class TestCreateDistillationStats:
             compression_ratio=0.25,
         )
         assert stats.total_steps == 1000
-        assert stats.compression_ratio == 0.25
+        assert stats.compression_ratio == pytest.approx(0.25)
 
     def test_negative_steps_raises(self) -> None:
         """Negative total_steps raises ValueError."""
@@ -897,9 +897,9 @@ class TestCalculateTemperatureAtStep:
             temperature=4.0,
             temperature_schedule="constant",
         )
-        assert calculate_temperature_at_step(config, 0, 1000) == 4.0
-        assert calculate_temperature_at_step(config, 500, 1000) == 4.0
-        assert calculate_temperature_at_step(config, 1000, 1000) == 4.0
+        assert calculate_temperature_at_step(config, 0, 1000) == pytest.approx(4.0)
+        assert calculate_temperature_at_step(config, 500, 1000) == pytest.approx(4.0)
+        assert calculate_temperature_at_step(config, 1000, 1000) == pytest.approx(4.0)
 
     def test_linear_decay(self) -> None:
         """Linear decay decreases linearly."""
@@ -908,7 +908,7 @@ class TestCalculateTemperatureAtStep:
             final_temperature=1.0,
             temperature_schedule="linear_decay",
         )
-        assert calculate_temperature_at_step(config, 0, 1000) == 4.0
+        assert calculate_temperature_at_step(config, 0, 1000) == pytest.approx(4.0)
         assert calculate_temperature_at_step(config, 500, 1000) == pytest.approx(2.5)
         assert calculate_temperature_at_step(config, 1000, 1000) == pytest.approx(1.0)
 
@@ -1104,27 +1104,27 @@ class TestGetRecommendedDistillationConfig:
     def test_classification_config(self) -> None:
         """Get config for classification task."""
         config = get_recommended_distillation_config("classification")
-        assert config.temperature == 4.0
-        assert config.alpha == 0.7
+        assert config.temperature == pytest.approx(4.0)
+        assert config.alpha == pytest.approx(0.7)
         assert config.method == DistillationMethod.RESPONSE_BASED
 
     def test_generation_config(self) -> None:
         """Get config for generation task."""
         config = get_recommended_distillation_config("generation")
-        assert config.temperature == 2.0
-        assert config.alpha == 0.5
+        assert config.temperature == pytest.approx(2.0)
+        assert config.alpha == pytest.approx(0.5)
 
     def test_embedding_config(self) -> None:
         """Get config for embedding task."""
         config = get_recommended_distillation_config("embedding")
         assert config.method == DistillationMethod.FEATURE_BASED
-        assert config.alpha == 0.8
+        assert config.alpha == pytest.approx(0.8)
 
     def test_qa_config(self) -> None:
         """Get config for QA task."""
         config = get_recommended_distillation_config("qa")
-        assert config.temperature == 3.0
-        assert config.alpha == 0.6
+        assert config.temperature == pytest.approx(3.0)
+        assert config.alpha == pytest.approx(0.6)
 
     def test_invalid_task_raises(self) -> None:
         """Invalid task raises ValueError."""

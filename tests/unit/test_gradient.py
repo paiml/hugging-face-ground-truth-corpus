@@ -136,9 +136,9 @@ class TestClippingConfig:
             norm_type=2.0,
         )
         assert config.method == ClippingMethod.NORM
-        assert config.max_norm == 1.0
-        assert config.max_value == 1.0
-        assert config.norm_type == 2.0
+        assert config.max_norm == pytest.approx(1.0)
+        assert config.max_value == pytest.approx(1.0)
+        assert config.norm_type == pytest.approx(2.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -164,9 +164,9 @@ class TestScalingConfig:
             backoff_factor=0.5,
         )
         assert config.method == ScalingMethod.DYNAMIC
-        assert config.initial_scale == 65536.0
-        assert config.growth_factor == 2.0
-        assert config.backoff_factor == 0.5
+        assert config.initial_scale == pytest.approx(65536.0)
+        assert config.growth_factor == pytest.approx(2.0)
+        assert config.backoff_factor == pytest.approx(0.5)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -239,8 +239,8 @@ class TestGradientStats:
             overflow_count=2,
             effective_batch_size=32,
         )
-        assert stats.grad_norm == 0.5
-        assert stats.clipped_ratio == 0.1
+        assert stats.grad_norm == pytest.approx(0.5)
+        assert stats.clipped_ratio == pytest.approx(0.1)
         assert stats.overflow_count == 2
         assert stats.effective_batch_size == 32
 
@@ -466,21 +466,21 @@ class TestCreateClippingConfig:
         """Create default config."""
         config = create_clipping_config()
         assert config.method == ClippingMethod.NORM
-        assert config.max_norm == 1.0
-        assert config.max_value == 1.0
-        assert config.norm_type == 2.0
+        assert config.max_norm == pytest.approx(1.0)
+        assert config.max_value == pytest.approx(1.0)
+        assert config.norm_type == pytest.approx(2.0)
 
     def test_value_clipping(self) -> None:
         """Create value clipping config."""
         config = create_clipping_config(method="value", max_value=0.5)
         assert config.method == ClippingMethod.VALUE
-        assert config.max_value == 0.5
+        assert config.max_value == pytest.approx(0.5)
 
     def test_adaptive_clipping(self) -> None:
         """Create adaptive clipping config."""
         config = create_clipping_config(method="adaptive", max_norm=2.0)
         assert config.method == ClippingMethod.ADAPTIVE
-        assert config.max_norm == 2.0
+        assert config.max_norm == pytest.approx(2.0)
 
     def test_no_clipping(self) -> None:
         """Create no clipping config."""
@@ -490,7 +490,7 @@ class TestCreateClippingConfig:
     def test_custom_norm_type(self) -> None:
         """Create config with custom norm type."""
         config = create_clipping_config(norm_type=1.0)
-        assert config.norm_type == 1.0
+        assert config.norm_type == pytest.approx(1.0)
 
     def test_invalid_method_raises(self) -> None:
         """Invalid method raises ValueError."""
@@ -505,15 +505,15 @@ class TestCreateScalingConfig:
         """Create default config."""
         config = create_scaling_config()
         assert config.method == ScalingMethod.DYNAMIC
-        assert config.initial_scale == 65536.0
-        assert config.growth_factor == 2.0
-        assert config.backoff_factor == 0.5
+        assert config.initial_scale == pytest.approx(65536.0)
+        assert config.growth_factor == pytest.approx(2.0)
+        assert config.backoff_factor == pytest.approx(0.5)
 
     def test_static_config(self) -> None:
         """Create static config."""
         config = create_scaling_config(method="static", initial_scale=1.0)
         assert config.method == ScalingMethod.STATIC
-        assert config.initial_scale == 1.0
+        assert config.initial_scale == pytest.approx(1.0)
 
     def test_loss_scale_config(self) -> None:
         """Create loss scale config."""
@@ -523,7 +523,7 @@ class TestCreateScalingConfig:
     def test_custom_growth_factor(self) -> None:
         """Create config with custom growth factor."""
         config = create_scaling_config(growth_factor=4.0)
-        assert config.growth_factor == 4.0
+        assert config.growth_factor == pytest.approx(4.0)
 
     def test_invalid_method_raises(self) -> None:
         """Invalid method raises ValueError."""
@@ -603,8 +603,8 @@ class TestCreateGradientStats:
     def test_default_stats(self) -> None:
         """Create default stats."""
         stats = create_gradient_stats()
-        assert stats.grad_norm == 0.0
-        assert stats.clipped_ratio == 0.0
+        assert stats.grad_norm == pytest.approx(0.0)
+        assert stats.clipped_ratio == pytest.approx(0.0)
         assert stats.overflow_count == 0
         assert stats.effective_batch_size == 1
 
@@ -616,8 +616,8 @@ class TestCreateGradientStats:
             overflow_count=2,
             effective_batch_size=32,
         )
-        assert stats.grad_norm == 0.5
-        assert stats.clipped_ratio == 0.1
+        assert stats.grad_norm == pytest.approx(0.5)
+        assert stats.clipped_ratio == pytest.approx(0.1)
         assert stats.overflow_count == 2
         assert stats.effective_batch_size == 32
 
@@ -628,27 +628,27 @@ class TestCalculateGradNorm:
     def test_l2_norm_3_4(self) -> None:
         """Calculate L2 norm of [3, 4]."""
         result = calculate_grad_norm([3.0, 4.0], 2.0)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_l1_norm(self) -> None:
         """Calculate L1 norm."""
         result = calculate_grad_norm([1.0, 2.0, 3.0], 1.0)
-        assert result == 6.0
+        assert result == pytest.approx(6.0)
 
     def test_linf_norm(self) -> None:
         """Calculate Linf norm."""
         result = calculate_grad_norm([1.0, 5.0, 2.0], float("inf"))
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_l2_norm_single_element(self) -> None:
         """Calculate L2 norm of single element."""
         result = calculate_grad_norm([5.0], 2.0)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_negative_gradients(self) -> None:
         """Calculate norm with negative gradients."""
         result = calculate_grad_norm([-3.0, -4.0], 2.0)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_empty_gradients_raises(self) -> None:
         """Empty gradients raises ValueError."""
@@ -675,7 +675,7 @@ class TestClipGradients:
         grads = [0.6, 0.8]  # norm = 1.0
         clipped, ratio = clip_gradients(grads, config)
         assert clipped == [0.6, 0.8]
-        assert ratio == 0.0
+        assert ratio == pytest.approx(0.0)
 
     def test_norm_clipping_over_threshold(self) -> None:
         """Norm clipping when over threshold."""
@@ -684,7 +684,7 @@ class TestClipGradients:
         clipped, ratio = clip_gradients(grads, config)
         clipped_norm = calculate_grad_norm(clipped, 2.0)
         assert abs(clipped_norm - 1.0) < 0.01
-        assert ratio == 1.0
+        assert ratio == pytest.approx(1.0)
 
     def test_value_clipping(self) -> None:
         """Value clipping clips individual values."""
@@ -700,7 +700,7 @@ class TestClipGradients:
         grads = [1.0, 2.0, 3.0]
         clipped, ratio = clip_gradients(grads, config)
         assert clipped == [1.0, 2.0, 3.0]
-        assert ratio == 0.0
+        assert ratio == pytest.approx(0.0)
 
     def test_adaptive_clipping(self) -> None:
         """Adaptive clipping uses stricter threshold."""
@@ -709,7 +709,7 @@ class TestClipGradients:
         clipped, ratio = clip_gradients(grads, config)
         clipped_norm = calculate_grad_norm(clipped, 2.0)
         assert clipped_norm < 1.0  # Stricter threshold (0.9 * 1.0)
-        assert ratio == 1.0
+        assert ratio == pytest.approx(1.0)
 
     def test_empty_gradients_raises(self) -> None:
         """Empty gradients raises ValueError."""
@@ -898,12 +898,12 @@ class TestGetRecommendedGradientConfig:
         """Get config for 7B fine tuning."""
         config = get_recommended_gradient_config("7b", "fine_tuning")
         assert config.clipping_config.method == ClippingMethod.NORM
-        assert config.clipping_config.max_norm == 1.0
+        assert config.clipping_config.max_norm == pytest.approx(1.0)
 
     def test_fine_tuning_70b(self) -> None:
         """Get config for 70B fine tuning."""
         config = get_recommended_gradient_config("70b", "fine_tuning")
-        assert config.clipping_config.max_norm == 2.0
+        assert config.clipping_config.max_norm == pytest.approx(2.0)
 
     def test_pretraining(self) -> None:
         """Get config for pretraining."""
@@ -913,7 +913,7 @@ class TestGetRecommendedGradientConfig:
     def test_rlhf(self) -> None:
         """Get config for RLHF."""
         config = get_recommended_gradient_config("7b", "rlhf")
-        assert config.clipping_config.max_norm == 0.5
+        assert config.clipping_config.max_norm == pytest.approx(0.5)
 
     def test_custom_accumulation_steps(self) -> None:
         """Get config with custom accumulation steps."""

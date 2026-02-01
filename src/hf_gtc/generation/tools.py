@@ -30,6 +30,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ToolFormat(Enum):
     """Supported tool definition formats.
@@ -388,9 +390,7 @@ def validate_tool_result(result: ToolResult) -> None:
         Traceback (most recent call last):
         ValueError: call_id cannot be empty
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if not result.call_id:
         msg = "call_id cannot be empty"
@@ -427,9 +427,7 @@ def validate_tool_config(config: ToolConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_calls must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_calls <= 0:
         msg = f"max_calls must be positive, got {config.max_calls}"
@@ -1015,38 +1013,44 @@ def _extract_json_objects(text: str) -> list[str]:
 
     while i < len(text):
         if text[i] == "{":
-            # Found start of potential JSON object
-            start = i
-            depth = 1
-            i += 1
-            in_string = False
-            escape_next = False
-
-            while i < len(text) and depth > 0:
-                char = text[i]
-
-                if escape_next:
-                    escape_next = False
-                elif char == "\\":
-                    escape_next = True
-                elif char == '"' and not escape_next:
-                    in_string = not in_string
-                elif not in_string:
-                    if char == "{":
-                        depth += 1
-                    elif char == "}":
-                        depth -= 1
-                i += 1
-
-            if depth == 0:
-                obj_str = text[start:i]
-                # Only include if it looks like it has a "name" field
-                if '"name"' in obj_str:
-                    objects.append(obj_str)
+            obj_str, i = _match_json_object(text, i)
+            if obj_str is not None and '"name"' in obj_str:
+                objects.append(obj_str)
         else:
             i += 1
 
     return objects
+
+
+def _match_json_object(text: str, start: int) -> tuple[str | None, int]:
+    """Match a JSON object starting at the given position.
+
+    Returns:
+        Tuple of (matched_string_or_None, next_position).
+    """
+    depth = 1
+    i = start + 1
+    in_string = False
+    escape_next = False
+
+    while i < len(text) and depth > 0:
+        char = text[i]
+        if escape_next:
+            escape_next = False
+        elif char == "\\":
+            escape_next = True
+        elif char == '"' and not escape_next:
+            in_string = not in_string
+        elif not in_string:
+            if char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+        i += 1
+
+    if depth == 0:
+        return text[start:i], i
+    return None, i
 
 
 def _parse_tool_calls_json(
@@ -1309,9 +1313,7 @@ def format_tool_stats(stats: ToolStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Total calls: {stats.total_calls}",

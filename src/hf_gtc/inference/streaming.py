@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     from typing import Any
 
+from hf_gtc._validation import validate_not_none
+
 
 class StreamingMode(Enum):
     """Streaming output granularity modes.
@@ -259,9 +261,7 @@ def validate_stream_config(config: StreamConfig) -> None:
         Traceback (most recent call last):
         ValueError: buffer_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.chunk_size <= 0:
         msg = f"chunk_size must be positive, got {config.chunk_size}"
@@ -311,9 +311,7 @@ def validate_chunk_config(config: ChunkConfig) -> None:
         Traceback (most recent call last):
         ValueError: min_chunk_tokens cannot exceed max_chunk_tokens
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.min_chunk_tokens <= 0:
         msg = f"min_chunk_tokens must be positive, got {config.min_chunk_tokens}"

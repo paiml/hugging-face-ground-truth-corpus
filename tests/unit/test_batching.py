@@ -200,7 +200,7 @@ class TestQueueConfig:
         )
         assert config.max_queue_size == 500
         assert config.overflow_policy == QueueOverflowPolicy.WAIT
-        assert config.timeout_seconds == 60.0
+        assert config.timeout_seconds == pytest.approx(60.0)
 
 
 class TestLatencySLO:
@@ -214,8 +214,8 @@ class TestLatencySLO:
             p99_ms=200.0,
             max_ms=500.0,
         )
-        assert slo.p50_ms == 50.0
-        assert slo.p99_ms == 200.0
+        assert slo.p50_ms == pytest.approx(50.0)
+        assert slo.p99_ms == pytest.approx(200.0)
 
     def test_slo_is_frozen(self) -> None:
         """SLO is immutable."""
@@ -226,10 +226,10 @@ class TestLatencySLO:
     def test_all_fields_accessible(self) -> None:
         """All fields are accessible."""
         slo = LatencySLO(25.0, 75.0, 150.0, 300.0)
-        assert slo.p50_ms == 25.0
-        assert slo.p90_ms == 75.0
-        assert slo.p99_ms == 150.0
-        assert slo.max_ms == 300.0
+        assert slo.p50_ms == pytest.approx(25.0)
+        assert slo.p90_ms == pytest.approx(75.0)
+        assert slo.p99_ms == pytest.approx(150.0)
+        assert slo.max_ms == pytest.approx(300.0)
 
 
 class TestBatchingStats:
@@ -244,7 +244,7 @@ class TestBatchingStats:
             slo_violations=42,
         )
         assert stats.requests_processed == 10000
-        assert stats.avg_batch_size == 24.5
+        assert stats.avg_batch_size == pytest.approx(24.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -256,8 +256,8 @@ class TestBatchingStats:
         """All fields are accessible."""
         stats = BatchingStats(5000, 16.0, 10.0, 5)
         assert stats.requests_processed == 5000
-        assert stats.avg_batch_size == 16.0
-        assert stats.avg_wait_time_ms == 10.0
+        assert stats.avg_batch_size == pytest.approx(16.0)
+        assert stats.avg_wait_time_ms == pytest.approx(10.0)
         assert stats.slo_violations == 5
 
 
@@ -522,7 +522,7 @@ class TestCreateQueueConfig:
         config = create_queue_config()
         assert config.max_queue_size == 1000
         assert config.overflow_policy == QueueOverflowPolicy.REJECT
-        assert config.timeout_seconds == 30.0
+        assert config.timeout_seconds == pytest.approx(30.0)
 
     def test_custom_queue_size(self) -> None:
         """Create config with custom queue size."""
@@ -537,7 +537,7 @@ class TestCreateQueueConfig:
     def test_custom_timeout(self) -> None:
         """Create config with custom timeout."""
         config = create_queue_config(timeout_seconds=60.0)
-        assert config.timeout_seconds == 60.0
+        assert config.timeout_seconds == pytest.approx(60.0)
 
     def test_invalid_overflow_policy_raises(self) -> None:
         """Invalid overflow policy raises ValueError."""
@@ -556,30 +556,30 @@ class TestCreateLatencySLO:
     def test_default_slo(self) -> None:
         """Create default SLO."""
         slo = create_latency_slo()
-        assert slo.p50_ms == 50.0
-        assert slo.p90_ms == 100.0
-        assert slo.p99_ms == 200.0
-        assert slo.max_ms == 500.0
+        assert slo.p50_ms == pytest.approx(50.0)
+        assert slo.p90_ms == pytest.approx(100.0)
+        assert slo.p99_ms == pytest.approx(200.0)
+        assert slo.max_ms == pytest.approx(500.0)
 
     def test_custom_p50(self) -> None:
         """Create SLO with custom p50."""
         slo = create_latency_slo(p50_ms=25.0)
-        assert slo.p50_ms == 25.0
+        assert slo.p50_ms == pytest.approx(25.0)
 
     def test_custom_p90(self) -> None:
         """Create SLO with custom p90."""
         slo = create_latency_slo(p90_ms=150.0)
-        assert slo.p90_ms == 150.0
+        assert slo.p90_ms == pytest.approx(150.0)
 
     def test_custom_p99(self) -> None:
         """Create SLO with custom p99."""
         slo = create_latency_slo(p99_ms=150.0)
-        assert slo.p99_ms == 150.0
+        assert slo.p99_ms == pytest.approx(150.0)
 
     def test_custom_max(self) -> None:
         """Create SLO with custom max."""
         slo = create_latency_slo(max_ms=1000.0)
-        assert slo.max_ms == 1000.0
+        assert slo.max_ms == pytest.approx(1000.0)
 
     def test_negative_p50_raises(self) -> None:
         """Negative p50 raises ValueError."""
@@ -594,8 +594,8 @@ class TestCreateBatchingStats:
         """Create default stats."""
         stats = create_batching_stats()
         assert stats.requests_processed == 0
-        assert stats.avg_batch_size == 0.0
-        assert stats.avg_wait_time_ms == 0.0
+        assert stats.avg_batch_size == pytest.approx(0.0)
+        assert stats.avg_wait_time_ms == pytest.approx(0.0)
         assert stats.slo_violations == 0
 
     def test_custom_requests(self) -> None:
@@ -606,12 +606,12 @@ class TestCreateBatchingStats:
     def test_custom_batch_size(self) -> None:
         """Create stats with custom avg batch size."""
         stats = create_batching_stats(avg_batch_size=28.5)
-        assert stats.avg_batch_size == 28.5
+        assert stats.avg_batch_size == pytest.approx(28.5)
 
     def test_custom_wait_time(self) -> None:
         """Create stats with custom avg wait time."""
         stats = create_batching_stats(avg_wait_time_ms=10.0)
-        assert stats.avg_wait_time_ms == 10.0
+        assert stats.avg_wait_time_ms == pytest.approx(10.0)
 
     def test_custom_violations(self) -> None:
         """Create stats with custom violations."""
@@ -857,7 +857,7 @@ class TestEstimateThroughput:
         # 1000 / 100 = 10 batches per second
         # 16384 * 10 = 163840 tokens per second
         throughput = estimate_throughput(32, 512, 100.0)
-        assert throughput == 163840.0
+        assert throughput == pytest.approx(163840.0)
 
     def test_larger_batch_higher_throughput(self) -> None:
         """Larger batch gives higher throughput."""

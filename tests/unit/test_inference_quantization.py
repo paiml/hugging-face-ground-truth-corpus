@@ -798,19 +798,19 @@ class TestCalculateBitsPerWeight:
 
     def test_int8(self) -> None:
         """Test INT8 bits per weight."""
-        assert calculate_bits_per_weight("int8") == 8.0
+        assert calculate_bits_per_weight("int8") == pytest.approx(8.0)
 
     def test_int4(self) -> None:
         """Test INT4 bits per weight."""
-        assert calculate_bits_per_weight("int4") == 4.0
+        assert calculate_bits_per_weight("int4") == pytest.approx(4.0)
 
     def test_q4_0(self) -> None:
         """Test GGUF q4_0 bits per weight."""
-        assert calculate_bits_per_weight("q4_0") == 4.5
+        assert calculate_bits_per_weight("q4_0") == pytest.approx(4.5)
 
     def test_fp16(self) -> None:
         """Test FP16 bits per weight."""
-        assert calculate_bits_per_weight("fp16") == 16.0
+        assert calculate_bits_per_weight("fp16") == pytest.approx(16.0)
 
     def test_invalid_raises_error(self) -> None:
         """Test that invalid type raises ValueError."""

@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class CheckpointStrategy(Enum):
     """Checkpointing strategies for memory optimization.
@@ -242,9 +244,7 @@ def validate_checkpoint_config(config: CheckpointConfig) -> None:
         Traceback (most recent call last):
         ValueError: checkpoint_ratio must be in [0.0, 1.0]
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.checkpoint_ratio <= 1.0:
         msg = f"checkpoint_ratio must be in [0.0, 1.0], got {config.checkpoint_ratio}"
@@ -278,9 +278,7 @@ def validate_offload_config(config: OffloadConfig) -> None:
         Traceback (most recent call last):
         ValueError: pin_memory only applies to CPU offloading
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.pin_memory and config.target != OffloadTarget.CPU:
         msg = "pin_memory only applies to CPU offloading"
@@ -309,9 +307,7 @@ def validate_memory_config(config: MemoryConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_checkpoint_config(config.checkpoint_config)
     validate_offload_config(config.offload_config)
@@ -801,9 +797,7 @@ def format_memory_stats(stats: MemoryStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Baseline: {stats.baseline_memory_gb:.2f} GB",

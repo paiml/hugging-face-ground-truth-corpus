@@ -36,6 +36,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class AnalysisType(Enum):
     """Types of model analysis.
@@ -300,9 +302,7 @@ def validate_parameter_stats(stats: ParameterStats) -> None:
         Traceback (most recent call last):
         ValueError: total_params must be non-negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_params < 0:
         msg = f"total_params must be non-negative, got {stats.total_params}"
@@ -478,9 +478,7 @@ def validate_analysis_config(config: AnalysisConfig) -> None:
         Traceback (most recent call last):
         ValueError: analysis_types cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.analysis_types:
         msg = "analysis_types cannot be empty"

@@ -120,7 +120,7 @@ class TestBiasDetectionConfig:
             protected_attributes=["gender"],
             metrics=[FairnessMetric.DEMOGRAPHIC_PARITY],
         )
-        assert config.threshold == 0.1
+        assert config.threshold == pytest.approx(0.1)
         assert config.intersectional is False
 
     def test_custom_values(self) -> None:
@@ -131,7 +131,7 @@ class TestBiasDetectionConfig:
             threshold=0.05,
             intersectional=True,
         )
-        assert config.threshold == 0.05
+        assert config.threshold == pytest.approx(0.05)
         assert config.intersectional is True
 
     def test_frozen(self) -> None:
@@ -155,14 +155,14 @@ class TestFairnessConstraint:
             group_comparison="pairwise",
         )
         assert constraint.metric == FairnessMetric.DEMOGRAPHIC_PARITY
-        assert constraint.threshold == 0.1
+        assert constraint.threshold == pytest.approx(0.1)
 
     def test_default_values(self) -> None:
         """Test default constraint values."""
         constraint = FairnessConstraint(metric=FairnessMetric.EQUALIZED_ODDS)
-        assert constraint.threshold == 0.05
+        assert constraint.threshold == pytest.approx(0.05)
         assert constraint.group_comparison == "pairwise"
-        assert constraint.slack == 0.0
+        assert constraint.slack == pytest.approx(0.0)
 
     def test_frozen(self) -> None:
         """Test that FairnessConstraint is immutable."""
@@ -182,8 +182,8 @@ class TestBiasAuditResult:
             overall_fairness=0.75,
             recommendations=["Consider reweighting"],
         )
-        assert result.overall_fairness == 0.75
-        assert result.disparities["gender"] == 0.15
+        assert result.overall_fairness == pytest.approx(0.75)
+        assert result.disparities["gender"] == pytest.approx(0.15)
 
     def test_frozen(self) -> None:
         """Test that BiasAuditResult is immutable."""
@@ -209,14 +209,14 @@ class TestStereotypeConfig:
         )
         assert config.lexicon_path == "/path/to/lexicon"
         assert config.categories == ["gender", "race"]
-        assert config.sensitivity == 0.7
+        assert config.sensitivity == pytest.approx(0.7)
 
     def test_default_values(self) -> None:
         """Test default configuration values."""
         config = StereotypeConfig()
         assert config.lexicon_path is None
         assert config.categories == []
-        assert config.sensitivity == 0.5
+        assert config.sensitivity == pytest.approx(0.5)
         assert config.context_window == 5
 
     def test_frozen(self) -> None:
@@ -301,7 +301,7 @@ class TestCreateBiasDetectionConfig:
             threshold=0.05,
             intersectional=True,
         )
-        assert config.threshold == 0.05
+        assert config.threshold == pytest.approx(0.05)
         assert config.intersectional is True
 
     def test_empty_attributes_raises_error(self) -> None:
@@ -382,9 +382,9 @@ class TestCreateFairnessConstraint:
             group_comparison="reference",
             slack=0.02,
         )
-        assert constraint.threshold == 0.1
+        assert constraint.threshold == pytest.approx(0.1)
         assert constraint.group_comparison == "reference"
-        assert constraint.slack == 0.02
+        assert constraint.slack == pytest.approx(0.02)
 
     def test_invalid_comparison_raises_error(self) -> None:
         """Test that invalid comparison raises ValueError."""
@@ -441,7 +441,7 @@ class TestCreateStereotypeConfig:
         config = create_stereotype_config()
         assert config.lexicon_path is None
         assert config.categories == []
-        assert config.sensitivity == 0.5
+        assert config.sensitivity == pytest.approx(0.5)
         assert config.context_window == 5
 
     def test_custom_values(self) -> None:
@@ -453,7 +453,7 @@ class TestCreateStereotypeConfig:
             context_window=10,
         )
         assert config.lexicon_path == "/path/to/lexicon"
-        assert config.sensitivity == 0.8
+        assert config.sensitivity == pytest.approx(0.8)
 
     def test_invalid_sensitivity_raises_error(self) -> None:
         """Test that invalid sensitivity raises ValueError."""
@@ -926,7 +926,7 @@ class TestGetRecommendedBiasConfig:
     def test_hiring_task(self) -> None:
         """Test configuration for hiring task."""
         config = get_recommended_bias_config("hiring")
-        assert config.threshold == 0.05
+        assert config.threshold == pytest.approx(0.05)
         assert FairnessMetric.PREDICTIVE_PARITY in config.metrics
 
     def test_credit_task(self) -> None:
@@ -938,7 +938,7 @@ class TestGetRecommendedBiasConfig:
     def test_healthcare_task(self) -> None:
         """Test configuration for healthcare task."""
         config = get_recommended_bias_config("healthcare")
-        assert config.threshold == 0.03
+        assert config.threshold == pytest.approx(0.03)
         assert FairnessMetric.EQUALIZED_ODDS in config.metrics
 
     def test_unknown_task_returns_default(self) -> None:

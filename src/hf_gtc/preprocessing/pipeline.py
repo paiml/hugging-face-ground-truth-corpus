@@ -25,6 +25,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class PipelineStage(Enum):
     """Stages in a data processing pipeline.
@@ -264,9 +266,7 @@ def validate_stage_config(config: StageConfig) -> None:
         Traceback (most recent call last):
         ValueError: function_name cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.function_name:
         msg = "function_name cannot be empty"
@@ -314,9 +314,7 @@ def validate_pipeline_config(config: PipelineConfig) -> None:
         Traceback (most recent call last):
         ValueError: stages cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.stages:
         msg = "stages cannot be empty"
@@ -370,9 +368,7 @@ def validate_pipeline_result(result: PipelineResult) -> None:
         Traceback (most recent call last):
         ValueError: num_processed cannot be negative
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if result.num_processed < 0:
         msg = f"num_processed cannot be negative, got {result.num_processed}"
@@ -430,9 +426,7 @@ def validate_pipeline_stats(stats: PipelineStats) -> None:
         Traceback (most recent call last):
         ValueError: cache_hit_rate must be between 0 and 1
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_samples < 0:
         msg = f"total_samples cannot be negative, got {stats.total_samples}"
@@ -989,9 +983,7 @@ def optimize_pipeline(
         Traceback (most recent call last):
         ValueError: sample_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if sample_size <= 0:
         msg = f"sample_size must be positive, got {sample_size}"
@@ -1073,9 +1065,7 @@ def estimate_pipeline_memory(
         Traceback (most recent call last):
         ValueError: num_samples cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if num_samples < 0:
         msg = f"num_samples cannot be negative, got {num_samples}"
@@ -1208,9 +1198,7 @@ def format_pipeline_stats(stats: PipelineStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Pipeline Statistics",

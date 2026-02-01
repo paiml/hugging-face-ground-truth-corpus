@@ -422,6 +422,20 @@ def validate_teacher_config(config: TeacherConfig) -> None:
         raise ValueError(msg)
 
 
+def _validate_model_name(name: str) -> None:
+    """Validate model_name_or_path is not empty."""
+    if not name or not name.strip():
+        msg = "model_name_or_path cannot be empty"
+        raise ValueError(msg)
+
+
+def _validate_positive_int(value: int, name: str) -> None:
+    """Validate an integer is positive."""
+    if value <= 0:
+        msg = f"{name} must be positive, got {value}"
+        raise ValueError(msg)
+
+
 def validate_student_config(config: StudentConfig) -> None:
     """Validate student model configuration.
 
@@ -453,15 +467,9 @@ def validate_student_config(config: StudentConfig) -> None:
             ...
         ValueError: layer_mapping length (3) must match num_layers (6)
     """
-    if not config.model_name_or_path or not config.model_name_or_path.strip():
-        msg = "model_name_or_path cannot be empty"
-        raise ValueError(msg)
-    if config.num_layers <= 0:
-        msg = f"num_layers must be positive, got {config.num_layers}"
-        raise ValueError(msg)
-    if config.hidden_size <= 0:
-        msg = f"hidden_size must be positive, got {config.hidden_size}"
-        raise ValueError(msg)
+    _validate_model_name(config.model_name_or_path)
+    _validate_positive_int(config.num_layers, "num_layers")
+    _validate_positive_int(config.hidden_size, "hidden_size")
     if len(config.layer_mapping) != config.num_layers:
         msg = (
             f"layer_mapping length ({len(config.layer_mapping)}) "
@@ -1216,6 +1224,7 @@ def calculate_soft_labels_loss(
     def softmax_with_temperature(
         logits: tuple[float, ...], temp: float
     ) -> tuple[float, ...]:
+        """Apply temperature-scaled softmax to logit values."""
         scaled = tuple(x / temp for x in logits)
         max_val = max(scaled)
         exp_vals = tuple(math.exp(x - max_val) for x in scaled)

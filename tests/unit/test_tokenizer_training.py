@@ -162,7 +162,7 @@ class TestUnigramConfig:
             max_piece_length=16,
             n_sub_iterations=2,
         )
-        assert config.shrinking_factor == 0.75
+        assert config.shrinking_factor == pytest.approx(0.75)
 
 
 class TestValidateUnigramConfig:
@@ -247,7 +247,7 @@ class TestCreateUnigramConfig:
         """Create default config."""
         config = create_unigram_config()
         assert config.vocab_size == 32000
-        assert config.shrinking_factor == 0.75
+        assert config.shrinking_factor == pytest.approx(0.75)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -420,12 +420,12 @@ class TestCalculateCompressionRatio:
     def test_basic_ratio(self) -> None:
         """Basic compression ratio."""
         ratio = calculate_compression_ratio(1000, 250)
-        assert ratio == 4.0
+        assert ratio == pytest.approx(4.0)
 
     def test_lower_ratio(self) -> None:
         """Lower compression ratio."""
         ratio = calculate_compression_ratio(500, 250)
-        assert ratio == 2.0
+        assert ratio == pytest.approx(2.0)
 
     def test_zero_original_raises(self) -> None:
         """Zero original length raises ValueError."""

@@ -27,6 +27,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class PaddingStrategy(Enum):
     """Strategies for padding sequences in a batch.
@@ -333,9 +335,7 @@ def validate_padding_config(config: PaddingConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_length is required when strategy is MAX_LENGTH
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.strategy == PaddingStrategy.MAX_LENGTH and config.max_length is None:
         msg = "max_length is required when strategy is MAX_LENGTH"
@@ -382,9 +382,7 @@ def validate_truncation_config(config: TruncationConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_length must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if (
         config.strategy != TruncationStrategy.DO_NOT_TRUNCATE
@@ -446,9 +444,7 @@ def validate_collator_config(config: CollatorConfig) -> None:
         Traceback (most recent call last):
         ValueError: mlm_probability must be between 0.0 and 1.0
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.mlm_probability <= 1.0:
         msg = (
@@ -501,9 +497,7 @@ def validate_collator_stats(stats: CollatorStats) -> None:
         Traceback (most recent call last):
         ValueError: avg_length cannot be negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.avg_length < 0:
         msg = f"avg_length cannot be negative, got {stats.avg_length}"
@@ -1331,6 +1325,106 @@ def format_collator_stats(stats: CollatorStats) -> str:
     )
 
 
+def _collator_classification() -> CollatorConfig:
+    """Create collator config for classification tasks."""
+    return create_collator_config(
+        collator_type=CollatorType.DEFAULT,
+        padding_config=create_padding_config(
+            strategy=PaddingStrategy.LONGEST,
+            max_length=512,
+            pad_to_multiple_of=8,
+        ),
+        truncation_config=create_truncation_config(
+            strategy=TruncationStrategy.LONGEST_FIRST,
+            max_length=512,
+        ),
+        mlm_probability=0.0,
+    )
+
+
+def _collator_generation() -> CollatorConfig:
+    """Create collator config for generation tasks."""
+    return create_collator_config(
+        collator_type=CollatorType.LANGUAGE_MODELING,
+        padding_config=create_padding_config(
+            strategy=PaddingStrategy.LONGEST,
+            max_length=2048,
+            padding_side=PaddingSide.LEFT,
+        ),
+        truncation_config=create_truncation_config(
+            strategy=TruncationStrategy.ONLY_FIRST,
+            max_length=2048,
+        ),
+        mlm_probability=0.0,
+    )
+
+
+def _collator_seq2seq() -> CollatorConfig:
+    """Create collator config for seq2seq tasks."""
+    return create_collator_config(
+        collator_type=CollatorType.SEQ2SEQ,
+        padding_config=create_padding_config(
+            strategy=PaddingStrategy.LONGEST,
+            max_length=512,
+        ),
+        truncation_config=create_truncation_config(
+            strategy=TruncationStrategy.LONGEST_FIRST,
+            max_length=512,
+        ),
+        mlm_probability=0.0,
+    )
+
+
+def _collator_masked_lm() -> CollatorConfig:
+    """Create collator config for masked LM tasks."""
+    return create_collator_config(
+        collator_type=CollatorType.LANGUAGE_MODELING,
+        padding_config=create_padding_config(
+            strategy=PaddingStrategy.MAX_LENGTH,
+            max_length=512,
+        ),
+        truncation_config=create_truncation_config(
+            strategy=TruncationStrategy.LONGEST_FIRST,
+            max_length=512,
+        ),
+        mlm_probability=0.15,
+    )
+
+
+def _collator_causal_lm() -> CollatorConfig:
+    """Create collator config for causal LM tasks."""
+    return create_collator_config(
+        collator_type=CollatorType.LANGUAGE_MODELING,
+        padding_config=create_padding_config(
+            strategy=PaddingStrategy.LONGEST,
+            max_length=2048,
+            padding_side=PaddingSide.LEFT,
+        ),
+        truncation_config=create_truncation_config(
+            strategy=TruncationStrategy.ONLY_FIRST,
+            max_length=2048,
+        ),
+        mlm_probability=0.0,
+    )
+
+
+def _collator_completion() -> CollatorConfig:
+    """Create collator config for completion tasks."""
+    return create_collator_config(
+        collator_type=CollatorType.COMPLETION_ONLY,
+        padding_config=create_padding_config(
+            strategy=PaddingStrategy.LONGEST,
+            max_length=4096,
+            padding_side=PaddingSide.LEFT,
+        ),
+        truncation_config=create_truncation_config(
+            strategy=TruncationStrategy.ONLY_FIRST,
+            max_length=4096,
+        ),
+        mlm_probability=0.0,
+    )
+
+
 def get_recommended_collator_config(task_type: str) -> CollatorConfig:
     """Get recommended collator configuration for a task type.
 
@@ -1381,85 +1475,12 @@ def get_recommended_collator_config(task_type: str) -> CollatorConfig:
         msg = f"task_type must be one of {valid_tasks}, got '{task_type}'"
         raise ValueError(msg)
 
-    if task_type == "classification":
-        return create_collator_config(
-            collator_type=CollatorType.DEFAULT,
-            padding_config=create_padding_config(
-                strategy=PaddingStrategy.LONGEST,
-                max_length=512,
-                pad_to_multiple_of=8,
-            ),
-            truncation_config=create_truncation_config(
-                strategy=TruncationStrategy.LONGEST_FIRST,
-                max_length=512,
-            ),
-            mlm_probability=0.0,
-        )
-    elif task_type == "generation":
-        return create_collator_config(
-            collator_type=CollatorType.LANGUAGE_MODELING,
-            padding_config=create_padding_config(
-                strategy=PaddingStrategy.LONGEST,
-                max_length=2048,
-                padding_side=PaddingSide.LEFT,
-            ),
-            truncation_config=create_truncation_config(
-                strategy=TruncationStrategy.ONLY_FIRST,
-                max_length=2048,
-            ),
-            mlm_probability=0.0,
-        )
-    elif task_type == "seq2seq":
-        return create_collator_config(
-            collator_type=CollatorType.SEQ2SEQ,
-            padding_config=create_padding_config(
-                strategy=PaddingStrategy.LONGEST,
-                max_length=512,
-            ),
-            truncation_config=create_truncation_config(
-                strategy=TruncationStrategy.LONGEST_FIRST,
-                max_length=512,
-            ),
-            mlm_probability=0.0,
-        )
-    elif task_type == "masked_lm":
-        return create_collator_config(
-            collator_type=CollatorType.LANGUAGE_MODELING,
-            padding_config=create_padding_config(
-                strategy=PaddingStrategy.MAX_LENGTH,
-                max_length=512,
-            ),
-            truncation_config=create_truncation_config(
-                strategy=TruncationStrategy.LONGEST_FIRST,
-                max_length=512,
-            ),
-            mlm_probability=0.15,
-        )
-    elif task_type == "causal_lm":
-        return create_collator_config(
-            collator_type=CollatorType.LANGUAGE_MODELING,
-            padding_config=create_padding_config(
-                strategy=PaddingStrategy.LONGEST,
-                max_length=2048,
-                padding_side=PaddingSide.LEFT,
-            ),
-            truncation_config=create_truncation_config(
-                strategy=TruncationStrategy.ONLY_FIRST,
-                max_length=2048,
-            ),
-            mlm_probability=0.0,
-        )
-    else:  # completion
-        return create_collator_config(
-            collator_type=CollatorType.COMPLETION_ONLY,
-            padding_config=create_padding_config(
-                strategy=PaddingStrategy.LONGEST,
-                max_length=4096,
-                padding_side=PaddingSide.LEFT,
-            ),
-            truncation_config=create_truncation_config(
-                strategy=TruncationStrategy.ONLY_FIRST,
-                max_length=4096,
-            ),
-            mlm_probability=0.0,
-        )
+    builders: dict[str, object] = {
+        "classification": _collator_classification,
+        "generation": _collator_generation,
+        "seq2seq": _collator_seq2seq,
+        "masked_lm": _collator_masked_lm,
+        "causal_lm": _collator_causal_lm,
+        "completion": _collator_completion,
+    }
+    return builders[task_type]()

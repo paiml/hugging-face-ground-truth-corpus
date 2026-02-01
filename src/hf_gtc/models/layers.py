@@ -27,6 +27,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class LayerType(Enum):
     """Supported neural network layer types.
@@ -303,9 +305,7 @@ def validate_mlp_config(config: MLPConfig) -> None:
         Traceback (most recent call last):
         ValueError: hidden_dim must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.hidden_dim <= 0:
         msg = f"hidden_dim must be positive, got {config.hidden_dim}"
@@ -350,9 +350,7 @@ def validate_gated_mlp_config(config: GatedMLPConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_mlp_config(config.mlp_config)
 
@@ -397,9 +395,7 @@ def validate_cross_attention_config(config: CrossAttentionConfig) -> None:
         Traceback (most recent call last):
         ValueError: hidden_dim must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.hidden_dim <= 0:
         msg = f"hidden_dim must be positive, got {config.hidden_dim}"
@@ -416,6 +412,39 @@ def validate_cross_attention_config(config: CrossAttentionConfig) -> None:
     if not 0 <= config.dropout <= 1:
         msg = f"dropout must be between 0 and 1, got {config.dropout}"
         raise ValueError(msg)
+
+
+def _validate_layer_type_config(config: LayerConfig) -> None:
+    """Validate layer sub-config based on layer type."""
+    mlp_types = (LayerType.MLP, LayerType.FFN)
+    if config.layer_type in mlp_types:
+        if config.mlp_config is None:
+            msg = f"mlp_config required for {config.layer_type.value}"
+            raise ValueError(msg)
+        validate_mlp_config(config.mlp_config)
+        return
+
+    layer_validators: dict[LayerType, tuple[str, str, object]] = {
+        LayerType.GATED_MLP: (
+            "gated_mlp_config",
+            "gated_mlp",
+            validate_gated_mlp_config,
+        ),
+        LayerType.CROSS_ATTENTION: (
+            "cross_attention_config",
+            "cross_attention",
+            validate_cross_attention_config,
+        ),
+    }
+    entry = layer_validators.get(config.layer_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
 
 
 def validate_layer_config(config: LayerConfig) -> None:
@@ -437,28 +466,9 @@ def validate_layer_config(config: LayerConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    mlp_types = (LayerType.MLP, LayerType.FFN)
-    if config.layer_type in mlp_types:
-        if config.mlp_config is None:
-            msg = f"mlp_config required for {config.layer_type.value}"
-            raise ValueError(msg)
-        validate_mlp_config(config.mlp_config)
-
-    if config.layer_type == LayerType.GATED_MLP:
-        if config.gated_mlp_config is None:
-            msg = "gated_mlp_config required for gated_mlp"
-            raise ValueError(msg)
-        validate_gated_mlp_config(config.gated_mlp_config)
-
-    if config.layer_type == LayerType.CROSS_ATTENTION:
-        if config.cross_attention_config is None:
-            msg = "cross_attention_config required for cross_attention"
-            raise ValueError(msg)
-        validate_cross_attention_config(config.cross_attention_config)
+    _validate_layer_type_config(config)
 
 
 def validate_layer_stats(stats: LayerStats) -> None:
@@ -486,9 +496,7 @@ def validate_layer_stats(stats: LayerStats) -> None:
         Traceback (most recent call last):
         ValueError: params must be non-negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.params < 0:
         msg = f"params must be non-negative, got {stats.params}"
@@ -920,6 +928,50 @@ def get_projection_type(name: str) -> ProjectionType:
     raise ValueError(msg)
 
 
+def _mlp_params(config: LayerConfig) -> int:
+    """Calculate parameters for MLP/FFN layer types."""
+    mlp = config.mlp_config
+    if mlp is None:
+        msg = "mlp_config required for MLP/FFN layer type"
+        raise ValueError(msg)
+    up_params = mlp.hidden_dim * mlp.intermediate_dim
+    down_params = mlp.intermediate_dim * mlp.hidden_dim
+    if mlp.bias:
+        up_params += mlp.intermediate_dim
+        down_params += mlp.hidden_dim
+    return up_params + down_params
+
+
+def _gated_mlp_params(config: LayerConfig) -> int:
+    """Calculate parameters for gated MLP layer type."""
+    gated = config.gated_mlp_config
+    if gated is None:
+        msg = "gated_mlp_config required for GATED_MLP layer type"
+        raise ValueError(msg)
+    mlp = gated.mlp_config
+    gate_params = mlp.hidden_dim * gated.gate_dim
+    up_params = mlp.hidden_dim * mlp.intermediate_dim
+    down_params = mlp.intermediate_dim * mlp.hidden_dim
+    if mlp.bias:
+        gate_params += gated.gate_dim
+        up_params += mlp.intermediate_dim
+        down_params += mlp.hidden_dim
+    return gate_params + up_params + down_params
+
+
+def _cross_attention_params(config: LayerConfig) -> int:
+    """Calculate parameters for cross-attention layer type."""
+    cross = config.cross_attention_config
+    if cross is None:
+        msg = "cross_attention_config required for CROSS_ATTENTION layer type"
+        raise ValueError(msg)
+    q_params = cross.hidden_dim * cross.hidden_dim
+    k_params = cross.kv_dim * cross.hidden_dim
+    v_params = cross.kv_dim * cross.hidden_dim
+    o_params = cross.hidden_dim * cross.hidden_dim
+    return q_params + k_params + v_params + o_params
+
+
 def calculate_layer_params(config: LayerConfig) -> int:
     """Calculate number of parameters for a layer configuration.
 
@@ -948,68 +1000,18 @@ def calculate_layer_params(config: LayerConfig) -> int:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    if config.layer_type in (LayerType.MLP, LayerType.FFN):
-        mlp = config.mlp_config
-        if mlp is None:
-            msg = "mlp_config required for MLP/FFN layer type"
-            raise ValueError(msg)
-        # Up projection: hidden_dim -> intermediate_dim
-        up_params = mlp.hidden_dim * mlp.intermediate_dim
-        if mlp.bias:
-            up_params += mlp.intermediate_dim
-        # Down projection: intermediate_dim -> hidden_dim
-        down_params = mlp.intermediate_dim * mlp.hidden_dim
-        if mlp.bias:
-            down_params += mlp.hidden_dim
-        return up_params + down_params
+    _layer_param_calculators = {
+        LayerType.MLP: _mlp_params,
+        LayerType.FFN: _mlp_params,
+        LayerType.GATED_MLP: _gated_mlp_params,
+        LayerType.CROSS_ATTENTION: _cross_attention_params,
+    }
 
-    if config.layer_type == LayerType.GATED_MLP:
-        gated = config.gated_mlp_config
-        if gated is None:
-            msg = "gated_mlp_config required for GATED_MLP layer type"
-            raise ValueError(msg)
-        mlp = gated.mlp_config
-        # Gate projection: hidden_dim -> gate_dim
-        gate_params = mlp.hidden_dim * gated.gate_dim
-        if mlp.bias:
-            gate_params += gated.gate_dim
-        # Up projection: hidden_dim -> intermediate_dim
-        up_params = mlp.hidden_dim * mlp.intermediate_dim
-        if mlp.bias:
-            up_params += mlp.intermediate_dim
-        # Down projection: intermediate_dim -> hidden_dim
-        down_params = mlp.intermediate_dim * mlp.hidden_dim
-        if mlp.bias:
-            down_params += mlp.hidden_dim
-        return gate_params + up_params + down_params
-
-    if config.layer_type == LayerType.CROSS_ATTENTION:
-        cross = config.cross_attention_config
-        if cross is None:
-            msg = "cross_attention_config required for CROSS_ATTENTION layer type"
-            raise ValueError(msg)
-        # Q projection: hidden_dim -> hidden_dim
-        q_params = cross.hidden_dim * cross.hidden_dim
-        # K projection: kv_dim -> hidden_dim
-        k_params = cross.kv_dim * cross.hidden_dim
-        # V projection: kv_dim -> hidden_dim
-        v_params = cross.kv_dim * cross.hidden_dim
-        # Output projection: hidden_dim -> hidden_dim
-        o_params = cross.hidden_dim * cross.hidden_dim
-        return q_params + k_params + v_params + o_params
-
-    if config.layer_type == LayerType.SELF_ATTENTION:
-        # For self-attention without config, return 0
-        return 0
-
-    if config.layer_type == LayerType.CONV1D:
-        # For conv1d without config, return 0
-        return 0
-
+    calculator = _layer_param_calculators.get(config.layer_type)
+    if calculator is not None:
+        return calculator(config)
     return 0
 
 
@@ -1048,9 +1050,7 @@ def estimate_layer_flops(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if batch_size <= 0:
         msg = f"batch_size must be positive, got {batch_size}"
@@ -1136,9 +1136,7 @@ def calculate_layer_memory(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if batch_size <= 0:
         msg = f"batch_size must be positive, got {batch_size}"
@@ -1269,9 +1267,7 @@ def format_layer_stats(stats: LayerStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     def format_number(n: int) -> str:
         """Format large numbers with units."""

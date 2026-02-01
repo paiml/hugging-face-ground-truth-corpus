@@ -774,7 +774,9 @@ class TestDetectContamination:
         config = create_decontamination_config(decontam_type="exact_match")
         contaminated = detect_contamination(train, test, config)
         assert len(contaminated) >= 1
-        assert contaminated[0][2] == 1.0  # Exact match has similarity 1.0
+        assert contaminated[0][2] == pytest.approx(
+            1.0
+        )  # Exact match has similarity 1.0
 
     def test_ngram_overlap_detection(self) -> None:
         """Test n-gram overlap contamination detection."""
@@ -909,7 +911,7 @@ class TestEstimateCurationTime:
     def test_zero_samples(self) -> None:
         """Test with zero samples."""
         time = estimate_curation_time(0)
-        assert time == 0.0
+        assert time == pytest.approx(0.0)
 
     def test_negative_samples_raises_error(self) -> None:
         """Test that negative samples raises ValueError."""
@@ -1132,10 +1134,10 @@ class TestEdgeCases:
     def test_boundary_threshold_values(self) -> None:
         """Test boundary threshold values."""
         config_zero = create_decontamination_config(threshold=0.0)
-        assert config_zero.threshold == 0.0
+        assert config_zero.threshold == pytest.approx(0.0)
 
         config_one = create_decontamination_config(threshold=1.0)
-        assert config_one.threshold == 1.0
+        assert config_one.threshold == pytest.approx(1.0)
 
     def test_single_sample_deduplication(self) -> None:
         """Test deduplication with single sample."""

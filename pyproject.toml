@@ -3,7 +3,7 @@ name = "hf-ground-truth-corpus"
 version = "0.1.0"
 description = "HuggingFace Ground Truth Corpus - High-quality Python recipes for ML patterns"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = { text = "MIT" }
 requires-python = ">=3.11"
 authors = [{ name = "Noah", email = "noah@example.com" }]
 keywords = ["huggingface", "machine-learning", "transformers", "ground-truth"]
@@ -69,9 +69,16 @@ convention = "google"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--doctest-modules --cov=src/hf_gtc --cov-report=term-missing --cov-fail-under=95 -v"
-markers = ["slow: marks tests as slow"]
+addopts = "--doctest-modules --cov=src/hf_gtc --cov-report=term-missing --cov-report=html --cov-fail-under=95 -v"
+markers = [
+    "hypothesis: Property-based tests using Hypothesis",
+    "slow: Slow tests",
+    "integration: Integration tests",
+]
 filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.hypothesis]
+settings = { max_examples = 100, deadline = 5000 }
 
 [tool.coverage.run]
 source = ["src/hf_gtc"]
@@ -93,4 +100,4 @@ python-version = "3.11"
 [tool.mutmut]
 paths_to_mutate = "src/hf_gtc/"
 tests_dir = "tests/"
-runner = "pytest -x -q --no-cov"
+runner = "uv run pytest -x -q --no-cov"

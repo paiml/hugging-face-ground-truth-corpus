@@ -27,6 +27,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class SamplingMethod(Enum):
     """Methods for sampling data from datasets.
@@ -269,9 +271,7 @@ def validate_stratified_config(config: StratifiedConfig) -> None:
         Traceback (most recent call last):
         ValueError: column cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.column:
         msg = "column cannot be empty"
@@ -305,9 +305,7 @@ def validate_importance_config(config: ImportanceConfig) -> None:
         Traceback (most recent call last):
         ValueError: temperature must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.temperature <= 0:
         msg = f"temperature must be positive, got {config.temperature}"
@@ -345,13 +343,41 @@ def validate_balanced_config(config: BalancedConfig) -> None:
         Traceback (most recent call last):
         ValueError: target_ratio must be in (0, 1]
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0 < config.target_ratio <= 1.0:
         msg = f"target_ratio must be in (0, 1], got {config.target_ratio}"
         raise ValueError(msg)
+
+
+def _validate_sampling_method_config(config: SamplingConfig) -> None:
+    """Validate method-specific sampling sub-config."""
+    method_validators: dict[SamplingMethod, tuple[str, str, object]] = {
+        SamplingMethod.STRATIFIED: (
+            "stratified_config",
+            "STRATIFIED sampling",
+            validate_stratified_config,
+        ),
+        SamplingMethod.IMPORTANCE: (
+            "importance_config",
+            "IMPORTANCE sampling",
+            validate_importance_config,
+        ),
+        SamplingMethod.BALANCED: (
+            "balanced_config",
+            "BALANCED sampling",
+            validate_balanced_config,
+        ),
+    }
+    entry = method_validators.get(config.method)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
 
 
 def validate_sampling_config(config: SamplingConfig) -> None:
@@ -392,31 +418,13 @@ def validate_sampling_config(config: SamplingConfig) -> None:
         Traceback (most recent call last):
         ValueError: stratified_config required for STRATIFIED sampling
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.sample_size <= 0:
         msg = f"sample_size must be positive, got {config.sample_size}"
         raise ValueError(msg)
 
-    if config.method == SamplingMethod.STRATIFIED:
-        if config.stratified_config is None:
-            msg = "stratified_config required for STRATIFIED sampling"
-            raise ValueError(msg)
-        validate_stratified_config(config.stratified_config)
-
-    elif config.method == SamplingMethod.IMPORTANCE:
-        if config.importance_config is None:
-            msg = "importance_config required for IMPORTANCE sampling"
-            raise ValueError(msg)
-        validate_importance_config(config.importance_config)
-
-    elif config.method == SamplingMethod.BALANCED:
-        if config.balanced_config is None:
-            msg = "balanced_config required for BALANCED sampling"
-            raise ValueError(msg)
-        validate_balanced_config(config.balanced_config)
+    _validate_sampling_method_config(config)
 
 
 def create_stratified_config(
@@ -1207,9 +1215,7 @@ def format_sampling_stats(stats: SamplingStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     sampling_rate = (
         stats.sampled_size / stats.original_size * 100

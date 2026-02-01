@@ -231,7 +231,7 @@ class TestVersionStats:
         )
         assert stats.total_versions == 10
         assert stats.latest_version == "2.0.0"
-        assert stats.release_frequency_days == 14.0
+        assert stats.release_frequency_days == pytest.approx(14.0)
 
     def test_stats_is_frozen(self) -> None:
         """VersionStats is immutable."""
@@ -495,7 +495,7 @@ class TestCreateVersionStats:
         )
         assert stats.total_versions == 20
         assert stats.latest_version == "3.0.0"
-        assert stats.release_frequency_days == 7.5
+        assert stats.release_frequency_days == pytest.approx(7.5)
 
     def test_negative_total_raises(self) -> None:
         """Negative total_versions raises ValueError."""

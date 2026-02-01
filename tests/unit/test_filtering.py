@@ -772,7 +772,7 @@ class TestDetectToxicity:
     def test_empty_text(self) -> None:
         """Test with empty text."""
         scores = detect_toxicity("")
-        assert all(v == 0.0 for v in scores.values())
+        assert all(v == pytest.approx(0.0) for v in scores.values())
 
     def test_none_text_raises_error(self) -> None:
         """Test that None text raises ValueError."""
@@ -922,7 +922,7 @@ class TestDetectLanguage:
         """Test with empty text."""
         lang, conf = detect_language("")
         assert lang == "unknown"
-        assert conf == 0.0
+        assert conf == pytest.approx(0.0)
 
     def test_none_text_raises_error(self) -> None:
         """Test that None text raises ValueError."""
@@ -1165,7 +1165,7 @@ class TestEdgeCases:
     def test_whitespace_only_text_toxicity(self) -> None:
         """Test toxicity detection with whitespace-only text."""
         scores = detect_toxicity("   \t\n  ")
-        assert all(v == 0.0 for v in scores.values())
+        assert all(v == pytest.approx(0.0) for v in scores.values())
 
     def test_whitespace_only_text_pii(self) -> None:
         """Test PII detection with whitespace-only text."""
@@ -1176,7 +1176,7 @@ class TestEdgeCases:
         """Test language detection with whitespace-only text."""
         lang, conf = detect_language("   \t\n  ")
         assert lang == "unknown"
-        assert conf == 0.0
+        assert conf == pytest.approx(0.0)
 
     def test_special_characters_in_text(self) -> None:
         """Test handling of special characters."""
@@ -1226,10 +1226,10 @@ class TestEdgeCases:
     def test_boundary_threshold_values(self) -> None:
         """Test boundary threshold values."""
         config_zero = create_toxicity_config(threshold=0.0)
-        assert config_zero.threshold == 0.0
+        assert config_zero.threshold == pytest.approx(0.0)
 
         config_one = create_toxicity_config(threshold=1.0)
-        assert config_one.threshold == 1.0
+        assert config_one.threshold == pytest.approx(1.0)
 
     def test_all_pii_types(self) -> None:
         """Test that all PII types are detectable."""

@@ -130,7 +130,7 @@ class TestStreamConfig:
         )
         assert config.mode == StreamingMode.TOKEN
         assert config.chunk_size == 10
-        assert config.timeout_seconds == 30.0
+        assert config.timeout_seconds == pytest.approx(30.0)
         assert config.buffer_size == 1024
 
     def test_default_values(self) -> None:
@@ -138,7 +138,7 @@ class TestStreamConfig:
         config = StreamConfig()
         assert config.mode == StreamingMode.TOKEN
         assert config.chunk_size == 10
-        assert config.timeout_seconds == 30.0
+        assert config.timeout_seconds == pytest.approx(30.0)
         assert config.buffer_size == 1024
 
     def test_config_is_frozen(self) -> None:
@@ -194,8 +194,8 @@ class TestStreamingStats:
         )
         assert stats.tokens_generated == 100
         assert stats.chunks_sent == 10
-        assert stats.elapsed_seconds == 5.0
-        assert stats.tokens_per_second == 20.0
+        assert stats.elapsed_seconds == pytest.approx(5.0)
+        assert stats.tokens_per_second == pytest.approx(20.0)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -217,7 +217,7 @@ class TestStreamEvent:
         )
         assert event.event_type == "token"
         assert event.data == "Hello"
-        assert event.timestamp == 1704067200.0
+        assert event.timestamp == pytest.approx(1704067200.0)
         assert event.sequence_number == 1
 
     def test_event_with_dict_data(self) -> None:
@@ -244,14 +244,14 @@ class TestBufferConfig:
             overflow_strategy="block",
         )
         assert config.max_buffer_tokens == 512
-        assert config.flush_interval == 0.05
+        assert config.flush_interval == pytest.approx(0.05)
         assert config.overflow_strategy == "block"
 
     def test_default_values(self) -> None:
         """Default values are correct."""
         config = BufferConfig()
         assert config.max_buffer_tokens == 1024
-        assert config.flush_interval == 0.1
+        assert config.flush_interval == pytest.approx(0.1)
         assert config.overflow_strategy == "drop_oldest"
 
     def test_config_is_frozen(self) -> None:
@@ -370,7 +370,7 @@ class TestCreateStreamConfig:
         config = create_stream_config()
         assert config.mode == StreamingMode.TOKEN
         assert config.chunk_size == 10
-        assert config.timeout_seconds == 30.0
+        assert config.timeout_seconds == pytest.approx(30.0)
         assert config.buffer_size == 1024
 
     @pytest.mark.parametrize(
@@ -395,7 +395,7 @@ class TestCreateStreamConfig:
     def test_custom_timeout(self) -> None:
         """Create config with custom timeout."""
         config = create_stream_config(timeout_seconds=60.0)
-        assert config.timeout_seconds == 60.0
+        assert config.timeout_seconds == pytest.approx(60.0)
 
     def test_custom_buffer_size(self) -> None:
         """Create config with custom buffer size."""
@@ -478,7 +478,7 @@ class TestCreateBufferConfig:
         """Create default config."""
         config = create_buffer_config()
         assert config.max_buffer_tokens == 1024
-        assert config.flush_interval == 0.1
+        assert config.flush_interval == pytest.approx(0.1)
         assert config.overflow_strategy == "drop_oldest"
 
     def test_custom_max_tokens(self) -> None:
@@ -489,7 +489,7 @@ class TestCreateBufferConfig:
     def test_custom_flush_interval(self) -> None:
         """Create config with custom flush interval."""
         config = create_buffer_config(flush_interval=0.05)
-        assert config.flush_interval == 0.05
+        assert config.flush_interval == pytest.approx(0.05)
 
     @pytest.mark.parametrize(
         "strategy",
@@ -678,17 +678,17 @@ class TestCalculateTokensPerSecond:
     def test_basic_calculation(self) -> None:
         """Basic calculation."""
         result = calculate_tokens_per_second(100, 5.0)
-        assert result == 20.0
+        assert result == pytest.approx(20.0)
 
     def test_zero_tokens(self) -> None:
         """Zero tokens returns zero."""
         result = calculate_tokens_per_second(0, 1.0)
-        assert result == 0.0
+        assert result == pytest.approx(0.0)
 
     def test_zero_elapsed_time(self) -> None:
         """Zero elapsed time returns zero."""
         result = calculate_tokens_per_second(50, 0.0)
-        assert result == 0.0
+        assert result == pytest.approx(0.0)
 
     def test_fractional_result(self) -> None:
         """Fractional result."""
@@ -698,12 +698,12 @@ class TestCalculateTokensPerSecond:
     def test_large_values(self) -> None:
         """Large values."""
         result = calculate_tokens_per_second(1000000, 100.0)
-        assert result == 10000.0
+        assert result == pytest.approx(10000.0)
 
     def test_small_elapsed_time(self) -> None:
         """Small elapsed time."""
         result = calculate_tokens_per_second(10, 0.001)
-        assert result == 10000.0
+        assert result == pytest.approx(10000.0)
 
     def test_negative_tokens_raises(self) -> None:
         """Negative tokens raises ValueError."""
@@ -722,17 +722,17 @@ class TestEstimateStreamDuration:
     def test_basic_estimate(self) -> None:
         """Basic estimate."""
         result = estimate_stream_duration(100, 20.0)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_zero_tokens(self) -> None:
         """Zero tokens returns zero."""
         result = estimate_stream_duration(0, 20.0)
-        assert result == 0.0
+        assert result == pytest.approx(0.0)
 
     def test_zero_rate(self) -> None:
         """Zero rate returns zero."""
         result = estimate_stream_duration(100, 0.0)
-        assert result == 0.0
+        assert result == pytest.approx(0.0)
 
     def test_fractional_result(self) -> None:
         """Fractional result."""
@@ -742,12 +742,12 @@ class TestEstimateStreamDuration:
     def test_large_values(self) -> None:
         """Large values."""
         result = estimate_stream_duration(10000, 100.0)
-        assert result == 100.0
+        assert result == pytest.approx(100.0)
 
     def test_small_rate(self) -> None:
         """Small rate."""
         result = estimate_stream_duration(1, 0.001)
-        assert result == 1000.0
+        assert result == pytest.approx(1000.0)
 
     def test_negative_tokens_raises(self) -> None:
         """Negative tokens raises ValueError."""
@@ -788,13 +788,13 @@ class TestIntegration:
             elapsed_seconds=elapsed,
             tokens_per_second=rate,
         )
-        assert stats.tokens_per_second == 20.0
+        assert stats.tokens_per_second == pytest.approx(20.0)
 
     def test_duration_estimation(self) -> None:
         """Estimate duration based on rate."""
         rate = calculate_tokens_per_second(100, 5.0)
         duration = estimate_stream_duration(200, rate)
-        assert duration == 10.0
+        assert duration == pytest.approx(10.0)
 
     def test_stream_event_sequence(self) -> None:
         """Create sequence of stream events."""

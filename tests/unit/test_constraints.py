@@ -272,7 +272,7 @@ class TestConstraintStats:
         assert stats.valid_outputs == 100
         assert stats.invalid_outputs == 5
         assert stats.retries == 10
-        assert stats.avg_generation_time_ms == 150.5
+        assert stats.avg_generation_time_ms == pytest.approx(150.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -588,7 +588,7 @@ class TestCreateConstraintStats:
         assert stats.valid_outputs == 0
         assert stats.invalid_outputs == 0
         assert stats.retries == 0
-        assert stats.avg_generation_time_ms == 0.0
+        assert stats.avg_generation_time_ms == pytest.approx(0.0)
 
     def test_with_values(self) -> None:
         """Create with values."""

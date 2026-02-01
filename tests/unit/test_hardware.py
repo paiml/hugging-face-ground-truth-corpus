@@ -169,7 +169,7 @@ class TestGPUInfo:
             tensor_cores=True,
         )
         assert info.name == "A100"
-        assert info.memory_gb == 80.0
+        assert info.memory_gb == pytest.approx(80.0)
 
     def test_gpu_info_is_frozen(self) -> None:
         """GPU info is immutable."""
@@ -181,7 +181,7 @@ class TestGPUInfo:
         """All fields are accessible."""
         info = GPUInfo("RTX 4090", 24.0, ComputeCapability.SM_89, True)
         assert info.name == "RTX 4090"
-        assert info.memory_gb == 24.0
+        assert info.memory_gb == pytest.approx(24.0)
         assert info.compute_capability == ComputeCapability.SM_89
         assert info.tensor_cores is True
 
@@ -211,7 +211,7 @@ class TestDeviceConfig:
         config = DeviceConfig(DeviceType.MPS, (0,), 0.8, False)
         assert config.device_type == DeviceType.MPS
         assert config.device_ids == (0,)
-        assert config.memory_fraction == 0.8
+        assert config.memory_fraction == pytest.approx(0.8)
         assert config.allow_growth is False
 
 
@@ -254,7 +254,7 @@ class TestHardwareStats:
             memory_bandwidth_gbps=2039.0,
         )
         assert stats.device_count == 8
-        assert stats.total_memory_gb == 640.0
+        assert stats.total_memory_gb == pytest.approx(640.0)
 
     def test_hardware_stats_is_frozen(self) -> None:
         """Hardware stats is immutable."""
@@ -266,9 +266,9 @@ class TestHardwareStats:
         """All fields are accessible."""
         stats = HardwareStats(4, 320.0, 78.0, 1020.0)
         assert stats.device_count == 4
-        assert stats.total_memory_gb == 320.0
-        assert stats.compute_tflops == 78.0
-        assert stats.memory_bandwidth_gbps == 1020.0
+        assert stats.total_memory_gb == pytest.approx(320.0)
+        assert stats.compute_tflops == pytest.approx(78.0)
+        assert stats.memory_bandwidth_gbps == pytest.approx(1020.0)
 
 
 class TestValidateGPUInfo:
@@ -409,7 +409,7 @@ class TestCreateGPUInfo:
         """Create GPU info with defaults."""
         info = create_gpu_info("A100", 80.0)
         assert info.name == "A100"
-        assert info.memory_gb == 80.0
+        assert info.memory_gb == pytest.approx(80.0)
         assert info.compute_capability == ComputeCapability.SM_80
         assert info.tensor_cores is True
 
@@ -442,7 +442,7 @@ class TestCreateDeviceConfig:
         config = create_device_config()
         assert config.device_type == DeviceType.CUDA
         assert config.device_ids == (0,)
-        assert config.memory_fraction == 0.9
+        assert config.memory_fraction == pytest.approx(0.9)
         assert config.allow_growth is True
 
     def test_custom_device_type(self) -> None:
@@ -458,7 +458,7 @@ class TestCreateDeviceConfig:
     def test_custom_memory_fraction(self) -> None:
         """Create device config with custom memory fraction."""
         config = create_device_config(memory_fraction=0.8)
-        assert config.memory_fraction == 0.8
+        assert config.memory_fraction == pytest.approx(0.8)
 
     def test_custom_allow_growth(self) -> None:
         """Create device config with custom allow growth."""
@@ -506,17 +506,17 @@ class TestCreateHardwareStats:
         """Create hardware stats with defaults."""
         stats = create_hardware_stats()
         assert stats.device_count == 1
-        assert stats.total_memory_gb == 0.0
-        assert stats.compute_tflops == 0.0
-        assert stats.memory_bandwidth_gbps == 0.0
+        assert stats.total_memory_gb == pytest.approx(0.0)
+        assert stats.compute_tflops == pytest.approx(0.0)
+        assert stats.memory_bandwidth_gbps == pytest.approx(0.0)
 
     def test_custom_values(self) -> None:
         """Create hardware stats with custom values."""
         stats = create_hardware_stats(8, 640.0, 156.0, 2039.0)
         assert stats.device_count == 8
-        assert stats.total_memory_gb == 640.0
-        assert stats.compute_tflops == 156.0
-        assert stats.memory_bandwidth_gbps == 2039.0
+        assert stats.total_memory_gb == pytest.approx(640.0)
+        assert stats.compute_tflops == pytest.approx(156.0)
+        assert stats.memory_bandwidth_gbps == pytest.approx(2039.0)
 
     def test_negative_device_count_raises(self) -> None:
         """Negative device count raises ValueError."""
@@ -842,7 +842,7 @@ class TestCalculateMemoryBandwidth:
     def test_cuda_bandwidth_with_capability(self) -> None:
         """CUDA bandwidth with compute capability."""
         bw = calculate_memory_bandwidth("cuda", "sm_80")
-        assert bw == 2039.0  # A100
+        assert bw == pytest.approx(2039.0)  # A100
 
     def test_h100_bandwidth(self) -> None:
         """H100 has highest bandwidth."""
@@ -948,33 +948,33 @@ class TestGetRecommendedHardwareConfig:
         """CPU config."""
         config = get_recommended_hardware_config("cpu")
         assert config.device_type == DeviceType.CPU
-        assert config.memory_fraction == 1.0
+        assert config.memory_fraction == pytest.approx(1.0)
 
     def test_gpu_consumer_config(self) -> None:
         """GPU consumer config."""
         config = get_recommended_hardware_config("gpu_consumer")
         assert config.device_type == DeviceType.CUDA
-        assert config.memory_fraction == 0.8
+        assert config.memory_fraction == pytest.approx(0.8)
         assert config.allow_growth is True
 
     def test_gpu_datacenter_config(self) -> None:
         """GPU datacenter config."""
         config = get_recommended_hardware_config("gpu_datacenter")
         assert config.device_type == DeviceType.CUDA
-        assert config.memory_fraction == 0.9
+        assert config.memory_fraction == pytest.approx(0.9)
         assert config.allow_growth is False
 
     def test_tpu_config(self) -> None:
         """TPU config."""
         config = get_recommended_hardware_config("tpu")
         assert config.device_type == DeviceType.TPU
-        assert config.memory_fraction == 0.95
+        assert config.memory_fraction == pytest.approx(0.95)
 
     def test_edge_config(self) -> None:
         """Edge config."""
         config = get_recommended_hardware_config("edge")
         assert config.device_type == DeviceType.CPU
-        assert config.memory_fraction == 0.7
+        assert config.memory_fraction == pytest.approx(0.7)
 
     def test_default_is_datacenter(self) -> None:
         """Default is gpu_datacenter."""

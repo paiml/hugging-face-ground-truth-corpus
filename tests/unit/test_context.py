@@ -154,7 +154,7 @@ class TestRoPEConfig:
             scaling_factor=2.0,
             original_max_length=4096,
         )
-        assert config.scaling_factor == 2.0
+        assert config.scaling_factor == pytest.approx(2.0)
         assert config.scaling_type == RoPEScalingType.LINEAR
         assert config.original_max_length == 4096
 
@@ -254,8 +254,8 @@ class TestContextStats:
             attention_sparsity=0.75,
         )
         assert stats.effective_length == 8192
-        assert stats.memory_usage_mb == 1024.0
-        assert stats.attention_sparsity == 0.75
+        assert stats.memory_usage_mb == pytest.approx(1024.0)
+        assert stats.attention_sparsity == pytest.approx(0.75)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -574,7 +574,7 @@ class TestCreateRoPEConfig:
         """Create default config."""
         config = create_rope_config()
         assert config.scaling_type == RoPEScalingType.LINEAR
-        assert config.scaling_factor == 2.0
+        assert config.scaling_factor == pytest.approx(2.0)
         assert config.original_max_length == 4096
 
     def test_custom_scaling_type(self) -> None:
@@ -585,7 +585,7 @@ class TestCreateRoPEConfig:
     def test_custom_scaling_factor(self) -> None:
         """Create config with custom scaling factor."""
         config = create_rope_config(scaling_factor=4.0)
-        assert config.scaling_factor == 4.0
+        assert config.scaling_factor == pytest.approx(4.0)
 
     def test_custom_original_max_length(self) -> None:
         """Create config with custom original max length."""
@@ -664,7 +664,7 @@ class TestCreateContextConfig:
         rope_config = create_rope_config(scaling_factor=4.0)
         config = create_context_config(rope_config=rope_config)
         assert config.rope_config is not None
-        assert config.rope_config.scaling_factor == 4.0
+        assert config.rope_config.scaling_factor == pytest.approx(4.0)
 
     def test_with_window_config(self) -> None:
         """Create config with provided window config."""
@@ -703,8 +703,8 @@ class TestCreateContextStats:
         """Create default stats."""
         stats = create_context_stats()
         assert stats.effective_length == 0
-        assert stats.memory_usage_mb == 0.0
-        assert stats.attention_sparsity == 0.0
+        assert stats.memory_usage_mb == pytest.approx(0.0)
+        assert stats.attention_sparsity == pytest.approx(0.0)
 
     def test_custom_effective_length(self) -> None:
         """Create stats with custom effective length."""
@@ -714,12 +714,12 @@ class TestCreateContextStats:
     def test_custom_memory_usage(self) -> None:
         """Create stats with custom memory usage."""
         stats = create_context_stats(memory_usage_mb=1024.0)
-        assert stats.memory_usage_mb == 1024.0
+        assert stats.memory_usage_mb == pytest.approx(1024.0)
 
     def test_custom_sparsity(self) -> None:
         """Create stats with custom sparsity."""
         stats = create_context_stats(attention_sparsity=0.75)
-        assert stats.attention_sparsity == 0.75
+        assert stats.attention_sparsity == pytest.approx(0.75)
 
     def test_invalid_sparsity_raises(self) -> None:
         """Invalid sparsity raises ValueError."""
@@ -921,12 +921,12 @@ class TestEstimateMemoryScaling:
     def test_full_attention_quadratic(self) -> None:
         """Full attention scales quadratically."""
         scale = estimate_memory_scaling(4096, 8192, attention_pattern="full")
-        assert scale == 4.0  # (8192/4096)^2 = 4
+        assert scale == pytest.approx(4.0)  # (8192/4096)^2 = 4
 
     def test_double_length_quadruple_memory(self) -> None:
         """Doubling length quadruples memory for full attention."""
         scale = estimate_memory_scaling(1024, 2048, attention_pattern="full")
-        assert scale == 4.0
+        assert scale == pytest.approx(4.0)
 
     def test_local_attention_linear(self) -> None:
         """Local attention scales more efficiently."""
@@ -934,7 +934,7 @@ class TestEstimateMemoryScaling:
             4096, 16384, attention_pattern="local", window_size=4096
         )
         # Local: (16384 * 4096) / (4096^2) = 4.0
-        assert scale == 4.0
+        assert scale == pytest.approx(4.0)
 
     def test_global_local_intermediate(self) -> None:
         """Global-local is between full and local."""
@@ -1209,7 +1209,7 @@ class TestGetRecommendedContextConfig:
             target_length=8192, original_max_length=4096
         )
         assert config.rope_config is not None
-        assert config.rope_config.scaling_factor == 2.0
+        assert config.rope_config.scaling_factor == pytest.approx(2.0)
 
     def test_memory_constraint_with_sufficient_memory(self) -> None:
         """Memory constraint with sufficient memory uses RoPE scaling."""

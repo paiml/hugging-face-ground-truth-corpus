@@ -581,8 +581,8 @@ class TestCalculateTextQualityScore:
     def test_empty_text(self) -> None:
         """Test with empty text."""
         scores = calculate_text_quality_score("")
-        assert scores["length"] == 0.0
-        assert scores["repetition"] == 0.0
+        assert scores["length"] == pytest.approx(0.0)
+        assert scores["repetition"] == pytest.approx(0.0)
 
     def test_none_text_raises_error(self) -> None:
         """Test that None text raises ValueError."""
@@ -608,7 +608,7 @@ class TestCalculateTextQualityScore:
         # Low repetition text
         diverse = "one two three four five"
         scores = calculate_text_quality_score(diverse)
-        assert scores["repetition"] == 0.0
+        assert scores["repetition"] == pytest.approx(0.0)
 
     @given(st.text(min_size=1, max_size=100))
     @settings(max_examples=20)
@@ -735,7 +735,7 @@ class TestCalculatePerplexityScore:
     def test_empty_text(self) -> None:
         """Test with empty text."""
         score = calculate_perplexity_score("")
-        assert score == 0.0
+        assert score == pytest.approx(0.0)
 
     def test_none_text_raises_error(self) -> None:
         """Test that None text raises ValueError."""

@@ -239,8 +239,8 @@ class TestEmbeddingStats:
             isotropy_score=0.85,
         )
         assert stats.dimension == 384
-        assert stats.vocab_coverage == 0.95
-        assert stats.isotropy_score == 0.85
+        assert stats.vocab_coverage == pytest.approx(0.95)
+        assert stats.isotropy_score == pytest.approx(0.85)
 
     def test_frozen(self) -> None:
         """Test that stats is immutable."""
@@ -519,9 +519,9 @@ class TestCreateEmbeddingStats:
         """Test default values."""
         stats = create_embedding_stats()
         assert stats.dimension == 384
-        assert stats.vocab_coverage == 1.0
-        assert stats.avg_magnitude == 1.0
-        assert stats.isotropy_score == 0.5
+        assert stats.vocab_coverage == pytest.approx(1.0)
+        assert stats.avg_magnitude == pytest.approx(1.0)
+        assert stats.isotropy_score == pytest.approx(0.5)
 
     def test_custom_dimension(self) -> None:
         """Test custom dimension."""
@@ -531,7 +531,7 @@ class TestCreateEmbeddingStats:
     def test_custom_isotropy(self) -> None:
         """Test custom isotropy score."""
         stats = create_embedding_stats(isotropy_score=0.9)
-        assert stats.isotropy_score == 0.9
+        assert stats.isotropy_score == pytest.approx(0.9)
 
     def test_zero_dimension_raises(self) -> None:
         """Test that zero dimension raises error."""
@@ -834,7 +834,9 @@ class TestEstimateEmbeddingQuality:
         emb = ((1.0, 0.0),)
         stats = estimate_embedding_quality(emb)
         assert stats.dimension == 2
-        assert stats.isotropy_score == 0.5  # Default for single embedding
+        assert stats.isotropy_score == pytest.approx(
+            0.5
+        )  # Default for single embedding
 
     def test_empty_embeddings_raises(self) -> None:
         """Test that empty embeddings raises error."""

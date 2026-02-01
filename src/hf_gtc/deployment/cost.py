@@ -478,17 +478,20 @@ def validate_instance_config(config: InstanceConfig) -> None:
         msg = f"memory_gb must be positive, got {config.memory_gb}"
         raise ValueError(msg)
 
-    # GPU type required for GPU instances
-    if config.instance_type in (
-        InstanceType.GPU_CONSUMER,
-        InstanceType.GPU_DATACENTER,
-    ):
-        if config.gpu_count == 0:
-            msg = "gpu_count must be positive for GPU instances"
-            raise ValueError(msg)
-        if not config.gpu_type:
-            msg = "gpu_type is required for GPU instances"
-            raise ValueError(msg)
+    _validate_gpu_instance_requirements(config)
+
+
+def _validate_gpu_instance_requirements(config: InstanceConfig) -> None:
+    """Validate GPU-specific requirements for GPU instances."""
+    gpu_types = (InstanceType.GPU_CONSUMER, InstanceType.GPU_DATACENTER)
+    if config.instance_type not in gpu_types:
+        return
+    if config.gpu_count == 0:
+        msg = "gpu_count must be positive for GPU instances"
+        raise ValueError(msg)
+    if not config.gpu_type:
+        msg = "gpu_type is required for GPU instances"
+        raise ValueError(msg)
 
 
 def validate_pricing_config(config: PricingConfig) -> None:

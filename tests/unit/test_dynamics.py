@@ -177,7 +177,7 @@ class TestGradientDynamics:
             exploding_layers=(),
         )
         assert dynamics.norms == (0.5, 0.4, 0.3)
-        assert dynamics.max_norm == 0.5
+        assert dynamics.max_norm == pytest.approx(0.5)
 
     def test_dynamics_is_frozen(self) -> None:
         """Dynamics is immutable."""
@@ -205,8 +205,8 @@ class TestTrainingSnapshot:
             weight_norms={"layer1": 1.0},
         )
         assert snapshot.step == 100
-        assert snapshot.loss == 0.5
-        assert snapshot.gradient_norm == 0.1
+        assert snapshot.loss == pytest.approx(0.5)
+        assert snapshot.gradient_norm == pytest.approx(0.1)
 
     def test_snapshot_is_frozen(self) -> None:
         """Snapshot is immutable."""
@@ -232,8 +232,8 @@ class TestDynamicsStats:
             oscillation_frequency=0.1,
             plateau_steps=0,
         )
-        assert stats.convergence_rate == 0.01
-        assert stats.stability_score == 0.9
+        assert stats.convergence_rate == pytest.approx(0.01)
+        assert stats.stability_score == pytest.approx(0.9)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -514,7 +514,7 @@ class TestCreateGradientDynamics:
         """Create basic gradient dynamics."""
         dynamics = create_gradient_dynamics([0.5, 0.4, 0.3])
         assert dynamics.norms == (0.5, 0.4, 0.3)
-        assert dynamics.max_norm == 0.5
+        assert dynamics.max_norm == pytest.approx(0.5)
 
     def test_with_layer_norms(self) -> None:
         """Create dynamics with layer norms."""
@@ -572,8 +572,8 @@ class TestCreateTrainingSnapshot:
         """Create basic snapshot."""
         snapshot = create_training_snapshot(100, 0.5)
         assert snapshot.step == 100
-        assert snapshot.loss == 0.5
-        assert snapshot.gradient_norm == 0.0
+        assert snapshot.loss == pytest.approx(0.5)
+        assert snapshot.gradient_norm == pytest.approx(0.0)
         assert snapshot.learning_rate == 1e-4
 
     def test_full_snapshot(self) -> None:
@@ -585,7 +585,7 @@ class TestCreateTrainingSnapshot:
             learning_rate=1e-5,
             weight_norms={"layer1": 1.0},
         )
-        assert snapshot.gradient_norm == 0.1
+        assert snapshot.gradient_norm == pytest.approx(0.1)
         assert snapshot.learning_rate == 1e-5
         assert snapshot.weight_norms == {"layer1": 1.0}
 
@@ -611,9 +611,9 @@ class TestCreateDynamicsStats:
     def test_default_stats(self) -> None:
         """Create default stats."""
         stats = create_dynamics_stats()
-        assert stats.convergence_rate == 0.0
-        assert stats.stability_score == 1.0
-        assert stats.oscillation_frequency == 0.0
+        assert stats.convergence_rate == pytest.approx(0.0)
+        assert stats.stability_score == pytest.approx(1.0)
+        assert stats.oscillation_frequency == pytest.approx(0.0)
         assert stats.plateau_steps == 0
 
     def test_custom_stats(self) -> None:
@@ -624,8 +624,8 @@ class TestCreateDynamicsStats:
             oscillation_frequency=0.1,
             plateau_steps=5,
         )
-        assert stats.convergence_rate == 0.01
-        assert stats.stability_score == 0.9
+        assert stats.convergence_rate == pytest.approx(0.01)
+        assert stats.stability_score == pytest.approx(0.9)
 
     def test_invalid_stability_score_raises(self) -> None:
         """Invalid stability_score raises ValueError."""
@@ -651,9 +651,9 @@ class TestSmoothCurve:
     def test_basic_smoothing(self) -> None:
         """Apply basic smoothing."""
         result = smooth_curve([1.0, 0.5, 0.3], 0.9)
-        assert result[0] == 1.0
-        assert result[1] == 0.95
-        assert result[2] == 0.885
+        assert result[0] == pytest.approx(1.0)
+        assert result[1] == pytest.approx(0.95)
+        assert result[2] == pytest.approx(0.885)
 
     def test_single_value(self) -> None:
         """Smooth single value."""
@@ -706,7 +706,7 @@ class TestAnalyzeLossCurve:
         """Analyze single value curve."""
         curve = create_loss_curve([0], [1.0])
         stats = analyze_loss_curve(curve)
-        assert stats.convergence_rate == 0.0
+        assert stats.convergence_rate == pytest.approx(0.0)
 
 
 class TestDetectConvergence:
@@ -828,22 +828,22 @@ class TestComputeGradientStatistics:
     def test_basic_statistics(self) -> None:
         """Compute basic statistics."""
         stats = compute_gradient_statistics([1.0, 2.0, 3.0, 4.0, 5.0])
-        assert stats["mean"] == 3.0
-        assert stats["min"] == 1.0
-        assert stats["max"] == 5.0
-        assert stats["median"] == 3.0
+        assert stats["mean"] == pytest.approx(3.0)
+        assert stats["min"] == pytest.approx(1.0)
+        assert stats["max"] == pytest.approx(5.0)
+        assert stats["median"] == pytest.approx(3.0)
 
     def test_single_value(self) -> None:
         """Compute statistics for single value."""
         stats = compute_gradient_statistics([5.0])
-        assert stats["mean"] == 5.0
-        assert stats["std"] == 0.0
-        assert stats["median"] == 5.0
+        assert stats["mean"] == pytest.approx(5.0)
+        assert stats["std"] == pytest.approx(0.0)
+        assert stats["median"] == pytest.approx(5.0)
 
     def test_even_count_median(self) -> None:
         """Compute median for even count."""
         stats = compute_gradient_statistics([1.0, 2.0, 3.0, 4.0])
-        assert stats["median"] == 2.5
+        assert stats["median"] == pytest.approx(2.5)
 
     def test_empty_norms_raises(self) -> None:
         """Empty norms raises ValueError."""
@@ -898,8 +898,8 @@ class TestGetRecommendedDynamicsConfig:
     def test_fine_tuning_7b(self) -> None:
         """Get config for 7B fine tuning."""
         config = get_recommended_dynamics_config("7b", "fine_tuning")
-        assert config["smoothing_factor"] == 0.9
-        assert config["convergence_threshold"] == 0.001
+        assert config["smoothing_factor"] == pytest.approx(0.9)
+        assert config["convergence_threshold"] == pytest.approx(0.001)
 
     def test_pretraining_70b(self) -> None:
         """Get config for 70B pretraining."""
@@ -910,8 +910,8 @@ class TestGetRecommendedDynamicsConfig:
     def test_rlhf(self) -> None:
         """Get config for RLHF."""
         config = get_recommended_dynamics_config("7b", "rlhf")
-        assert config["smoothing_factor"] == 0.95
-        assert config["convergence_threshold"] == 0.0001
+        assert config["smoothing_factor"] == pytest.approx(0.95)
+        assert config["convergence_threshold"] == pytest.approx(0.0001)
 
     def test_invalid_training_type_raises(self) -> None:
         """Invalid training type raises ValueError."""

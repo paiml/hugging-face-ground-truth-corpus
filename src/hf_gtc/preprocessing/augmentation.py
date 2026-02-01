@@ -19,12 +19,15 @@ Examples:
 from __future__ import annotations
 
 import random
+import unicodedata
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+
+from hf_gtc._validation import validate_not_none
 
 
 class AugmentationType(Enum):
@@ -324,9 +327,7 @@ def validate_augment_config(config: AugmentConfig) -> None:
         Traceback (most recent call last):
         ValueError: probability must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.probability <= 1.0:
         msg = f"probability must be between 0 and 1, got {config.probability}"
@@ -370,9 +371,7 @@ def validate_synonym_config(config: SynonymConfig) -> None:
         Traceback (most recent call last):
         ValueError: method cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.method:
         msg = "method cannot be empty"
@@ -417,9 +416,7 @@ def validate_backtranslation_config(config: BacktranslationConfig) -> None:
         Traceback (most recent call last):
         ValueError: pivot_languages cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.pivot_languages:
         msg = "pivot_languages cannot be empty"
@@ -461,9 +458,7 @@ def validate_noise_config(config: NoiseConfig) -> None:
         Traceback (most recent call last):
         ValueError: probability must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.probability <= 1.0:
         msg = f"probability must be between 0 and 1, got {config.probability}"
@@ -501,9 +496,7 @@ def validate_augmentation_config(config: AugmentationConfig) -> None:
         Traceback (most recent call last):
         ValueError: probability must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.probability <= 1.0:
         msg = f"probability must be between 0 and 1, got {config.probability}"
@@ -1182,9 +1175,7 @@ def inject_noise(
         msg = "text cannot be None"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.probability == 0.0 or not text:
         return text
@@ -1225,19 +1216,32 @@ def _inject_word_noise(text: str, probability: float, rng: random.Random) -> str
 
     result = []
     for word in words:
-        if rng.random() < probability:
-            # Skip word (drop) with 50% chance, or shuffle characters
-            if rng.random() < 0.5:
-                continue  # Drop word
-            else:
-                # Shuffle middle characters
-                if len(word) > 3:
-                    middle = list(word[1:-1])
-                    rng.shuffle(middle)
-                    word = word[0] + "".join(middle) + word[-1]
-        result.append(word)
-
+        word = _apply_word_noise(word, probability, rng, result)
     return " ".join(result) if result else text
+
+
+def _apply_word_noise(
+    word: str,
+    probability: float,
+    rng: random.Random,
+    result: list[str],
+) -> str:
+    """Apply noise to a single word, appending to result."""
+    if rng.random() < probability:
+        if rng.random() < 0.5:
+            return word  # Drop word (don't append)
+        word = _shuffle_middle(word, rng)
+    result.append(word)
+    return word
+
+
+def _shuffle_middle(word: str, rng: random.Random) -> str:
+    """Shuffle middle characters of a word if long enough."""
+    if len(word) > 3:
+        middle = list(word[1:-1])
+        rng.shuffle(middle)
+        return word[0] + "".join(middle) + word[-1]
+    return word
 
 
 # Keyboard layout for typo simulation
@@ -1357,6 +1361,9 @@ def augment_text(
         msg = "text cannot be None"
         raise ValueError(msg)
 
+    # Apply NFC normalization for consistent Unicode handling
+    text = unicodedata.normalize("NFC", text)
+
     effective_config = config or AugmentConfig()
 
     if effective_config.augmentation_type == AugmentationType.NONE:
@@ -1469,9 +1476,7 @@ def apply_augmentation(
         msg = "text cannot be None"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     rng = rng or random.Random()
 
@@ -1523,13 +1528,12 @@ def create_augmenter(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_augment_config(config)
 
     def augmenter(text: str) -> AugmentResult:
+        """Apply the configured augmentation pipeline to input text."""
         return augment_text(text, config, synonyms=synonyms)
 
     return augmenter
@@ -1824,9 +1828,7 @@ def format_augmentation_stats(stats: AugmentationStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     augmentation_factor = (
         stats.total_augmented / stats.total_texts if stats.total_texts > 0 else 0.0

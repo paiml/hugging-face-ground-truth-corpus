@@ -29,6 +29,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class SeedComponent(Enum):
     """Components that can be seeded for reproducibility.
@@ -293,9 +295,7 @@ def validate_seed_config(config: SeedConfig) -> None:
         Traceback (most recent call last):
         ValueError: seed must be non-negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.seed < 0:
         msg = f"seed must be non-negative, got {config.seed}"
@@ -327,9 +327,7 @@ def validate_reproducibility_config(config: ReproducibilityConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_seed_config(config.seed_config)
 
@@ -433,9 +431,7 @@ def validate_reproducibility_stats(stats: ReproducibilityStats) -> None:
         Traceback (most recent call last):
         ValueError: seed must be non-negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.seed < 0:
         msg = f"seed must be non-negative, got {stats.seed}"
@@ -838,6 +834,66 @@ def get_checksum_type(name: str) -> ChecksumType:
     return ChecksumType(name)
 
 
+def _seed_python(seed: int, config: SeedConfig, results: dict[str, bool]) -> None:
+    """Seed the Python random module."""
+    import random
+
+    random.seed(seed)
+    results["python"] = True
+
+
+def _seed_numpy(seed: int, config: SeedConfig, results: dict[str, bool]) -> None:
+    """Seed the NumPy random module."""
+    try:
+        import numpy as np
+
+        np.random.seed(seed)
+        results["numpy"] = True
+    except ImportError:
+        results["numpy"] = False
+
+
+def _seed_torch(seed: int, config: SeedConfig, results: dict[str, bool]) -> None:
+    """Seed PyTorch."""
+    try:
+        import torch
+
+        torch.manual_seed(seed)
+        if config.deterministic_algorithms:
+            torch.use_deterministic_algorithms(True)
+        results["torch"] = True
+    except ImportError:
+        results["torch"] = False
+
+
+def _seed_cuda(seed: int, config: SeedConfig, results: dict[str, bool]) -> None:
+    """Seed CUDA RNG."""
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+            if config.deterministic_algorithms:
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+            results["cuda"] = True
+        else:
+            results["cuda"] = False
+    except ImportError:
+        results["cuda"] = False
+
+
+def _seed_transformers(seed: int, config: SeedConfig, results: dict[str, bool]) -> None:
+    """Seed Hugging Face transformers."""
+    try:
+        from transformers import set_seed as hf_set_seed
+
+        hf_set_seed(seed)
+        results["transformers"] = True
+    except ImportError:
+        results["transformers"] = False
+
+
 def set_all_seeds(config: SeedConfig) -> dict[str, bool]:
     """Set random seeds for all configured components.
 
@@ -863,65 +919,25 @@ def set_all_seeds(config: SeedConfig) -> dict[str, bool]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_seed_config(config)
 
     results: dict[str, bool] = {}
     seed = config.seed
 
+    seeders = {
+        SeedComponent.PYTHON: _seed_python,
+        SeedComponent.NUMPY: _seed_numpy,
+        SeedComponent.TORCH: _seed_torch,
+        SeedComponent.CUDA: _seed_cuda,
+        SeedComponent.TRANSFORMERS: _seed_transformers,
+    }
+
     for component in config.components:
-        if component == SeedComponent.PYTHON:
-            import random
-
-            random.seed(seed)
-            results["python"] = True
-
-        elif component == SeedComponent.NUMPY:
-            try:
-                import numpy as np
-
-                np.random.seed(seed)
-                results["numpy"] = True
-            except ImportError:
-                results["numpy"] = False
-
-        elif component == SeedComponent.TORCH:
-            try:
-                import torch
-
-                torch.manual_seed(seed)
-                if config.deterministic_algorithms:
-                    torch.use_deterministic_algorithms(True)
-                results["torch"] = True
-            except ImportError:
-                results["torch"] = False
-
-        elif component == SeedComponent.CUDA:
-            try:
-                import torch
-
-                if torch.cuda.is_available():
-                    torch.cuda.manual_seed_all(seed)
-                    if config.deterministic_algorithms:
-                        torch.backends.cudnn.deterministic = True
-                        torch.backends.cudnn.benchmark = False
-                    results["cuda"] = True
-                else:
-                    results["cuda"] = False
-            except ImportError:
-                results["cuda"] = False
-
-        elif component == SeedComponent.TRANSFORMERS:
-            try:
-                from transformers import set_seed as hf_set_seed
-
-                hf_set_seed(seed)
-                results["transformers"] = True
-            except ImportError:
-                results["transformers"] = False
+        seeder = seeders.get(component)
+        if seeder is not None:
+            seeder(seed, config, results)
 
     return results
 
@@ -1004,6 +1020,57 @@ def get_rng_state(components: tuple[SeedComponent, ...] | None = None) -> RNGSta
     )
 
 
+def _restore_python_state(saved: bytes, results: dict[str, bool], key: str) -> None:
+    """Restore Python RNG state."""
+    import pickle
+    import random
+
+    random.setstate(pickle.loads(saved))  # nosec B301 - trusted internal state
+    results[key] = True
+
+
+def _restore_numpy_state(saved: bytes, results: dict[str, bool], key: str) -> None:
+    """Restore NumPy RNG state."""
+    import pickle
+
+    try:
+        import numpy as np
+
+        np.random.set_state(pickle.loads(saved))  # nosec B301
+        results[key] = True
+    except ImportError:
+        results[key] = False
+
+
+def _restore_torch_state(saved: bytes, results: dict[str, bool], key: str) -> None:
+    """Restore PyTorch RNG state."""
+    import pickle
+
+    try:
+        import torch
+
+        torch.set_rng_state(pickle.loads(saved))  # nosec B301
+        results[key] = True
+    except ImportError:
+        results[key] = False
+
+
+def _restore_cuda_state(saved: bytes, results: dict[str, bool], key: str) -> None:
+    """Restore CUDA RNG state."""
+    import pickle
+
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            torch.cuda.set_rng_state_all(pickle.loads(saved))  # nosec B301
+            results[key] = True
+        else:
+            results[key] = False
+    except ImportError:
+        results[key] = False
+
+
 def set_rng_state(state: RNGState) -> dict[str, bool]:
     """Restore RNG states from a saved state container.
 
@@ -1032,45 +1099,19 @@ def set_rng_state(state: RNGState) -> dict[str, bool]:
         msg = "state cannot be None"
         raise ValueError(msg)
 
-    import pickle
-
     results: dict[str, bool] = {}
 
-    if state.python_state is not None:
-        import random
+    restorers: tuple[tuple[str, str, object], ...] = (
+        ("python_state", "python", _restore_python_state),
+        ("numpy_state", "numpy", _restore_numpy_state),
+        ("torch_state", "torch", _restore_torch_state),
+        ("cuda_state", "cuda", _restore_cuda_state),
+    )
 
-        random.setstate(pickle.loads(state.python_state))  # nosec B301 - trusted internal state
-        results["python"] = True
-
-    if state.numpy_state is not None:
-        try:
-            import numpy as np
-
-            np.random.set_state(pickle.loads(state.numpy_state))  # nosec B301
-            results["numpy"] = True
-        except ImportError:
-            results["numpy"] = False
-
-    if state.torch_state is not None:
-        try:
-            import torch
-
-            torch.set_rng_state(pickle.loads(state.torch_state))  # nosec B301
-            results["torch"] = True
-        except ImportError:
-            results["torch"] = False
-
-    if state.cuda_state is not None:
-        try:
-            import torch
-
-            if torch.cuda.is_available():
-                torch.cuda.set_rng_state_all(pickle.loads(state.cuda_state))  # nosec B301
-                results["cuda"] = True
-            else:
-                results["cuda"] = False
-        except ImportError:
-            results["cuda"] = False
+    for attr_name, key, restorer in restorers:
+        saved = getattr(state, attr_name)
+        if saved is not None:
+            restorer(saved, results, key)
 
     return results
 
@@ -1105,9 +1146,7 @@ def compute_config_hash(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     # Create a canonical string representation
     components_str = ",".join(sorted(c.value for c in config.seed_config.components))
@@ -1229,9 +1268,7 @@ def verify_reproducibility(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not expected_config_hash:
         msg = "expected_config_hash cannot be empty"
@@ -1290,9 +1327,7 @@ def format_reproducibility_stats(stats: ReproducibilityStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     return (
         f"Reproducibility Stats:\n"

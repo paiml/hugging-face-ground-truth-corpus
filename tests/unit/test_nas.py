@@ -187,8 +187,8 @@ class TestArchitectureCandidate:
             cost=1.5e9,
             rank=1,
         )
-        assert candidate.performance == 0.92
-        assert candidate.cost == 1.5e9
+        assert candidate.performance == pytest.approx(0.92)
+        assert candidate.cost == pytest.approx(1.5e9)
         assert candidate.rank == 1
         assert candidate.config["num_layers"] == 6
 
@@ -213,8 +213,8 @@ class TestNASStats:
             pareto_front_size=5,
         )
         assert stats.total_trials == 100
-        assert stats.best_performance == 0.95
-        assert stats.search_time_hours == 24.5
+        assert stats.best_performance == pytest.approx(0.95)
+        assert stats.search_time_hours == pytest.approx(24.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -457,8 +457,8 @@ class TestCreateArchitectureCandidate:
     def test_default_candidate(self) -> None:
         """Create default candidate."""
         candidate = create_architecture_candidate()
-        assert candidate.performance == 0.0
-        assert candidate.cost == 0.0
+        assert candidate.performance == pytest.approx(0.0)
+        assert candidate.cost == pytest.approx(0.0)
         assert candidate.rank == 1
         assert candidate.config == {}
 
@@ -470,8 +470,8 @@ class TestCreateArchitectureCandidate:
             cost=1.5e9,
             rank=3,
         )
-        assert candidate.performance == 0.92
-        assert candidate.cost == 1.5e9
+        assert candidate.performance == pytest.approx(0.92)
+        assert candidate.cost == pytest.approx(1.5e9)
         assert candidate.rank == 3
 
     def test_negative_performance_raises(self) -> None:
@@ -497,8 +497,8 @@ class TestCreateNASStats:
         """Create default stats."""
         stats = create_nas_stats()
         assert stats.total_trials == 0
-        assert stats.best_performance == 0.0
-        assert stats.search_time_hours == 0.0
+        assert stats.best_performance == pytest.approx(0.0)
+        assert stats.search_time_hours == pytest.approx(0.0)
         assert stats.pareto_front_size == 0
 
     def test_custom_stats(self) -> None:
@@ -510,7 +510,7 @@ class TestCreateNASStats:
             pareto_front_size=5,
         )
         assert stats.total_trials == 100
-        assert stats.best_performance == 0.95
+        assert stats.best_performance == pytest.approx(0.95)
 
     def test_negative_trials_raises(self) -> None:
         """Negative trials raises ValueError."""
@@ -648,13 +648,13 @@ class TestEstimateSearchCost:
         """Basic cost estimation."""
         config = create_search_config(num_trials=100)
         cost = estimate_search_cost(config, hours_per_trial=0.5, gpu_cost_per_hour=1.0)
-        assert cost == 50.0
+        assert cost == pytest.approx(50.0)
 
     def test_higher_cost(self) -> None:
         """Higher cost estimation."""
         config = create_search_config(num_trials=50)
         cost = estimate_search_cost(config, hours_per_trial=1.0, gpu_cost_per_hour=2.0)
-        assert cost == 100.0
+        assert cost == pytest.approx(100.0)
 
     def test_zero_hours_raises(self) -> None:
         """Zero hours raises ValueError."""
@@ -685,8 +685,8 @@ class TestEvaluateArchitecture:
             performance_metric=0.92,
             cost_metric=1.5e9,
         )
-        assert result.performance == 0.92
-        assert result.cost == 1.5e9
+        assert result.performance == pytest.approx(0.92)
+        assert result.cost == pytest.approx(1.5e9)
         assert result.rank == 1
         assert result.config["num_layers"] == 6
 
@@ -694,7 +694,7 @@ class TestEvaluateArchitecture:
         """Evaluation with empty config."""
         result = evaluate_architecture({}, 0.8, 1e9)
         assert result.config == {}
-        assert result.performance == 0.8
+        assert result.performance == pytest.approx(0.8)
 
     def test_negative_performance_raises(self) -> None:
         """Negative performance raises ValueError."""

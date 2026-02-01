@@ -231,6 +231,16 @@ class NASStats:
     pareto_front_size: int
 
 
+def _validate_search_range(name: str, lo: int, hi: int) -> None:
+    """Validate a search space range: min <= max and min > 0."""
+    if lo > hi:
+        msg = f"{name} min ({lo}) must be <= max ({hi})"
+        raise ValueError(msg)
+    if lo <= 0:
+        msg = f"{name} min must be positive, got {lo}"
+        raise ValueError(msg)
+
+
 def validate_search_space_config(config: SearchSpaceConfig) -> None:
     """Validate search space configuration parameters.
 
@@ -260,29 +270,13 @@ def validate_search_space_config(config: SearchSpaceConfig) -> None:
             ...
         ValueError: num_layers_range min (12) must be <= max (4)
     """
-    min_layers, max_layers = config.num_layers_range
-    if min_layers > max_layers:
-        msg = f"num_layers_range min ({min_layers}) must be <= max ({max_layers})"
-        raise ValueError(msg)
-    if min_layers <= 0:
-        msg = f"num_layers_range min must be positive, got {min_layers}"
-        raise ValueError(msg)
-
-    min_hidden, max_hidden = config.hidden_dims_range
-    if min_hidden > max_hidden:
-        msg = f"hidden_dims_range min ({min_hidden}) must be <= max ({max_hidden})"
-        raise ValueError(msg)
-    if min_hidden <= 0:
-        msg = f"hidden_dims_range min must be positive, got {min_hidden}"
-        raise ValueError(msg)
-
-    min_heads, max_heads = config.num_heads_range
-    if min_heads > max_heads:
-        msg = f"num_heads_range min ({min_heads}) must be <= max ({max_heads})"
-        raise ValueError(msg)
-    if min_heads <= 0:
-        msg = f"num_heads_range min must be positive, got {min_heads}"
-        raise ValueError(msg)
+    ranges = (
+        ("num_layers_range", config.num_layers_range),
+        ("hidden_dims_range", config.hidden_dims_range),
+        ("num_heads_range", config.num_heads_range),
+    )
+    for name, (lo, hi) in ranges:
+        _validate_search_range(name, lo, hi)
 
 
 def validate_search_config(config: SearchConfig) -> None:

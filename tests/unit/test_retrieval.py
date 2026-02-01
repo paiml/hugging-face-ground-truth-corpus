@@ -269,7 +269,7 @@ class TestCreateRetrievalResult:
         """Create default result."""
         chunk = create_document_chunk("text", "c0", "d1")
         result = create_retrieval_result(chunk, score=0.9, rank=1)
-        assert result.score == 0.9
+        assert result.score == pytest.approx(0.9)
         assert result.rank == 1
 
     def test_invalid_score_raises(self) -> None:
@@ -326,12 +326,12 @@ class TestCalculateOverlapRatio:
     def test_basic_ratio(self) -> None:
         """Basic overlap ratio."""
         ratio = calculate_overlap_ratio(50, 500)
-        assert ratio == 0.1
+        assert ratio == pytest.approx(0.1)
 
     def test_half_overlap(self) -> None:
         """Half overlap ratio."""
         ratio = calculate_overlap_ratio(100, 200)
-        assert ratio == 0.5
+        assert ratio == pytest.approx(0.5)
 
     def test_zero_chunk_size_raises(self) -> None:
         """Zero chunk size raises ValueError."""
@@ -507,7 +507,7 @@ class TestRetrievalResult:
         """Create retrieval result."""
         chunk = DocumentChunk("text", "c0", "d1", 0, 4, {})
         result = RetrievalResult(chunk=chunk, score=0.95, rank=1)
-        assert result.score == 0.95
+        assert result.score == pytest.approx(0.95)
 
 
 class TestRetrievalStats:

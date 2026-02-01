@@ -747,37 +747,37 @@ class TestAggregateMetric:
         """Last aggregation returns last value by step."""
         values = [(0, 1.0), (2, 3.0), (1, 2.0)]
         result = _aggregate_metric(values, MetricAggregation.LAST, True)
-        assert result == 3.0
+        assert result == pytest.approx(3.0)
 
     def test_mean_aggregation(self) -> None:
         """Mean aggregation returns average."""
         values = [(0, 1.0), (1, 2.0), (2, 3.0)]
         result = _aggregate_metric(values, MetricAggregation.MEAN, True)
-        assert result == 2.0
+        assert result == pytest.approx(2.0)
 
     def test_min_aggregation(self) -> None:
         """Min aggregation returns minimum."""
         values = [(0, 3.0), (1, 1.0), (2, 2.0)]
         result = _aggregate_metric(values, MetricAggregation.MIN, True)
-        assert result == 1.0
+        assert result == pytest.approx(1.0)
 
     def test_max_aggregation(self) -> None:
         """Max aggregation returns maximum."""
         values = [(0, 1.0), (1, 3.0), (2, 2.0)]
         result = _aggregate_metric(values, MetricAggregation.MAX, True)
-        assert result == 3.0
+        assert result == pytest.approx(3.0)
 
     def test_best_higher_is_better(self) -> None:
         """Best with higher_is_better=True returns max."""
         values = [(0, 1.0), (1, 3.0), (2, 2.0)]
         result = _aggregate_metric(values, MetricAggregation.BEST, True)
-        assert result == 3.0
+        assert result == pytest.approx(3.0)
 
     def test_best_lower_is_better(self) -> None:
         """Best with higher_is_better=False returns min."""
         values = [(0, 1.0), (1, 3.0), (2, 2.0)]
         result = _aggregate_metric(values, MetricAggregation.BEST, False)
-        assert result == 1.0
+        assert result == pytest.approx(1.0)
 
     def test_empty_values_raises(self) -> None:
         """Empty values raises ValueError."""
@@ -838,9 +838,9 @@ class TestCompareRuns:
         run2 = create_experiment_run(config, run_id="run-2")
         run2 = log_metric(run2, "accuracy", 0.9)
         comparison = compare_runs([run1, run2])
-        assert comparison["run-1"]["accuracy"] == 0.8
-        assert comparison["run-1"]["loss"] == 0.2
-        assert comparison["run-2"]["accuracy"] == 0.9
+        assert comparison["run-1"]["accuracy"] == pytest.approx(0.8)
+        assert comparison["run-1"]["loss"] == pytest.approx(0.2)
+        assert comparison["run-2"]["accuracy"] == pytest.approx(0.9)
         assert comparison["run-2"]["loss"] is None
 
     def test_compare_specific_metrics(self) -> None:
@@ -864,7 +864,7 @@ class TestCompareRuns:
         run = log_metric(run, "accuracy", 0.5, step=0)
         run = log_metric(run, "accuracy", 0.9, step=100)
         comparison = compare_runs([run])
-        assert comparison["run-1"]["accuracy"] == 0.9
+        assert comparison["run-1"]["accuracy"] == pytest.approx(0.9)
 
 
 class TestExperimentStats:
@@ -882,7 +882,7 @@ class TestExperimentStats:
         assert stats.total_runs == 10
         assert stats.completed_runs == 8
         assert stats.failed_runs == 2
-        assert stats.avg_duration_seconds == 3600.0
+        assert stats.avg_duration_seconds == pytest.approx(3600.0)
         assert stats.metric_stats["accuracy"] == (0.7, 0.95, 0.85)
 
 
@@ -899,8 +899,8 @@ class TestCalculateExperimentStats:
         stats = calculate_experiment_stats([run1, run2])
         assert stats.total_runs == 2
         min_val, max_val, mean_val = stats.metric_stats["accuracy"]
-        assert min_val == 0.8
-        assert max_val == 0.9
+        assert min_val == pytest.approx(0.8)
+        assert max_val == pytest.approx(0.9)
         assert abs(mean_val - 0.85) < 1e-10
 
     def test_empty_runs(self) -> None:
@@ -941,7 +941,7 @@ class TestCalculateExperimentStats:
             now + timedelta(hours=1),
         )
         stats = calculate_experiment_stats([run])
-        assert stats.avg_duration_seconds == 3600.0
+        assert stats.avg_duration_seconds == pytest.approx(3600.0)
 
 
 class TestFormatExperimentSummary:

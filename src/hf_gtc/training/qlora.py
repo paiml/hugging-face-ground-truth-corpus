@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class QuantBits(Enum):
     """Supported quantization bit widths.
@@ -226,9 +228,7 @@ def validate_quant_config(config: QuantConfig) -> None:
         Traceback (most recent call last):
         ValueError: bits must be 4 or 8
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.bits not in (4, 8):
         msg = f"bits must be 4 or 8, got {config.bits}"
@@ -260,9 +260,7 @@ def validate_qlora_config(config: QLoRAConfig) -> None:
         Traceback (most recent call last):
         ValueError: r must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.r <= 0:
         msg = f"r must be positive, got {config.r}"
@@ -516,9 +514,7 @@ def get_qlora_peft_config(config: QLoRAConfig) -> dict[str, Any]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "r": config.r,
@@ -554,9 +550,7 @@ def get_bnb_config(config: QuantConfig) -> dict[str, Any]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     result: dict[str, Any] = {}
 

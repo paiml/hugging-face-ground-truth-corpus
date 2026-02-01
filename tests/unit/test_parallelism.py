@@ -241,7 +241,7 @@ class TestParallelStats:
             efficiency=0.85,
         )
         assert stats.world_size == 16
-        assert stats.efficiency == 0.85
+        assert stats.efficiency == pytest.approx(0.85)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""

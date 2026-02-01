@@ -164,7 +164,7 @@ class TestVLLMConfig:
             enforce_eager=False,
         )
         assert config.tensor_parallel_size == 4
-        assert config.gpu_memory_utilization == 0.9
+        assert config.gpu_memory_utilization == pytest.approx(0.9)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -176,7 +176,7 @@ class TestVLLMConfig:
         """All fields are accessible."""
         config = VLLMConfig(2, 0.85, 8192, True)
         assert config.tensor_parallel_size == 2
-        assert config.gpu_memory_utilization == 0.85
+        assert config.gpu_memory_utilization == pytest.approx(0.85)
         assert config.max_model_len == 8192
         assert config.enforce_eager is True
 
@@ -283,8 +283,8 @@ class TestEngineStats:
             latency_ms=50.0,
             memory_usage_gb=24.0,
         )
-        assert stats.throughput_tokens_per_sec == 1500.0
-        assert stats.latency_ms == 50.0
+        assert stats.throughput_tokens_per_sec == pytest.approx(1500.0)
+        assert stats.latency_ms == pytest.approx(50.0)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -295,9 +295,9 @@ class TestEngineStats:
     def test_all_fields_accessible(self) -> None:
         """All fields are accessible."""
         stats = EngineStats(1000.0, 100.0, 16.0)
-        assert stats.throughput_tokens_per_sec == 1000.0
-        assert stats.latency_ms == 100.0
-        assert stats.memory_usage_gb == 16.0
+        assert stats.throughput_tokens_per_sec == pytest.approx(1000.0)
+        assert stats.latency_ms == pytest.approx(100.0)
+        assert stats.memory_usage_gb == pytest.approx(16.0)
 
 
 class TestValidateVLLMConfig:
@@ -555,7 +555,7 @@ class TestCreateVLLMConfig:
         """Create default config."""
         config = create_vllm_config()
         assert config.tensor_parallel_size == 1
-        assert config.gpu_memory_utilization == 0.9
+        assert config.gpu_memory_utilization == pytest.approx(0.9)
         assert config.max_model_len == 4096
         assert config.enforce_eager is False
 
@@ -567,7 +567,7 @@ class TestCreateVLLMConfig:
     def test_custom_memory_utilization(self) -> None:
         """Create config with custom gpu_memory_utilization."""
         config = create_vllm_config(gpu_memory_utilization=0.8)
-        assert config.gpu_memory_utilization == 0.8
+        assert config.gpu_memory_utilization == pytest.approx(0.8)
 
     def test_custom_max_model_len(self) -> None:
         """Create config with custom max_model_len."""
@@ -711,24 +711,24 @@ class TestCreateEngineStats:
     def test_default_stats(self) -> None:
         """Create default stats."""
         stats = create_engine_stats()
-        assert stats.throughput_tokens_per_sec == 0.0
-        assert stats.latency_ms == 0.0
-        assert stats.memory_usage_gb == 0.0
+        assert stats.throughput_tokens_per_sec == pytest.approx(0.0)
+        assert stats.latency_ms == pytest.approx(0.0)
+        assert stats.memory_usage_gb == pytest.approx(0.0)
 
     def test_custom_throughput(self) -> None:
         """Create stats with custom throughput."""
         stats = create_engine_stats(throughput_tokens_per_sec=1500.0)
-        assert stats.throughput_tokens_per_sec == 1500.0
+        assert stats.throughput_tokens_per_sec == pytest.approx(1500.0)
 
     def test_custom_latency(self) -> None:
         """Create stats with custom latency."""
         stats = create_engine_stats(latency_ms=50.0)
-        assert stats.latency_ms == 50.0
+        assert stats.latency_ms == pytest.approx(50.0)
 
     def test_custom_memory(self) -> None:
         """Create stats with custom memory."""
         stats = create_engine_stats(memory_usage_gb=24.0)
-        assert stats.memory_usage_gb == 24.0
+        assert stats.memory_usage_gb == pytest.approx(24.0)
 
     def test_negative_throughput_raises(self) -> None:
         """Negative throughput raises ValueError."""
@@ -968,7 +968,7 @@ class TestCompareEnginePerformance:
     def test_same_engine_equal_performance(self) -> None:
         """Same engine has equal performance."""
         result = compare_engine_performance("vllm", "vllm", 7.0, 16)
-        assert result["ratio_a_to_b"] == 1.0
+        assert result["ratio_a_to_b"] == pytest.approx(1.0)
 
     def test_invalid_engine_a_raises(self) -> None:
         """Invalid engine_a raises ValueError."""

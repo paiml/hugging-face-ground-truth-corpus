@@ -218,7 +218,7 @@ class TestEvaluationResults:
             datasets=("glue", "superglue"),
             scores={"accuracy": 0.92, "f1": 0.89},
         )
-        assert results.scores["accuracy"] == 0.92
+        assert results.scores["accuracy"] == pytest.approx(0.92)
         assert "f1" in results.metrics
 
     def test_results_is_frozen(self) -> None:
@@ -267,7 +267,7 @@ class TestModelCardStats:
             missing_sections=("ethics",),
             word_count=500,
         )
-        assert stats.completeness_score == 0.85
+        assert stats.completeness_score == pytest.approx(0.85)
         assert "ethics" in stats.missing_sections
 
     def test_stats_is_frozen(self) -> None:
@@ -548,7 +548,7 @@ class TestCreateEvaluationResults:
             ["glue"],
             {"accuracy": 0.92, "f1": 0.89},
         )
-        assert results.scores["accuracy"] == 0.92
+        assert results.scores["accuracy"] == pytest.approx(0.92)
         assert results.metrics == ("accuracy", "f1")
         assert results.datasets == ("glue",)
 
@@ -610,7 +610,7 @@ class TestCreateModelCardConfig:
         )
         config = create_model_card_config(metadata, evaluation=evaluation)
         assert config.evaluation is not None
-        assert config.evaluation.scores["accuracy"] == 0.9
+        assert config.evaluation.scores["accuracy"] == pytest.approx(0.9)
 
 
 class TestListCardSections:

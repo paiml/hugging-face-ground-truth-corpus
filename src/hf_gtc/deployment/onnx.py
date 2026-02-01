@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ONNXOpset(Enum):
     """ONNX opset versions.
@@ -299,9 +301,7 @@ def validate_export_config(config: ONNXExportConfig) -> None:
         Traceback (most recent call last):
         ValueError: input_names cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.opset_version not in VALID_OPSET_VERSIONS:
         msg = (
@@ -342,9 +342,7 @@ def validate_runtime_config(config: RuntimeConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_threads cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_threads < 0:
         msg = f"num_threads cannot be negative, got {config.num_threads}"
@@ -798,9 +796,7 @@ def get_export_config_dict(config: ONNXExportConfig) -> dict[str, Any]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     result: dict[str, Any] = {
         "opset_version": config.opset_version,
@@ -839,9 +835,7 @@ def get_runtime_session_options(config: RuntimeConfig) -> dict[str, Any]:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     # Map OptimizationLevel to ORT GraphOptimizationLevel values
     opt_level_map = {
@@ -938,9 +932,7 @@ def format_export_stats(stats: ExportStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     # Format size in appropriate units
     size_mb = stats.model_size_bytes / (1024 * 1024)

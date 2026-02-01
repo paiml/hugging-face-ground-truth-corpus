@@ -69,8 +69,8 @@ class TestSamplingConfig:
             length_penalty=1.0,
             no_repeat_ngram_size=3,
         )
-        assert config.temperature == 0.7
-        assert config.top_p == 0.9
+        assert config.temperature == pytest.approx(0.7)
+        assert config.top_p == pytest.approx(0.9)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -233,7 +233,7 @@ class TestCreateSamplingConfig:
         """Create default config."""
         config = create_sampling_config()
         assert config.strategy == SamplingStrategy.TOP_P
-        assert config.temperature == 1.0
+        assert config.temperature == pytest.approx(1.0)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -243,8 +243,8 @@ class TestCreateSamplingConfig:
             top_p=0.8,
         )
         assert config.strategy == SamplingStrategy.GREEDY
-        assert config.temperature == 0.5
-        assert config.top_p == 0.8
+        assert config.temperature == pytest.approx(0.5)
+        assert config.top_p == pytest.approx(0.8)
 
     def test_invalid_strategy_raises(self) -> None:
         """Invalid strategy raises ValueError."""
@@ -270,7 +270,7 @@ class TestCreateBeamSearchConfig:
         """Create custom config."""
         config = create_beam_search_config(num_beams=8, length_penalty=1.5)
         assert config.num_beams == 8
-        assert config.length_penalty == 1.5
+        assert config.length_penalty == pytest.approx(1.5)
 
     def test_zero_beams_raises(self) -> None:
         """Zero beams raises ValueError."""
@@ -324,13 +324,13 @@ class TestCreateContrastiveConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_contrastive_config()
-        assert config.penalty_alpha == 0.6
+        assert config.penalty_alpha == pytest.approx(0.6)
         assert config.top_k == 4
 
     def test_custom_config(self) -> None:
         """Create custom config."""
         config = create_contrastive_config(penalty_alpha=0.5, top_k=6)
-        assert config.penalty_alpha == 0.5
+        assert config.penalty_alpha == pytest.approx(0.5)
         assert config.top_k == 6
 
     def test_invalid_alpha_raises(self) -> None:
@@ -388,12 +388,12 @@ class TestGetRecommendedConfig:
     def test_factual_task(self) -> None:
         """Get config for factual task."""
         config = get_recommended_config("factual")
-        assert config.temperature == 0.1
+        assert config.temperature == pytest.approx(0.1)
 
     def test_code_task(self) -> None:
         """Get config for code task."""
         config = get_recommended_config("code")
-        assert config.temperature == 0.2
+        assert config.temperature == pytest.approx(0.2)
 
     def test_chat_task(self) -> None:
         """Get config for chat task."""
@@ -510,5 +510,5 @@ class TestContrastiveConfig:
     def test_create_config(self) -> None:
         """Create contrastive config."""
         config = ContrastiveConfig(penalty_alpha=0.6, top_k=4)
-        assert config.penalty_alpha == 0.6
+        assert config.penalty_alpha == pytest.approx(0.6)
         assert config.top_k == 4

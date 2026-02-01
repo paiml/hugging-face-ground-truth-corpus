@@ -19,12 +19,15 @@ from __future__ import annotations
 
 import hashlib
 import math
+import unicodedata
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+from hf_gtc._validation import validate_not_none
 
 
 class DeduplicationMethod(Enum):
@@ -252,9 +255,7 @@ def validate_deduplication_config(config: DeduplicationConfig) -> None:
         Traceback (most recent call last):
         ValueError: similarity_threshold must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.similarity_threshold <= 1.0:
         msg = (
@@ -306,9 +307,7 @@ def validate_quality_filter_config(config: QualityFilterConfig) -> None:
         Traceback (most recent call last):
         ValueError: metrics cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.metrics:
         msg = "metrics cannot be empty"
@@ -351,9 +350,7 @@ def validate_contamination_config(config: ContaminationConfig) -> None:
         Traceback (most recent call last):
         ValueError: test_datasets cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.test_datasets:
         msg = "test_datasets cannot be empty"
@@ -713,6 +710,9 @@ def calculate_text_quality_score(
     if text is None:
         msg = "text cannot be None"
         raise ValueError(msg)
+
+    # Apply NFC normalization for consistent Unicode handling
+    text = unicodedata.normalize("NFC", text)
 
     effective_metrics = metrics or list(QualityMetric)
 
@@ -1075,9 +1075,7 @@ def format_quality_stats(stats: QualityStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     retention_rate = (
         (stats.total_samples - stats.filtered_count) / stats.total_samples * 100

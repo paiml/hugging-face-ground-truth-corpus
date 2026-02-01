@@ -125,9 +125,9 @@ class TestTemperatureConfig:
     def test_default_values(self) -> None:
         """Test default configuration values."""
         config = TemperatureConfig()
-        assert config.initial_temp == 1.0
+        assert config.initial_temp == pytest.approx(1.0)
         assert config.optimize is True
-        assert config.lr == 0.01
+        assert config.lr == pytest.approx(0.01)
 
     def test_custom_values(self) -> None:
         """Test custom configuration values."""
@@ -136,9 +136,9 @@ class TestTemperatureConfig:
             optimize=False,
             lr=0.001,
         )
-        assert config.initial_temp == 2.0
+        assert config.initial_temp == pytest.approx(2.0)
         assert config.optimize is False
-        assert config.lr == 0.001
+        assert config.lr == pytest.approx(0.001)
 
     def test_frozen(self) -> None:
         """Test that TemperatureConfig is immutable."""
@@ -173,7 +173,7 @@ class TestCalibrationConfig:
         )
         assert config.method == CalibrationMethod.HISTOGRAM
         assert config.temperature_config is not None
-        assert config.temperature_config.initial_temp == 1.5
+        assert config.temperature_config.initial_temp == pytest.approx(1.5)
         assert config.n_bins == 20
         assert config.validate_before is False
 
@@ -445,7 +445,7 @@ class TestCreateTemperatureConfig:
         """Test that function creates a config."""
         config = create_temperature_config()
         assert isinstance(config, TemperatureConfig)
-        assert config.initial_temp == 1.0
+        assert config.initial_temp == pytest.approx(1.0)
 
     def test_with_custom_options(self) -> None:
         """Test config creation with custom options."""
@@ -454,9 +454,9 @@ class TestCreateTemperatureConfig:
             optimize=False,
             lr=0.001,
         )
-        assert config.initial_temp == 2.0
+        assert config.initial_temp == pytest.approx(2.0)
         assert config.optimize is False
-        assert config.lr == 0.001
+        assert config.lr == pytest.approx(0.001)
 
     def test_invalid_initial_temp_raises_error(self) -> None:
         """Test that invalid initial_temp raises ValueError."""
@@ -506,14 +506,14 @@ class TestCreateUncertaintyResult:
             0.7, 0.05, (0.5, 0.9), UncertaintyType.PREDICTIVE
         )
         assert isinstance(result, UncertaintyResult)
-        assert result.mean == 0.7
+        assert result.mean == pytest.approx(0.7)
 
     def test_with_zero_variance(self) -> None:
         """Test result creation with zero variance."""
         result = create_uncertainty_result(
             0.5, 0.0, (0.5, 0.5), UncertaintyType.ALEATORIC
         )
-        assert result.variance == 0.0
+        assert result.variance == pytest.approx(0.0)
 
     def test_invalid_variance_raises_error(self) -> None:
         """Test that invalid variance raises ValueError."""
@@ -936,7 +936,7 @@ class TestOptimizeTemperature:
         labels = [0, 1]
         config = TemperatureConfig(initial_temp=2.5, optimize=False)
         temp = optimize_temperature(logits, labels, config)
-        assert temp == 2.5
+        assert temp == pytest.approx(2.5)
 
     def test_none_logits_raises_error(self) -> None:
         """Test that None logits raises ValueError."""
@@ -979,8 +979,8 @@ class TestEstimateUncertainty:
         """Test uncertainty with single prediction."""
         preds = [0.7]
         result = estimate_uncertainty(preds)
-        assert result.mean == 0.7
-        assert result.variance == 0.0
+        assert result.mean == pytest.approx(0.7)
+        assert result.variance == pytest.approx(0.0)
         assert result.confidence_interval == (0.7, 0.7)
 
     def test_custom_uncertainty_type(self) -> None:

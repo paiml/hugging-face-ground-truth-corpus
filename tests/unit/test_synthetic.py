@@ -821,12 +821,12 @@ class TestCalculateDiversityScore:
     def test_empty_texts(self) -> None:
         """Test with empty texts list."""
         score = calculate_diversity_score([])
-        assert score == 0.0
+        assert score == pytest.approx(0.0)
 
     def test_single_text(self) -> None:
         """Test with single text."""
         score = calculate_diversity_score(["only one"])
-        assert score == 0.0
+        assert score == pytest.approx(0.0)
 
     def test_none_texts_raises_error(self) -> None:
         """Test that None texts raises ValueError."""
@@ -847,7 +847,7 @@ class TestCalculateDiversityScore:
         """Test with texts that have no words after splitting."""
         texts = ["", "", ""]
         score = calculate_diversity_score(texts)
-        assert score == 0.0
+        assert score == pytest.approx(0.0)
 
 
 class TestFilterSyntheticSamples:
@@ -1226,8 +1226,8 @@ class TestComputeGenerationStats:
         gen = [SyntheticSample("a", GenerationMethod.SELF_INSTRUCT, 0.8, 0.7)]
         stats = compute_generation_stats(gen, gen, [])
         assert stats.final_count == 0
-        assert stats.avg_quality_score == 0.0
-        assert stats.avg_diversity_score == 0.0
+        assert stats.avg_quality_score == pytest.approx(0.0)
+        assert stats.avg_diversity_score == pytest.approx(0.0)
 
 
 class TestPropertyBased:

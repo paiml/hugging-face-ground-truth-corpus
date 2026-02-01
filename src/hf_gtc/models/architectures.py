@@ -31,6 +31,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ArchitectureType(Enum):
     """Transformer architecture types.
@@ -297,9 +299,7 @@ def validate_transformer_config(config: TransformerConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_layers must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_layers <= 0:
         msg = f"num_layers must be positive, got {config.num_layers}"
@@ -354,9 +354,7 @@ def validate_encoder_config(config: EncoderConfig) -> None:
         Traceback (most recent call last):
         ValueError: pooler_type must be one of...
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_transformer_config(config.transformer_config)
 
@@ -385,9 +383,7 @@ def validate_decoder_config(config: DecoderConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_transformer_config(config.transformer_config)
 
@@ -415,9 +411,7 @@ def validate_encoder_decoder_config(config: EncoderDecoderConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_encoder_config(config.encoder_config)
     validate_decoder_config(config.decoder_config)
@@ -449,9 +443,7 @@ def validate_architecture_stats(stats: ArchitectureStats) -> None:
         Traceback (most recent call last):
         ValueError: total_params must be non-negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_params < 0:
         msg = f"total_params must be non-negative, got {stats.total_params}"
@@ -876,9 +868,7 @@ def calculate_model_params(config: TransformerConfig) -> int:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_transformer_config(config)
 
@@ -957,9 +947,7 @@ def estimate_memory_footprint(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if dtype_bytes not in (1, 2, 4, 8):
         msg = f"dtype_bytes must be 1, 2, 4, or 8, got {dtype_bytes}"
@@ -1072,9 +1060,7 @@ def get_hidden_states_shape(
         Traceback (most recent call last):
         ValueError: batch_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if batch_size <= 0:
         msg = f"batch_size must be positive, got {batch_size}"
@@ -1085,6 +1071,29 @@ def get_hidden_states_shape(
         raise ValueError(msg)
 
     return (batch_size, seq_length, config.hidden_size)
+
+
+_PARAM_THRESHOLDS = (
+    (1e12, 1e12, "T"),
+    (1e9, 1e9, "B"),
+    (1e6, 1e6, "M"),
+    (1e3, 1e3, "K"),
+)
+
+
+def _format_params(count: int) -> str:
+    """Format parameter count with appropriate unit."""
+    for threshold, divisor, suffix in _PARAM_THRESHOLDS:
+        if count >= threshold:
+            return f"{count / divisor:.2f}{suffix}"
+    return str(count)
+
+
+def _format_memory(mb: float) -> str:
+    """Format memory size with appropriate unit."""
+    if mb >= 1024:
+        return f"{mb / 1024:.2f} GB"
+    return f"{mb:.2f} MB"
 
 
 def format_architecture_stats(stats: ArchitectureStats) -> str:
@@ -1113,32 +1122,12 @@ def format_architecture_stats(stats: ArchitectureStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
-
-    def format_params(count: int) -> str:
-        """Format parameter count with appropriate unit."""
-        if count >= 1e12:
-            return f"{count / 1e12:.2f}T"
-        if count >= 1e9:
-            return f"{count / 1e9:.2f}B"
-        if count >= 1e6:
-            return f"{count / 1e6:.2f}M"
-        if count >= 1e3:
-            return f"{count / 1e3:.2f}K"
-        return str(count)
-
-    def format_memory(mb: float) -> str:
-        """Format memory size with appropriate unit."""
-        if mb >= 1024:
-            return f"{mb / 1024:.2f} GB"
-        return f"{mb:.2f} MB"
+    validate_not_none(stats, "stats")
 
     lines = [
-        f"Total Parameters: {format_params(stats.total_params)}",
-        f"Trainable Parameters: {format_params(stats.trainable_params)}",
-        f"Memory Footprint: {format_memory(stats.memory_footprint_mb)}",
+        f"Total Parameters: {_format_params(stats.total_params)}",
+        f"Trainable Parameters: {_format_params(stats.trainable_params)}",
+        f"Memory Footprint: {_format_memory(stats.memory_footprint_mb)}",
     ]
 
     return "\n".join(lines)

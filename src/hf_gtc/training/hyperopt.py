@@ -271,19 +271,29 @@ def validate_parameter_space(space: ParameterSpace) -> None:
         raise ValueError(msg)
 
     if space.param_type == ParameterType.CATEGORICAL:
-        if space.choices is None or len(space.choices) == 0:
-            msg = "categorical parameter must have non-empty choices"
-            raise ValueError(msg)
+        _validate_categorical_space(space)
     else:
-        if space.low is None or space.high is None:
-            msg = f"{space.param_type.value} parameter must have low and high bounds"
-            raise ValueError(msg)
-        if space.low >= space.high:
-            msg = f"low ({space.low}) must be less than high ({space.high})"
-            raise ValueError(msg)
-        if space.param_type == ParameterType.LOG_UNIFORM and space.low <= 0:
-            msg = f"log_uniform parameter low must be positive, got {space.low}"
-            raise ValueError(msg)
+        _validate_numeric_space(space)
+
+
+def _validate_categorical_space(space: ParameterSpace) -> None:
+    """Validate a categorical parameter space."""
+    if space.choices is None or len(space.choices) == 0:
+        msg = "categorical parameter must have non-empty choices"
+        raise ValueError(msg)
+
+
+def _validate_numeric_space(space: ParameterSpace) -> None:
+    """Validate a numeric (continuous/discrete/log_uniform) parameter space."""
+    if space.low is None or space.high is None:
+        msg = f"{space.param_type.value} parameter must have low and high bounds"
+        raise ValueError(msg)
+    if space.low >= space.high:
+        msg = f"low ({space.low}) must be less than high ({space.high})"
+        raise ValueError(msg)
+    if space.param_type == ParameterType.LOG_UNIFORM and space.low <= 0:
+        msg = f"log_uniform parameter low must be positive, got {space.low}"
+        raise ValueError(msg)
 
 
 def validate_hyperopt_config(config: HyperoptConfig) -> None:

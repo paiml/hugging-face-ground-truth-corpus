@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class PlanningStrategy(Enum):
     """Supported planning strategies for agents.
@@ -260,9 +262,7 @@ def validate_plan_config(config: PlanConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_retries cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_steps <= 0:
         msg = f"max_steps must be positive, got {config.max_steps}"
@@ -711,9 +711,7 @@ def calculate_plan_progress(stats: PlanningStats) -> float:
         Traceback (most recent call last):
         ValueError: total_steps must be positive
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_steps <= 0:
         msg = f"total_steps must be positive, got {stats.total_steps}"

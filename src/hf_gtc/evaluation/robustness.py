@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class PerturbationType(Enum):
     """Types of text perturbations.
@@ -217,9 +219,7 @@ def validate_perturbation_config(config: PerturbationConfig) -> None:
         Traceback (most recent call last):
         ValueError: intensity must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.intensity <= 1.0:
         msg = f"intensity must be between 0 and 1, got {config.intensity}"
@@ -254,9 +254,7 @@ def validate_adversarial_config(config: AdversarialConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_queries must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_queries <= 0:
         msg = f"max_queries must be positive, got {config.max_queries}"
@@ -294,9 +292,7 @@ def validate_ood_config(config: OODConfig) -> None:
         Traceback (most recent call last):
         ValueError: threshold must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.threshold <= 1.0:
         msg = f"threshold must be between 0 and 1, got {config.threshold}"
@@ -634,9 +630,7 @@ def apply_perturbation(
         msg = "text cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_perturbation_config(config)
 
@@ -917,9 +911,7 @@ def detect_ood_samples(
         msg = "scores cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_ood_config(config)
 
@@ -1016,6 +1008,33 @@ def calculate_attack_success_rate(
     return successful_attacks / originally_correct
 
 
+def _interpret_perturbation(accuracy: float) -> str:
+    """Interpret perturbation robustness."""
+    if accuracy >= 0.8:
+        return "Good perturbation robustness"
+    if accuracy >= 0.6:
+        return "Moderate perturbation robustness"
+    return "Low perturbation robustness"
+
+
+def _interpret_adversarial(attack_rate: float) -> str:
+    """Interpret adversarial robustness."""
+    if attack_rate <= 0.2:
+        return "Good adversarial robustness"
+    if attack_rate <= 0.4:
+        return "Moderate adversarial robustness"
+    return "Low adversarial robustness"
+
+
+def _interpret_ood(auroc: float) -> str:
+    """Interpret OOD detection quality."""
+    if auroc >= 0.9:
+        return "Excellent OOD detection"
+    if auroc >= 0.7:
+        return "Good OOD detection"
+    return "Poor OOD detection"
+
+
 def format_robustness_result(result: RobustnessResult) -> str:
     """Format a robustness result as a human-readable string.
 
@@ -1044,9 +1063,7 @@ def format_robustness_result(result: RobustnessResult) -> str:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [
         "Robustness Evaluation Results",
@@ -1054,32 +1071,12 @@ def format_robustness_result(result: RobustnessResult) -> str:
         f"Accuracy under Perturbation: {result.accuracy_under_perturbation:.2%}",
         f"Attack Success Rate: {result.attack_success_rate:.2%}",
         f"OOD Detection AUROC: {result.ood_detection_auroc:.4f}",
+        "",
+        "Interpretation:",
+        f"  - {_interpret_perturbation(result.accuracy_under_perturbation)}",
+        f"  - {_interpret_adversarial(result.attack_success_rate)}",
+        f"  - {_interpret_ood(result.ood_detection_auroc)}",
     ]
-
-    # Add interpretation
-    lines.append("")
-    lines.append("Interpretation:")
-
-    if result.accuracy_under_perturbation >= 0.8:
-        lines.append("  - Good perturbation robustness")
-    elif result.accuracy_under_perturbation >= 0.6:
-        lines.append("  - Moderate perturbation robustness")
-    else:
-        lines.append("  - Low perturbation robustness")
-
-    if result.attack_success_rate <= 0.2:
-        lines.append("  - Good adversarial robustness")
-    elif result.attack_success_rate <= 0.4:
-        lines.append("  - Moderate adversarial robustness")
-    else:
-        lines.append("  - Low adversarial robustness")
-
-    if result.ood_detection_auroc >= 0.9:
-        lines.append("  - Excellent OOD detection")
-    elif result.ood_detection_auroc >= 0.7:
-        lines.append("  - Good OOD detection")
-    else:
-        lines.append("  - Poor OOD detection")
 
     return "\n".join(lines)
 

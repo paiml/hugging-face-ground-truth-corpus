@@ -224,7 +224,7 @@ class TestBatchNormConfig:
         )
         assert config.num_features == 256
         assert config.eps == 1e-5
-        assert config.momentum == 0.1
+        assert config.momentum == pytest.approx(0.1)
         assert config.affine is True
         assert config.track_running_stats is True
 
@@ -287,8 +287,8 @@ class TestNormStats:
             memory_bytes=6144,
             flops_per_token=4608,
         )
-        assert stats.mean_activation == 0.0
-        assert stats.std_activation == 1.0
+        assert stats.mean_activation == pytest.approx(0.0)
+        assert stats.std_activation == pytest.approx(1.0)
         assert stats.num_parameters == 1536
 
 
@@ -604,7 +604,7 @@ class TestCreateBatchNormConfig:
         config = create_batch_norm_config()
         assert config.num_features == 256
         assert config.eps == 1e-5
-        assert config.momentum == 0.1
+        assert config.momentum == pytest.approx(0.1)
         assert config.affine is True
         assert config.track_running_stats is True
 
@@ -616,7 +616,7 @@ class TestCreateBatchNormConfig:
     def test_custom_momentum(self) -> None:
         """Create config with custom momentum."""
         config = create_batch_norm_config(256, momentum=0.2)
-        assert config.momentum == 0.2
+        assert config.momentum == pytest.approx(0.2)
 
     def test_invalid_momentum_raises(self) -> None:
         """Invalid momentum raises ValueError."""

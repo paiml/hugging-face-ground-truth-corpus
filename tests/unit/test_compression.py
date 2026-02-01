@@ -232,8 +232,8 @@ class TestPruningSchedule:
             end_step=1000,
             frequency=100,
         )
-        assert schedule.initial_sparsity == 0.0
-        assert schedule.final_sparsity == 0.9
+        assert schedule.initial_sparsity == pytest.approx(0.0)
+        assert schedule.final_sparsity == pytest.approx(0.9)
         assert schedule.begin_step == 0
         assert schedule.end_step == 1000
         assert schedule.frequency == 100
@@ -264,7 +264,7 @@ class TestPruningConfig:
             schedule=None,
         )
         assert config.method == PruningMethod.MAGNITUDE
-        assert config.sparsity == 0.5
+        assert config.sparsity == pytest.approx(0.5)
         assert config.scope == PruningScope.GLOBAL
         assert config.importance_metric == ImportanceMetric.L1_NORM
         assert config.schedule is None
@@ -286,7 +286,7 @@ class TestPruningConfig:
             schedule=schedule,
         )
         assert config.schedule is not None
-        assert config.schedule.final_sparsity == 0.9
+        assert config.schedule.final_sparsity == pytest.approx(0.9)
 
     def test_frozen(self) -> None:
         """Test that PruningConfig is immutable."""
@@ -313,7 +313,7 @@ class TestStructuredPruningConfig:
             min_structures=1,
         )
         assert config.dimension == StructuredPruningDim.CHANNEL
-        assert config.pruning_ratio == 0.3
+        assert config.pruning_ratio == pytest.approx(0.3)
         assert config.importance_metric == ImportanceMetric.L2_NORM
         assert config.min_structures == 1
 
@@ -396,7 +396,7 @@ class TestLowRankConfig:
         assert config.rank == 64
         assert config.decomposition_method == DecompositionMethod.SVD
         assert config.rank_ratio is None
-        assert config.energy_threshold == 0.99
+        assert config.energy_threshold == pytest.approx(0.99)
 
     def test_creation_with_rank_ratio(self) -> None:
         """Test creating LowRankConfig with rank_ratio."""
@@ -407,7 +407,7 @@ class TestLowRankConfig:
             energy_threshold=0.99,
         )
         assert config.rank is None
-        assert config.rank_ratio == 0.5
+        assert config.rank_ratio == pytest.approx(0.5)
 
     def test_frozen(self) -> None:
         """Test that LowRankConfig is immutable."""
@@ -438,8 +438,8 @@ class TestCompressionConfig:
         assert config.enable_fusion is True
         assert config.enable_weight_sharing is False
         assert config.enable_low_rank is False
-        assert config.target_speedup == 2.0
-        assert config.target_size_reduction == 0.5
+        assert config.target_speedup == pytest.approx(2.0)
+        assert config.target_size_reduction == pytest.approx(0.5)
 
     def test_frozen(self) -> None:
         """Test that CompressionConfig is immutable."""
@@ -471,11 +471,11 @@ class TestCompressionStats:
         )
         assert stats.original_params == 110_000_000
         assert stats.compressed_params == 55_000_000
-        assert stats.sparsity == 0.5
-        assert stats.compression_ratio == 2.0
-        assert stats.estimated_speedup == 1.8
-        assert stats.original_size_mb == 440.0
-        assert stats.compressed_size_mb == 220.0
+        assert stats.sparsity == pytest.approx(0.5)
+        assert stats.compression_ratio == pytest.approx(2.0)
+        assert stats.estimated_speedup == pytest.approx(1.8)
+        assert stats.original_size_mb == pytest.approx(440.0)
+        assert stats.compressed_size_mb == pytest.approx(220.0)
 
     def test_frozen(self) -> None:
         """Test that CompressionStats is immutable."""
@@ -797,8 +797,8 @@ class TestCreatePruningSchedule:
     def test_default_values(self) -> None:
         """Test creating schedule with default values."""
         schedule = create_pruning_schedule()
-        assert schedule.initial_sparsity == 0.0
-        assert schedule.final_sparsity == 0.9
+        assert schedule.initial_sparsity == pytest.approx(0.0)
+        assert schedule.final_sparsity == pytest.approx(0.9)
         assert schedule.begin_step == 0
         assert schedule.end_step == 1000
         assert schedule.frequency == 100
@@ -812,8 +812,8 @@ class TestCreatePruningSchedule:
             end_step=2000,
             frequency=50,
         )
-        assert schedule.initial_sparsity == 0.1
-        assert schedule.final_sparsity == 0.8
+        assert schedule.initial_sparsity == pytest.approx(0.1)
+        assert schedule.final_sparsity == pytest.approx(0.8)
         assert schedule.begin_step == 100
         assert schedule.end_step == 2000
         assert schedule.frequency == 50
@@ -872,7 +872,7 @@ class TestCreatePruningConfig:
         """Test creating config with default values."""
         config = create_pruning_config()
         assert config.method == PruningMethod.MAGNITUDE
-        assert config.sparsity == 0.5
+        assert config.sparsity == pytest.approx(0.5)
         assert config.scope == PruningScope.GLOBAL
         assert config.importance_metric == ImportanceMetric.L1_NORM
         assert config.schedule is None
@@ -902,7 +902,7 @@ class TestCreatePruningConfig:
         schedule = create_pruning_schedule()
         config = create_pruning_config(schedule=schedule)
         assert config.schedule is not None
-        assert config.schedule.final_sparsity == 0.9
+        assert config.schedule.final_sparsity == pytest.approx(0.9)
 
     def test_invalid_sparsity_raises_error(self) -> None:
         """Test that invalid sparsity raises ValueError."""
@@ -922,7 +922,7 @@ class TestCreateStructuredPruningConfig:
         """Test creating config with default values."""
         config = create_structured_pruning_config()
         assert config.dimension == StructuredPruningDim.CHANNEL
-        assert config.pruning_ratio == 0.3
+        assert config.pruning_ratio == pytest.approx(0.3)
         assert config.importance_metric == ImportanceMetric.L2_NORM
         assert config.min_structures == 1
 
@@ -1041,7 +1041,7 @@ class TestCreateLowRankConfig:
         assert config.rank == 64
         assert config.decomposition_method == DecompositionMethod.SVD
         assert config.rank_ratio is None
-        assert config.energy_threshold == 0.99
+        assert config.energy_threshold == pytest.approx(0.99)
 
     def test_string_decomposition_method(self) -> None:
         """Test creating config with string decomposition_method."""
@@ -1057,7 +1057,7 @@ class TestCreateLowRankConfig:
         """Test creating config with rank_ratio."""
         config = create_low_rank_config(rank=None, rank_ratio=0.5)
         assert config.rank is None
-        assert config.rank_ratio == 0.5
+        assert config.rank_ratio == pytest.approx(0.5)
 
     def test_zero_rank_raises_error(self) -> None:
         """Test that zero rank raises ValueError."""
@@ -1080,8 +1080,8 @@ class TestCreateCompressionConfig:
         assert config.enable_fusion is True
         assert config.enable_weight_sharing is False
         assert config.enable_low_rank is False
-        assert config.target_speedup == 2.0
-        assert config.target_size_reduction == 0.5
+        assert config.target_speedup == pytest.approx(2.0)
+        assert config.target_size_reduction == pytest.approx(0.5)
 
     def test_custom_values(self) -> None:
         """Test creating config with custom values."""
@@ -1097,8 +1097,8 @@ class TestCreateCompressionConfig:
         assert config.enable_fusion is False
         assert config.enable_weight_sharing is True
         assert config.enable_low_rank is True
-        assert config.target_speedup == 4.0
-        assert config.target_size_reduction == 0.25
+        assert config.target_speedup == pytest.approx(4.0)
+        assert config.target_size_reduction == pytest.approx(0.25)
 
     def test_speedup_below_one_raises_error(self) -> None:
         """Test that target_speedup below 1.0 raises ValueError."""
@@ -1148,8 +1148,8 @@ class TestCreateCompressionStats:
             original_size_mb=400.0,
             compressed_size_mb=200.0,
         )
-        assert stats.original_size_mb == 400.0
-        assert stats.compressed_size_mb == 200.0
+        assert stats.original_size_mb == pytest.approx(400.0)
+        assert stats.compressed_size_mb == pytest.approx(200.0)
 
     def test_zero_compressed_params(self) -> None:
         """Test stats with zero compressed params."""
@@ -1491,7 +1491,7 @@ class TestCalculateSparsityAtStep:
             begin_step=0,
             end_step=1000,
         )
-        assert calculate_sparsity_at_step(schedule, 0) == 0.0
+        assert calculate_sparsity_at_step(schedule, 0) == pytest.approx(0.0)
 
     def test_at_end_step(self) -> None:
         """Test sparsity at end_step."""
@@ -1501,7 +1501,7 @@ class TestCalculateSparsityAtStep:
             begin_step=0,
             end_step=1000,
         )
-        assert calculate_sparsity_at_step(schedule, 1000) == 0.9
+        assert calculate_sparsity_at_step(schedule, 1000) == pytest.approx(0.9)
 
     def test_at_midpoint(self) -> None:
         """Test sparsity at midpoint."""
@@ -1521,7 +1521,7 @@ class TestCalculateSparsityAtStep:
             begin_step=100,
             end_step=1000,
         )
-        assert calculate_sparsity_at_step(schedule, 50) == 0.1
+        assert calculate_sparsity_at_step(schedule, 50) == pytest.approx(0.1)
 
     def test_after_end_step(self) -> None:
         """Test sparsity after end_step returns final."""
@@ -1531,7 +1531,7 @@ class TestCalculateSparsityAtStep:
             begin_step=0,
             end_step=1000,
         )
-        assert calculate_sparsity_at_step(schedule, 1500) == 0.9
+        assert calculate_sparsity_at_step(schedule, 1500) == pytest.approx(0.9)
 
     def test_linear_interpolation(self) -> None:
         """Test that sparsity interpolates linearly."""
@@ -1746,8 +1746,8 @@ class TestGetRecommendedCompressionConfig:
         assert config.enable_fusion is True
         assert config.enable_weight_sharing is False
         assert config.enable_low_rank is False
-        assert config.target_speedup == 2.0
-        assert config.target_size_reduction == 0.5
+        assert config.target_speedup == pytest.approx(2.0)
+        assert config.target_size_reduction == pytest.approx(0.5)
 
     def test_mobile_config(self) -> None:
         """Test mobile task configuration."""
@@ -1756,8 +1756,8 @@ class TestGetRecommendedCompressionConfig:
         assert config.enable_fusion is True
         assert config.enable_weight_sharing is True
         assert config.enable_low_rank is True
-        assert config.target_speedup == 4.0
-        assert config.target_size_reduction == 0.25
+        assert config.target_speedup == pytest.approx(4.0)
+        assert config.target_size_reduction == pytest.approx(0.25)
 
     def test_edge_config(self) -> None:
         """Test edge task configuration."""
@@ -1766,8 +1766,8 @@ class TestGetRecommendedCompressionConfig:
         assert config.enable_fusion is True
         assert config.enable_weight_sharing is True
         assert config.enable_low_rank is True
-        assert config.target_speedup == 8.0
-        assert config.target_size_reduction == 0.1
+        assert config.target_speedup == pytest.approx(8.0)
+        assert config.target_size_reduction == pytest.approx(0.1)
 
     def test_research_config(self) -> None:
         """Test research task configuration."""
@@ -1776,8 +1776,8 @@ class TestGetRecommendedCompressionConfig:
         assert config.enable_fusion is False
         assert config.enable_weight_sharing is False
         assert config.enable_low_rank is False
-        assert config.target_speedup == 1.5
-        assert config.target_size_reduction == 0.7
+        assert config.target_speedup == pytest.approx(1.5)
+        assert config.target_size_reduction == pytest.approx(0.7)
 
     def test_invalid_task_raises_error(self) -> None:
         """Test that invalid task raises ValueError."""

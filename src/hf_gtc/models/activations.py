@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ActivationType(Enum):
     """Supported activation function types.
@@ -243,9 +245,7 @@ def validate_gelu_config(config: GELUConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
 
 def validate_swiglu_config(config: SwiGLUConfig) -> None:
@@ -272,9 +272,7 @@ def validate_swiglu_config(config: SwiGLUConfig) -> None:
         Traceback (most recent call last):
         ValueError: hidden_dim must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.hidden_dim <= 0:
         msg = f"hidden_dim must be positive, got {config.hidden_dim}"
@@ -305,9 +303,7 @@ def validate_activation_config(config: ActivationConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     gelu_types = (ActivationType.GELU, ActivationType.GELU_NEW)
     if config.activation_type in gelu_types and config.gelu_config is None:
@@ -359,9 +355,7 @@ def validate_activation_stats(stats: ActivationStats) -> None:
         Traceback (most recent call last):
         ValueError: memory_overhead must be positive
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.memory_overhead <= 0:
         msg = f"memory_overhead must be positive, got {stats.memory_overhead}"
@@ -895,9 +889,7 @@ def format_activation_stats(stats: ActivationStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Memory Overhead: {stats.memory_overhead:.2f}x",

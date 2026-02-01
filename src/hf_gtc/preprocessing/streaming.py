@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Any, TypeVar
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
+from hf_gtc._validation import validate_not_none
+
 # Generic type variables for streaming functions
 T = TypeVar("T")
 U = TypeVar("U")
@@ -153,9 +155,7 @@ def validate_stream_config(config: StreamConfig) -> None:
         Traceback (most recent call last):
         ValueError: batch_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.batch_size <= 0:
         msg = f"batch_size must be positive, got {config.batch_size}"

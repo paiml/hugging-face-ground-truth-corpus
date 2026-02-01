@@ -973,7 +973,7 @@ def get_recommended_vectorstore_config(
         use_case_configs["similarity_search"],
     )
 
-    # Optimize index parameters
+    # Select index parameters based on recall and latency constraints
     params = optimize_index_params(
         num_vectors=num_vectors,
         dimension=dimension,

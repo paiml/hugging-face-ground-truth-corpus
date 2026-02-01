@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class ProfileMetric(Enum):
     """Types of profiling metrics to collect.
@@ -280,9 +282,7 @@ def validate_profiling_config(config: ProfilingConfig) -> None:
         Traceback (most recent call last):
         ValueError: metrics cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.metrics:
         msg = "metrics cannot be empty"
@@ -411,9 +411,7 @@ def validate_profiling_result(result: ProfilingResult) -> None:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if result.throughput_tokens_per_sec < 0:
         msg = (
@@ -1199,9 +1197,7 @@ def format_profiling_result(result: ProfilingResult) -> str:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [
         "Model Profiling Results",

@@ -167,7 +167,7 @@ class TestGuardrailConfig:
         )
         assert config.guardrail_type == GuardrailType.TOXICITY_FILTER
         assert config.action_on_violation == ActionType.BLOCK
-        assert config.threshold == 0.8
+        assert config.threshold == pytest.approx(0.8)
         assert config.enabled is True
 
     def test_default_values(self) -> None:
@@ -176,7 +176,7 @@ class TestGuardrailConfig:
             guardrail_type=GuardrailType.PII_FILTER,
             action_on_violation=ActionType.REDACT,
         )
-        assert config.threshold == 0.5
+        assert config.threshold == pytest.approx(0.5)
         assert config.enabled is True
 
     def test_frozen(self) -> None:
@@ -284,14 +284,14 @@ class TestToxicityConfig:
             categories=("toxic", "insult"),
         )
         assert config.model_id == "custom/model"
-        assert config.threshold == 0.7
+        assert config.threshold == pytest.approx(0.7)
         assert config.categories == ("toxic", "insult")
 
     def test_default_values(self) -> None:
         """Test default values for ToxicityConfig."""
         config = ToxicityConfig()
         assert config.model_id == "unitary/toxic-bert"
-        assert config.threshold == 0.5
+        assert config.threshold == pytest.approx(0.5)
         assert "toxic" in config.categories
         assert "severe_toxic" in config.categories
 
@@ -446,7 +446,7 @@ class TestCreateGuardrailConfig:
         )
         assert config.guardrail_type == GuardrailType.TOXICITY_FILTER
         assert config.action_on_violation == ActionType.BLOCK
-        assert config.threshold == 0.8
+        assert config.threshold == pytest.approx(0.8)
 
     def test_create_with_string_types(self) -> None:
         """Test creating config with string types."""
@@ -482,7 +482,7 @@ class TestCreateGuardrailConfig:
         """Test default values in create_guardrail_config."""
         config = create_guardrail_config(GuardrailType.INPUT_FILTER)
         assert config.action_on_violation == ActionType.BLOCK
-        assert config.threshold == 0.5
+        assert config.threshold == pytest.approx(0.5)
         assert config.enabled is True
 
 
@@ -563,14 +563,14 @@ class TestCreateToxicityConfig:
             categories=("toxic", "insult"),
         )
         assert config.model_id == "custom/model"
-        assert config.threshold == 0.7
+        assert config.threshold == pytest.approx(0.7)
         assert config.categories == ("toxic", "insult")
 
     def test_default_values(self) -> None:
         """Test default values."""
         config = create_toxicity_config()
         assert config.model_id == "unitary/toxic-bert"
-        assert config.threshold == 0.5
+        assert config.threshold == pytest.approx(0.5)
         assert "toxic" in config.categories
 
     def test_empty_model_id_raises_error(self) -> None:
@@ -969,12 +969,12 @@ class TestCalculateSafetyScore:
     def test_safe_content_score_1(self) -> None:
         """Test safe content returns score of 1.0."""
         score = calculate_safety_score("Hello, world!")
-        assert score == 1.0
+        assert score == pytest.approx(1.0)
 
     def test_empty_content_score_1(self) -> None:
         """Test empty content returns score of 1.0."""
         score = calculate_safety_score("")
-        assert score == 1.0
+        assert score == pytest.approx(1.0)
 
     def test_none_content_raises_error(self) -> None:
         """Test that None content raises ValueError."""
@@ -989,7 +989,7 @@ class TestCalculateSafetyScore:
             pii_config=pii_config,
         )
         assert 0.0 <= score < 1.0
-        assert score == 0.8  # 1.0 - 0.2
+        assert score == pytest.approx(0.8)  # 1.0 - 0.2
 
     def test_multiple_violations_reduce_score_more(self) -> None:
         """Test that multiple violations reduce score more."""
@@ -998,7 +998,7 @@ class TestCalculateSafetyScore:
             "Email: test@example.com, Phone: 555-123-4567",
             pii_config=pii_config,
         )
-        assert score == 0.6  # 1.0 - 0.4
+        assert score == pytest.approx(0.6)  # 1.0 - 0.4
 
     def test_many_violations_min_score_zero(self) -> None:
         """Test that many violations result in minimum score of 0.0."""
@@ -1024,7 +1024,7 @@ class TestCalculateSafetyScore:
     def test_no_config_returns_1(self) -> None:
         """Test that no config returns score of 1.0."""
         score = calculate_safety_score("test@example.com")
-        assert score == 1.0  # Without PII config, no detection
+        assert score == pytest.approx(1.0)  # Without PII config, no detection
 
 
 class TestPIIPatterns:

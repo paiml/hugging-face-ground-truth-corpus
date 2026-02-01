@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class OptimizerType(Enum):
     """Supported optimizer types.
@@ -305,9 +307,7 @@ def validate_adamw_config(config: AdamWConfig) -> None:
         Traceback (most recent call last):
         ValueError: lr must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.lr <= 0:
         msg = f"lr must be positive, got {config.lr}"
@@ -356,9 +356,7 @@ def validate_lion_config(config: LionConfig) -> None:
         Traceback (most recent call last):
         ValueError: lr must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.lr <= 0:
         msg = f"lr must be positive, got {config.lr}"
@@ -404,9 +402,7 @@ def validate_sophia_config(config: SophiaConfig) -> None:
         Traceback (most recent call last):
         ValueError: rho must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.lr <= 0:
         msg = f"lr must be positive, got {config.lr}"
@@ -455,9 +451,7 @@ def validate_adafactor_config(config: AdafactorConfig) -> None:
         Traceback (most recent call last):
         ValueError: clip_threshold must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.lr is not None and config.lr <= 0:
         msg = f"lr must be positive when specified, got {config.lr}"
@@ -475,6 +469,40 @@ def validate_adafactor_config(config: AdafactorConfig) -> None:
     if config.clip_threshold <= 0:
         msg = f"clip_threshold must be positive, got {config.clip_threshold}"
         raise ValueError(msg)
+
+
+def _validate_optimizer_type_config(config: OptimizerConfig) -> None:
+    """Validate that the correct sub-config is present for the optimizer type."""
+    adamw_types = {OptimizerType.ADAMW, OptimizerType.ADAM, OptimizerType.PAGED_ADAMW}
+    if config.optimizer_type in adamw_types:
+        if config.adamw_config is None:
+            msg = f"adamw_config required for {config.optimizer_type.value}"
+            raise ValueError(msg)
+        validate_adamw_config(config.adamw_config)
+        return
+
+    single_validators: dict[OptimizerType, tuple[str, str, object]] = {
+        OptimizerType.LION: ("lion_config", "lion optimizer", validate_lion_config),
+        OptimizerType.SOPHIA: (
+            "sophia_config",
+            "sophia optimizer",
+            validate_sophia_config,
+        ),
+        OptimizerType.ADAFACTOR: (
+            "adafactor_config",
+            "adafactor optimizer",
+            validate_adafactor_config,
+        ),
+    }
+    entry = single_validators.get(config.optimizer_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
 
 
 def validate_optimizer_config(config: OptimizerConfig) -> None:
@@ -498,34 +526,9 @@ def validate_optimizer_config(config: OptimizerConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    adamw_types = {OptimizerType.ADAMW, OptimizerType.ADAM, OptimizerType.PAGED_ADAMW}
-    if config.optimizer_type in adamw_types:
-        if config.adamw_config is None:
-            msg = f"adamw_config required for {config.optimizer_type.value}"
-            raise ValueError(msg)
-        validate_adamw_config(config.adamw_config)
-
-    if config.optimizer_type == OptimizerType.LION:
-        if config.lion_config is None:
-            msg = "lion_config required for lion optimizer"
-            raise ValueError(msg)
-        validate_lion_config(config.lion_config)
-
-    if config.optimizer_type == OptimizerType.SOPHIA:
-        if config.sophia_config is None:
-            msg = "sophia_config required for sophia optimizer"
-            raise ValueError(msg)
-        validate_sophia_config(config.sophia_config)
-
-    if config.optimizer_type == OptimizerType.ADAFACTOR:
-        if config.adafactor_config is None:
-            msg = "adafactor_config required for adafactor optimizer"
-            raise ValueError(msg)
-        validate_adafactor_config(config.adafactor_config)
+    _validate_optimizer_type_config(config)
 
 
 def create_adamw_config(
@@ -1108,9 +1111,7 @@ def format_optimizer_stats(stats: OptimizerStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     recommended = ", ".join(stats.recommended_for)
     lines = [

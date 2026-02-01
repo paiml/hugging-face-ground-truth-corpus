@@ -234,7 +234,7 @@ class TestCreateTTSConfig:
         config = create_tts_config(model_id="bark", voice="v2", speed=1.5)
         assert config.model_id == "bark"
         assert config.voice == "v2"
-        assert config.speed == 1.5
+        assert config.speed == pytest.approx(1.5)
 
     def test_empty_model_id_raises(self) -> None:
         """Empty model_id raises ValueError."""
@@ -474,7 +474,7 @@ class TestTTSConfig:
             sample_rate=16000,
             speed=1.0,
         )
-        assert config.speed == 1.0
+        assert config.speed == pytest.approx(1.0)
 
 
 class TestTranscriptionResult:

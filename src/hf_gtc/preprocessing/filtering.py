@@ -17,12 +17,15 @@ Examples:
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+from hf_gtc._validation import validate_not_none
 
 
 class FilterType(Enum):
@@ -310,9 +313,7 @@ def validate_toxicity_config(config: ToxicityConfig) -> None:
         Traceback (most recent call last):
         ValueError: threshold must be between 0 and 1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.threshold <= 1.0:
         msg = f"threshold must be between 0 and 1, got {config.threshold}"
@@ -355,9 +356,7 @@ def validate_pii_config(config: PIIConfig) -> None:
         Traceback (most recent call last):
         ValueError: pii_types cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.pii_types:
         msg = "pii_types cannot be empty"
@@ -395,9 +394,7 @@ def validate_language_config(config: LanguageConfig) -> None:
         Traceback (most recent call last):
         ValueError: allowed_languages cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.allowed_languages:
         msg = "allowed_languages cannot be empty"
@@ -409,6 +406,32 @@ def validate_language_config(config: LanguageConfig) -> None:
             f"got {config.confidence_threshold}"
         )
         raise ValueError(msg)
+
+
+def _validate_filter_type_config(config: FilterConfig) -> None:
+    """Validate filter sub-config based on filter type."""
+    filter_validators: dict[FilterType, tuple[str, str, object]] = {
+        FilterType.TOXICITY: (
+            "toxicity_config",
+            "TOXICITY filter",
+            validate_toxicity_config,
+        ),
+        FilterType.PII: ("pii_config", "PII filter", validate_pii_config),
+        FilterType.LANGUAGE: (
+            "language_config",
+            "LANGUAGE filter",
+            validate_language_config,
+        ),
+    }
+    entry = filter_validators.get(config.filter_type)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
 
 
 def validate_filter_config(config: FilterConfig) -> None:
@@ -451,27 +474,9 @@ def validate_filter_config(config: FilterConfig) -> None:
         Traceback (most recent call last):
         ValueError: toxicity_config required for TOXICITY filter
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
-    if config.filter_type == FilterType.TOXICITY:
-        if config.toxicity_config is None:
-            msg = "toxicity_config required for TOXICITY filter"
-            raise ValueError(msg)
-        validate_toxicity_config(config.toxicity_config)
-
-    elif config.filter_type == FilterType.PII:
-        if config.pii_config is None:
-            msg = "pii_config required for PII filter"
-            raise ValueError(msg)
-        validate_pii_config(config.pii_config)
-
-    elif config.filter_type == FilterType.LANGUAGE:
-        if config.language_config is None:
-            msg = "language_config required for LANGUAGE filter"
-            raise ValueError(msg)
-        validate_language_config(config.language_config)
+    _validate_filter_type_config(config)
 
 
 def create_toxicity_config(
@@ -855,6 +860,9 @@ def detect_toxicity(
         msg = "text cannot be None"
         raise ValueError(msg)
 
+    # Apply NFC normalization for consistent Unicode handling
+    text = unicodedata.normalize("NFC", text)
+
     effective_config = config or create_toxicity_config()
 
     # Return zero scores for empty text
@@ -932,6 +940,9 @@ def detect_pii(
     if text is None:
         msg = "text cannot be None"
         raise ValueError(msg)
+
+    # Apply NFC normalization for consistent Unicode handling
+    text = unicodedata.normalize("NFC", text)
 
     effective_config = config or create_pii_config()
 
@@ -1029,6 +1040,9 @@ def redact_pii(
         msg = "text cannot be None"
         raise ValueError(msg)
 
+    # Apply NFC normalization for consistent Unicode handling
+    text = unicodedata.normalize("NFC", text)
+
     effective_config = config or create_pii_config()
 
     if effective_config.detect_only:
@@ -1064,6 +1078,7 @@ def _redact_pii_type(text: str, pii_type: PIIType, redact_char: str) -> str:
         return text
 
     def replace_match(match: re.Match[str]) -> str:
+        """Replace matched PII text with redaction characters."""
         return redact_char * len(match.group(0))
 
     return pattern.sub(replace_match, text)
@@ -1285,9 +1300,7 @@ def format_filter_stats(stats: FilterStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     pass_rate = (
         stats.passed_count / stats.total_processed * 100

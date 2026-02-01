@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class MessageRole(Enum):
     """Role of a chat message participant.
@@ -324,9 +326,7 @@ def validate_chat_config(config: ChatConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_turns must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_turns <= 0:
         msg = f"max_turns must be positive, got {config.max_turns}"
@@ -759,9 +759,7 @@ def format_chat_prompt(
         msg = "messages cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_chat_config(config)
 

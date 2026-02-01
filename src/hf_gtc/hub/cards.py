@@ -16,6 +16,8 @@ import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from hf_gtc._validation import validate_not_none
+
 if TYPE_CHECKING:
     pass
 
@@ -172,17 +174,32 @@ def _parse_yaml_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     yaml_content = content[3 : end_match.start() + 3]
     remaining = content[end_match.end() + 3 :]
 
-    # Parse YAML manually for simple cases to avoid yaml dependency
+    metadata = _parse_simple_yaml(yaml_content)
+    return metadata, remaining
+
+
+def _parse_yaml_value(value: str) -> str | list[str]:
+    """Parse a single YAML scalar or inline list value."""
+    if value.startswith("[") and value.endswith("]"):
+        items = value[1:-1].split(",")
+        return [item.strip().strip("'\"") for item in items]
+    return value.strip("'\"")
+
+
+def _parse_simple_yaml(yaml_content: str) -> dict[str, Any]:
+    """Parse simple YAML key-value pairs without external dependency.
+
+    Supports scalar values, inline lists, and indented list items.
+    """
     metadata: dict[str, Any] = {}
     current_key: str | None = None
     current_list: list[str] | None = None
 
-    for line in yaml_content.split("\n"):
-        line = line.rstrip()
+    for raw_line in yaml_content.split("\n"):
+        line = raw_line.rstrip()
         if not line:
             continue
 
-        # Check for list item
         if line.startswith("  - ") and current_key is not None:
             if current_list is None:
                 current_list = []
@@ -190,24 +207,16 @@ def _parse_yaml_frontmatter(content: str) -> tuple[dict[str, Any], str]:
             current_list.append(line[4:].strip())
             continue
 
-        # Check for key: value
         if ":" in line:
             key, _, value = line.partition(":")
             key = key.strip()
             value = value.strip()
-
             current_key = key
             current_list = None
-
             if value:
-                # Handle inline lists [a, b, c]
-                if value.startswith("[") and value.endswith("]"):
-                    items = value[1:-1].split(",")
-                    metadata[key] = [item.strip().strip("'\"") for item in items]
-                else:
-                    metadata[key] = value.strip("'\"")
+                metadata[key] = _parse_yaml_value(value)
 
-    return metadata, remaining
+    return metadata
 
 
 def _parse_sections(content: str) -> list[ModelCardSection]:
@@ -415,9 +424,7 @@ def validate_model_card(card: ModelCard) -> ValidationResult:
         Traceback (most recent call last):
         ValueError: card cannot be None
     """
-    if card is None:
-        msg = "card cannot be None"
-        raise ValueError(msg)
+    validate_not_none(card, "card")
 
     missing_sections: list[str] = []
     missing_metadata: list[str] = []
@@ -451,6 +458,45 @@ def validate_model_card(card: ModelCard) -> ValidationResult:
     )
 
 
+def _build_frontmatter(card_data: Any) -> str:
+    """Build YAML frontmatter string from HuggingFace card data."""
+    if card_data is None:
+        return ""
+    parts = ["---"]
+    if card_data.license:
+        parts.append(f"license: {card_data.license}")
+    if card_data.language:
+        _append_language_field(parts, card_data.language)
+    if card_data.tags:
+        parts.append("tags:")
+        parts.extend(f"  - {tag}" for tag in card_data.tags)
+    parts.append("---\n")
+    return "\n".join(parts)
+
+
+def _append_language_field(parts: list[str], language: Any) -> None:
+    """Append language field to frontmatter parts list."""
+    if isinstance(language, list):
+        parts.append("language:")
+        parts.extend(f"  - {lang}" for lang in language)
+    else:
+        parts.append(f"language: {language}")
+
+
+def _fetch_readme_content(api: Any, model_id: str, frontmatter: str) -> str:
+    """Fetch README content from the Hub, falling back to frontmatter."""
+    try:
+        readme = api.hf_hub_download(
+            repo_id=model_id,
+            filename="README.md",
+            repo_type="model",
+        )
+        with open(readme, encoding="utf-8") as f:
+            return f.read()
+    except Exception:
+        return frontmatter if frontmatter else f"# {model_id}\n\nNo README."
+
+
 def get_model_card(model_id: str) -> ModelCard:
     """Fetch and parse a model card from HuggingFace Hub.
 
@@ -478,47 +524,10 @@ def get_model_card(model_id: str) -> ModelCard:
     api = HfApi()
 
     try:
-        # Get model info which includes the README
         model_info = api.model_info(model_id)
-        card_data = model_info.card_data
-
-        # Reconstruct the card content
-        if card_data is not None:
-            # Build frontmatter from card_data
-            frontmatter_parts = ["---"]
-            if card_data.license:
-                frontmatter_parts.append(f"license: {card_data.license}")
-            if card_data.language:
-                if isinstance(card_data.language, list):
-                    frontmatter_parts.append("language:")
-                    for lang in card_data.language:
-                        frontmatter_parts.append(f"  - {lang}")
-                else:
-                    frontmatter_parts.append(f"language: {card_data.language}")
-            if card_data.tags:
-                frontmatter_parts.append("tags:")
-                for tag in card_data.tags:
-                    frontmatter_parts.append(f"  - {tag}")
-            frontmatter_parts.append("---\n")
-            frontmatter = "\n".join(frontmatter_parts)
-        else:
-            frontmatter = ""
-
-        # Try to get the README content
-        try:
-            readme = api.hf_hub_download(
-                repo_id=model_id,
-                filename="README.md",
-                repo_type="model",
-            )
-            with open(readme, encoding="utf-8") as f:
-                content = f.read()
-        except Exception:
-            # If no README, use just the frontmatter
-            content = frontmatter if frontmatter else f"# {model_id}\n\nNo README."
-
+        frontmatter = _build_frontmatter(model_info.card_data)
+        content = _fetch_readme_content(api, model_id, frontmatter)
         return parse_model_card(content, model_id)
-
     except Exception as e:
         msg = f"Failed to fetch model card for {model_id}: {e}"
         raise RuntimeError(msg) from e
@@ -550,9 +559,7 @@ def extract_model_description(card: ModelCard) -> str | None:
         Traceback (most recent call last):
         ValueError: card cannot be None
     """
-    if card is None:
-        msg = "card cannot be None"
-        raise ValueError(msg)
+    validate_not_none(card, "card")
 
     # Look for Model Description section
     for section in card.sections:
@@ -597,8 +604,6 @@ def list_model_card_sections(card: ModelCard) -> list[str]:
         Traceback (most recent call last):
         ValueError: card cannot be None
     """
-    if card is None:
-        msg = "card cannot be None"
-        raise ValueError(msg)
+    validate_not_none(card, "card")
 
     return [section.title for section in card.sections]

@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ModelFormat(Enum):
     """Supported model formats for conversion.
@@ -246,9 +248,7 @@ def validate_conversion_config(config: ConversionConfig) -> None:
         Traceback (most recent call last):
         ValueError: source and target formats cannot be the same
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.source_format == config.target_format:
         msg = "source and target formats cannot be the same"
@@ -282,9 +282,7 @@ def validate_gguf_conversion_config(config: GGUFConversionConfig) -> None:
         Traceback (most recent call last):
         ValueError: quantization_type cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.quantization_type:
         msg = "quantization_type cannot be empty"
@@ -318,9 +316,7 @@ def validate_safetensors_conversion_config(
         Traceback (most recent call last):
         ValueError: shard_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.shard_size <= 0:
         msg = f"shard_size must be positive, got {config.shard_size}"
@@ -900,9 +896,7 @@ def format_conversion_stats(stats: ConversionStats) -> str:
         >>> "Compression ratio:" in formatted
         True
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     compression_ratio = stats.original_size_mb / stats.converted_size_mb
 
@@ -1023,9 +1017,7 @@ def get_conversion_config_dict(config: ConversionConfig) -> dict[str, Any]:
         >>> d["target_format"]
         'safetensors'
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "source_format": config.source_format.value,
@@ -1055,9 +1047,7 @@ def get_gguf_conversion_config_dict(config: GGUFConversionConfig) -> dict[str, A
         >>> d["use_mmap"]
         True
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "quantization_type": config.quantization_type,
@@ -1088,9 +1078,7 @@ def get_safetensors_conversion_config_dict(
         >>> d["shard_size"]
         5000000000
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "metadata": config.metadata,

@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class GuardrailType(Enum):
     """Type of guardrail to apply.
@@ -313,9 +315,7 @@ def validate_guardrail_config(config: GuardrailConfig) -> None:
         Traceback (most recent call last):
         ValueError: threshold must be between 0.0 and 1.0
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.threshold <= 1.0:
         msg = f"threshold must be between 0.0 and 1.0, got {config.threshold}"
@@ -349,9 +349,7 @@ def validate_content_policy_config(config: ContentPolicyConfig) -> None:
         Traceback (most recent call last):
         ValueError: invalid regex pattern in custom_rules...
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     for pattern in config.custom_rules:
         try:

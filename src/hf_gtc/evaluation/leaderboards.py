@@ -26,6 +26,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class LeaderboardType(Enum):
     """Types of HuggingFace leaderboards.
@@ -364,9 +366,7 @@ def validate_leaderboard_config(config: LeaderboardConfig) -> None:
         Traceback (most recent call last):
         ValueError: name cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.name:
         msg = "name cannot be empty"
@@ -395,9 +395,7 @@ def create_leaderboard(config: LeaderboardConfig) -> Leaderboard:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_leaderboard_config(config)
     return Leaderboard(config=config)
@@ -1406,9 +1404,7 @@ def validate_submission_config(config: SubmissionConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_few_shot cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.model_name:
         msg = "model_name cannot be empty"
@@ -1444,9 +1440,7 @@ def validate_leaderboard_stats(stats: LeaderboardStats) -> None:
         Traceback (most recent call last):
         ValueError: total_models cannot be negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.total_models < 0:
         msg = f"total_models cannot be negative, got {stats.total_models}"
@@ -1783,9 +1777,7 @@ def format_leaderboard_stats(stats: LeaderboardStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Leaderboard Statistics",

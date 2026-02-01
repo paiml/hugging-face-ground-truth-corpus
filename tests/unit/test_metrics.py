@@ -763,7 +763,7 @@ class TestCalculateRouge:
         cands = ["apple banana cherry"]
         refs = ["dog elephant fox"]
         results = calculate_rouge(cands, refs)
-        assert results["rouge1"].score == 0.0
+        assert results["rouge1"].score == pytest.approx(0.0)
 
 
 class TestCalculateBertscore:
@@ -832,7 +832,7 @@ class TestCalculateBertscore:
         refs = ["dog elephant fox"]
         result = calculate_bertscore(cands, refs)
         # No overlap means 0 score
-        assert result.score == 0.0
+        assert result.score == pytest.approx(0.0)
 
 
 class TestCalculatePerplexity:

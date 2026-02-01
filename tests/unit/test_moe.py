@@ -167,8 +167,8 @@ class TestLoadBalanceConfig:
             drop_tokens=False,
         )
         assert config.loss_type == LoadBalancingLoss.AUXILIARY
-        assert config.loss_weight == 0.01
-        assert config.capacity_factor == 1.25
+        assert config.loss_weight == pytest.approx(0.01)
+        assert config.capacity_factor == pytest.approx(1.25)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -190,7 +190,7 @@ class TestExpertConfig:
         )
         assert config.hidden_dim == 4096
         assert config.activation == ExpertActivation.GELU
-        assert config.dropout == 0.1
+        assert config.dropout == pytest.approx(0.1)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -237,8 +237,8 @@ class TestMoEStats:
             expert_utilization=0.75,
             dropped_tokens=128,
         )
-        assert stats.router_entropy == 2.5
-        assert stats.expert_utilization == 0.75
+        assert stats.router_entropy == pytest.approx(2.5)
+        assert stats.expert_utilization == pytest.approx(0.75)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -445,8 +445,8 @@ class TestCreateLoadBalanceConfig:
         """Create default config."""
         config = create_load_balance_config()
         assert config.loss_type == LoadBalancingLoss.AUXILIARY
-        assert config.loss_weight == 0.01
-        assert config.capacity_factor == 1.25
+        assert config.loss_weight == pytest.approx(0.01)
+        assert config.capacity_factor == pytest.approx(1.25)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -457,7 +457,7 @@ class TestCreateLoadBalanceConfig:
             drop_tokens=True,
         )
         assert config.loss_type == LoadBalancingLoss.Z_LOSS
-        assert config.loss_weight == 0.001
+        assert config.loss_weight == pytest.approx(0.001)
         assert config.drop_tokens is True
 
     def test_with_enum_loss_type(self) -> None:
@@ -488,7 +488,7 @@ class TestCreateExpertConfig:
         config = create_expert_config()
         assert config.hidden_dim == 4096
         assert config.activation == ExpertActivation.GELU
-        assert config.dropout == 0.1
+        assert config.dropout == pytest.approx(0.1)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -552,7 +552,7 @@ class TestCreateMoEConfig:
         )
         assert config.router_config.num_experts == 32
         assert config.expert_config.hidden_dim == 16384
-        assert config.balance_config.loss_weight == 0.02
+        assert config.balance_config.loss_weight == pytest.approx(0.02)
 
     def test_invalid_num_layers_raises(self) -> None:
         """Invalid num_layers raises ValueError."""
@@ -566,7 +566,7 @@ class TestCreateMoEStats:
     def test_default_stats(self) -> None:
         """Create default stats."""
         stats = create_moe_stats()
-        assert stats.router_entropy == 0.0
+        assert stats.router_entropy == pytest.approx(0.0)
         assert stats.dropped_tokens == 0
 
     def test_custom_stats(self) -> None:
@@ -577,8 +577,8 @@ class TestCreateMoEStats:
             expert_utilization=0.75,
             dropped_tokens=128,
         )
-        assert stats.router_entropy == 2.5
-        assert stats.expert_utilization == 0.75
+        assert stats.router_entropy == pytest.approx(2.5)
+        assert stats.expert_utilization == pytest.approx(0.75)
 
     def test_negative_router_entropy_raises(self) -> None:
         """Negative router_entropy raises ValueError."""
@@ -770,26 +770,26 @@ class TestEstimateExpertUtilization:
         """Half the experts used."""
         probs = (0.25, 0.25, 0.25, 0.25, 0.0, 0.0, 0.0, 0.0)
         utilization = estimate_expert_utilization(probs)
-        assert utilization == 0.5
+        assert utilization == pytest.approx(0.5)
 
     def test_full_utilization(self) -> None:
         """All experts used."""
         probs = (0.125,) * 8
         utilization = estimate_expert_utilization(probs)
-        assert utilization == 1.0
+        assert utilization == pytest.approx(1.0)
 
     def test_no_utilization(self) -> None:
         """No experts above threshold."""
         probs = (0.005,) * 8
         utilization = estimate_expert_utilization(probs)
-        assert utilization == 0.0
+        assert utilization == pytest.approx(0.0)
 
     def test_custom_threshold(self) -> None:
         """Custom threshold affects utilization."""
         probs = (0.15, 0.15, 0.05, 0.05, 0.2, 0.2, 0.15, 0.05)
         utilization = estimate_expert_utilization(probs, threshold=0.1)
         # probs > 0.1 are: 0.15, 0.15, 0.2, 0.2, 0.15 = 5 out of 8 = 0.625
-        assert utilization == 0.625
+        assert utilization == pytest.approx(0.625)
 
     def test_empty_probs_raises(self) -> None:
         """Empty probs raises ValueError."""
@@ -858,7 +858,7 @@ class TestCalculateLoadBalanceLoss:
         probs = (0.25, 0.25, 0.25, 0.25)
         counts = (100, 100, 100, 100)
         loss = calculate_load_balance_loss(probs, counts, LoadBalancingLoss.NONE)
-        assert loss == 0.0
+        assert loss == pytest.approx(0.0)
 
     def test_z_loss_type(self) -> None:
         """Z-loss type computes variance-based loss."""
@@ -881,7 +881,7 @@ class TestCalculateLoadBalanceLoss:
         probs = (0.25, 0.25, 0.25, 0.25)
         counts = (0, 0, 0, 0)
         loss = calculate_load_balance_loss(probs, counts)
-        assert loss == 0.0
+        assert loss == pytest.approx(0.0)
 
     def test_empty_probs_raises(self) -> None:
         """Empty probs raises ValueError."""

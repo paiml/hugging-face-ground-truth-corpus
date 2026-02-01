@@ -240,7 +240,7 @@ class TestCreateSearchConfig:
         """Create custom config."""
         config = create_search_config(top_k=5, score_threshold=0.8)
         assert config.top_k == 5
-        assert config.score_threshold == 0.8
+        assert config.score_threshold == pytest.approx(0.8)
 
     def test_zero_top_k_raises(self) -> None:
         """Zero top_k raises ValueError."""

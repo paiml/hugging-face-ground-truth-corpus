@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class OutputFormat(Enum):
     """Supported output formats for structured generation.
@@ -269,9 +271,7 @@ def validate_structured_config(config: StructuredConfig) -> None:
         Traceback (most recent call last):
         ValueError: schema is required for JSON_SCHEMA format
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_retries < 0:
         msg = f"max_retries must be non-negative, got {config.max_retries}"
@@ -315,9 +315,7 @@ def validate_json_schema_config(config: JSONSchemaConfig) -> None:
         Traceback (most recent call last):
         ValueError: schema_dict cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.schema_dict:
         msg = "schema_dict cannot be empty"
@@ -362,9 +360,7 @@ def validate_grammar_config(config: GrammarConfig) -> None:
         Traceback (most recent call last):
         ValueError: grammar_string cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.grammar_string:
         msg = "grammar_string cannot be empty"
@@ -411,9 +407,7 @@ def validate_choices_config(config: ChoicesConfig) -> None:
         Traceback (most recent call last):
         ValueError: choices cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.choices:
         msg = "choices cannot be empty"
@@ -1029,9 +1023,7 @@ def format_validation_result(result: ValidationResult) -> str:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [f"Valid: {result.is_valid}"]
 

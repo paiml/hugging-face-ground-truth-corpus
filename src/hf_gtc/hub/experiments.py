@@ -1029,6 +1029,37 @@ class ExperimentStats:
     metric_stats: dict[str, tuple[float, float, float]]
 
 
+def _compute_avg_duration(runs: list[ExperimentRun]) -> float | None:
+    """Compute average duration for runs with end_time."""
+    durations: list[float] = []
+    for run in runs:
+        if run.end_time is not None:
+            delta = run.end_time - run.start_time
+            durations.append(delta.total_seconds())
+    return sum(durations) / len(durations) if durations else None
+
+
+def _compute_metric_stats(
+    runs: list[ExperimentRun],
+) -> dict[str, tuple[float, float, float]]:
+    """Compute per-metric min/max/mean across runs."""
+    metric_values: dict[str, list[float]] = {}
+    for run in runs:
+        for metric_name, values in run.metrics.items():
+            if not values:
+                continue
+            if metric_name not in metric_values:
+                metric_values[metric_name] = []
+            sorted_values = sorted(values, key=lambda x: x[0])
+            metric_values[metric_name].append(sorted_values[-1][1])
+
+    return {
+        name: (min(vals), max(vals), sum(vals) / len(vals))
+        for name, vals in metric_values.items()
+        if vals
+    }
+
+
 def calculate_experiment_stats(runs: list[ExperimentRun]) -> ExperimentStats:
     """Calculate statistics for a set of experiment runs.
 
@@ -1066,35 +1097,8 @@ def calculate_experiment_stats(runs: list[ExperimentRun]) -> ExperimentStats:
 
     completed = sum(1 for r in runs if r.status == ExperimentStatus.COMPLETED)
     failed = sum(1 for r in runs if r.status == ExperimentStatus.FAILED)
-
-    # Calculate average duration for completed runs with end_time
-    durations: list[float] = []
-    for run in runs:
-        if run.end_time is not None:
-            delta = run.end_time - run.start_time
-            durations.append(delta.total_seconds())
-
-    avg_duration = sum(durations) / len(durations) if durations else None
-
-    # Calculate metric stats
-    metric_values: dict[str, list[float]] = {}
-    for run in runs:
-        for metric_name, values in run.metrics.items():
-            if values:
-                if metric_name not in metric_values:
-                    metric_values[metric_name] = []
-                # Use last value from each run
-                sorted_values = sorted(values, key=lambda x: x[0])
-                metric_values[metric_name].append(sorted_values[-1][1])
-
-    metric_stats: dict[str, tuple[float, float, float]] = {}
-    for metric_name, vals in metric_values.items():
-        if vals:
-            metric_stats[metric_name] = (
-                min(vals),
-                max(vals),
-                sum(vals) / len(vals),
-            )
+    avg_duration = _compute_avg_duration(runs)
+    metric_stats = _compute_metric_stats(runs)
 
     return ExperimentStats(
         total_runs=len(runs),
@@ -1138,25 +1142,44 @@ def format_experiment_summary(run: ExperimentRun) -> str:
     if run.config.tags:
         lines.append(f"Tags: {', '.join(run.config.tags)}")
 
-    if run.config.hyperparameters:
-        lines.append("Hyperparameters:")
-        for key, value in run.config.hyperparameters.items():
-            lines.append(f"  {key}: {value}")
-
-    if run.metrics:
-        lines.append("Metrics:")
-        for metric_name, values in run.metrics.items():
-            if values:
-                sorted_values = sorted(values, key=lambda x: x[0])
-                last_value = sorted_values[-1][1]
-                lines.append(f"  {metric_name}: {last_value}")
-
-    if run.artifacts:
-        lines.append(f"Artifacts: {len(run.artifacts)}")
-        for artifact in run.artifacts:
-            lines.append(f"  [{artifact.artifact_type.value}] {artifact.path}")
+    _append_hyperparameters(lines, run.config.hyperparameters)
+    _append_metrics_summary(lines, run.metrics)
+    _append_artifacts_summary(lines, run.artifacts)
 
     return "\n".join(lines)
+
+
+def _append_hyperparameters(
+    lines: list[str], hyperparameters: dict[str, object]
+) -> None:
+    """Append hyperparameters section if present."""
+    if not hyperparameters:
+        return
+    lines.append("Hyperparameters:")
+    for key, value in hyperparameters.items():
+        lines.append(f"  {key}: {value}")
+
+
+def _append_metrics_summary(
+    lines: list[str], metrics: dict[str, list[tuple[object, float]]]
+) -> None:
+    """Append metrics summary section if present."""
+    if not metrics:
+        return
+    lines.append("Metrics:")
+    for metric_name, values in metrics.items():
+        if values:
+            sorted_values = sorted(values, key=lambda x: x[0])
+            lines.append(f"  {metric_name}: {sorted_values[-1][1]}")
+
+
+def _append_artifacts_summary(lines: list[str], artifacts: tuple[object, ...]) -> None:
+    """Append artifacts section if present."""
+    if not artifacts:
+        return
+    lines.append(f"Artifacts: {len(artifacts)}")
+    for artifact in artifacts:
+        lines.append(f"  [{artifact.artifact_type.value}] {artifact.path}")
 
 
 @dataclass(frozen=True, slots=True)

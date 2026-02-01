@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class SchedulerType(Enum):
     """Learning rate scheduler types.
@@ -307,9 +309,7 @@ def validate_checkpoint_config(config: CheckpointConfig) -> None:
         Traceback (most recent call last):
         ValueError: save_total_limit must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.save_total_limit is not None and config.save_total_limit <= 0:
         msg = "save_total_limit must be positive"
@@ -340,9 +340,7 @@ def validate_early_stopping_config(config: EarlyStoppingConfig) -> None:
         Traceback (most recent call last):
         ValueError: patience must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.patience <= 0:
         msg = "patience must be positive"
@@ -380,9 +378,7 @@ def validate_scheduler_config(config: SchedulerConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_warmup_steps cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_warmup_steps < 0:
         msg = "num_warmup_steps cannot be negative"
@@ -529,9 +525,7 @@ def should_stop_early(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return evaluations_without_improvement >= config.patience
 
@@ -571,9 +565,7 @@ def is_metric_improved(
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.mode == EarlyStoppingMode.MIN:
         return current_metric < best_metric - config.threshold

@@ -180,7 +180,7 @@ class TestSemanticChunkConfig:
             min_chunk_size=100,
             embedding_model="all-MiniLM-L6-v2",
         )
-        assert config.similarity_threshold == 0.8
+        assert config.similarity_threshold == pytest.approx(0.8)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -397,14 +397,14 @@ class TestCreateSemanticChunkConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_semantic_chunk_config()
-        assert config.similarity_threshold == 0.8
+        assert config.similarity_threshold == pytest.approx(0.8)
         assert config.min_chunk_size == 100
         assert config.embedding_model == "all-MiniLM-L6-v2"
 
     def test_custom_threshold(self) -> None:
         """Create config with custom threshold."""
         config = create_semantic_chunk_config(similarity_threshold=0.9)
-        assert config.similarity_threshold == 0.9
+        assert config.similarity_threshold == pytest.approx(0.9)
 
     def test_custom_min_chunk_size(self) -> None:
         """Create config with custom min_chunk_size."""

@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class VocabTrainingMethod(Enum):
     """Vocabulary training methods.
@@ -258,9 +260,7 @@ def validate_vocab_training_config(config: VocabTrainingConfig) -> None:
         Traceback (most recent call last):
         ValueError: vocab_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.vocab_size <= 0:
         msg = f"vocab_size must be positive, got {config.vocab_size}"
@@ -303,9 +303,7 @@ def validate_merge_config(config: MergeConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_merges must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_merges <= 0:
         msg = f"num_merges must be positive, got {config.num_merges}"
@@ -353,9 +351,7 @@ def validate_special_tokens_config(config: SpecialTokensConfig) -> None:
         Traceback (most recent call last):
         ValueError: pad token cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.pad:
         msg = "pad token cannot be empty"
@@ -412,9 +408,7 @@ def validate_vocab_training_stats(stats: VocabTrainingStats) -> None:
         Traceback (most recent call last):
         ValueError: coverage must be between 0 and 100
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.vocab_size <= 0:
         msg = f"vocab_size must be positive, got {stats.vocab_size}"
@@ -1029,9 +1023,7 @@ def format_vocab_training_stats(stats: VocabTrainingStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Vocabulary Statistics",

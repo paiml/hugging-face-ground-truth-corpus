@@ -108,8 +108,8 @@ class TestWatermarkConfig:
         config = WatermarkConfig()
         assert config.watermark_type == WatermarkType.SOFT
         assert config.strength == WatermarkStrength.MEDIUM
-        assert config.gamma == 0.25
-        assert config.delta == 2.0
+        assert config.gamma == pytest.approx(0.25)
+        assert config.delta == pytest.approx(2.0)
         assert config.seeding_scheme == "selfhash"
 
     def test_custom_values(self) -> None:
@@ -123,8 +123,8 @@ class TestWatermarkConfig:
         )
         assert config.watermark_type == WatermarkType.HARD
         assert config.strength == WatermarkStrength.HIGH
-        assert config.gamma == 0.5
-        assert config.delta == 3.0
+        assert config.gamma == pytest.approx(0.5)
+        assert config.delta == pytest.approx(3.0)
         assert config.seeding_scheme == "custom"
 
     def test_frozen(self) -> None:
@@ -141,7 +141,7 @@ class TestDetectionConfig:
         """Test default values."""
         config = DetectionConfig()
         assert config.method == DetectionMethod.Z_SCORE
-        assert config.threshold == 4.0
+        assert config.threshold == pytest.approx(4.0)
         assert config.window_size == 256
         assert config.ignore_repeated is True
 
@@ -154,7 +154,7 @@ class TestDetectionConfig:
             ignore_repeated=False,
         )
         assert config.method == DetectionMethod.LOG_LIKELIHOOD
-        assert config.threshold == 5.0
+        assert config.threshold == pytest.approx(5.0)
         assert config.window_size == 512
         assert config.ignore_repeated is False
 
@@ -212,7 +212,7 @@ class TestEmbeddingConfig:
     def test_default_values(self) -> None:
         """Test default values."""
         config = EmbeddingConfig()
-        assert config.vocab_fraction == 0.5
+        assert config.vocab_fraction == pytest.approx(0.5)
         assert config.hash_key == 15485863
         assert config.context_width == 1
 
@@ -223,7 +223,7 @@ class TestEmbeddingConfig:
             hash_key=42,
             context_width=2,
         )
-        assert config.vocab_fraction == 0.3
+        assert config.vocab_fraction == pytest.approx(0.3)
         assert config.hash_key == 42
         assert config.context_width == 2
 
@@ -330,8 +330,8 @@ class TestCreateWatermarkConfig:
         config = create_watermark_config()
         assert config.watermark_type == WatermarkType.SOFT
         assert config.strength == WatermarkStrength.MEDIUM
-        assert config.gamma == 0.25
-        assert config.delta == 2.0
+        assert config.gamma == pytest.approx(0.25)
+        assert config.delta == pytest.approx(2.0)
         assert config.seeding_scheme == "selfhash"
 
     def test_creates_config_with_string_type(self) -> None:
@@ -365,8 +365,8 @@ class TestCreateWatermarkConfig:
         )
         assert config.watermark_type == WatermarkType.STATISTICAL
         assert config.strength == WatermarkStrength.LOW
-        assert config.gamma == 0.3
-        assert config.delta == 3.0
+        assert config.gamma == pytest.approx(0.3)
+        assert config.delta == pytest.approx(3.0)
         assert config.seeding_scheme == "custom"
 
     def test_invalid_gamma_raises_error(self) -> None:
@@ -387,7 +387,7 @@ class TestCreateDetectionConfig:
         """Test creating config with defaults."""
         config = create_detection_config()
         assert config.method == DetectionMethod.Z_SCORE
-        assert config.threshold == 4.0
+        assert config.threshold == pytest.approx(4.0)
         assert config.window_size == 256
         assert config.ignore_repeated is True
 
@@ -410,7 +410,7 @@ class TestCreateDetectionConfig:
             ignore_repeated=False,
         )
         assert config.method == DetectionMethod.ENTROPY
-        assert config.threshold == 5.0
+        assert config.threshold == pytest.approx(5.0)
         assert config.window_size == 512
         assert config.ignore_repeated is False
 
@@ -431,7 +431,7 @@ class TestCreateEmbeddingConfig:
     def test_creates_config_with_defaults(self) -> None:
         """Test creating config with defaults."""
         config = create_embedding_config()
-        assert config.vocab_fraction == 0.5
+        assert config.vocab_fraction == pytest.approx(0.5)
         assert config.hash_key == 15485863
         assert config.context_width == 1
 
@@ -442,7 +442,7 @@ class TestCreateEmbeddingConfig:
             hash_key=42,
             context_width=2,
         )
-        assert config.vocab_fraction == 0.3
+        assert config.vocab_fraction == pytest.approx(0.3)
         assert config.hash_key == 42
         assert config.context_width == 2
 

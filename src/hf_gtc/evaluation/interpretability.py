@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class AttributionMethod(Enum):
     """Methods for computing feature attributions.
@@ -268,9 +270,7 @@ def validate_attention_config(config: AttentionConfig) -> None:
         Traceback (most recent call last):
         ValueError: layer_indices cannot contain negative values
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.layer_indices is not None and any(
         idx < 0 for idx in config.layer_indices
@@ -346,9 +346,7 @@ def validate_attribution_config(config: AttributionConfig) -> None:
         Traceback (most recent call last):
         ValueError: n_steps must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.n_steps <= 0:
         msg = f"n_steps must be positive, got {config.n_steps}"
@@ -425,9 +423,7 @@ def validate_visualization_config(config: VisualizationConfig) -> None:
         Traceback (most recent call last):
         ValueError: figsize dimensions must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.colormap:
         msg = "colormap cannot be empty"
@@ -711,9 +707,7 @@ def calculate_attribution_scores(
         msg = "inputs cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if len(gradients) != len(inputs):
         msg = (
@@ -793,9 +787,7 @@ def aggregate_attention_weights(
         msg = "attention_weights cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     num_positions = len(attention_weights[0])
     aggregated: list[float] = []
@@ -865,9 +857,7 @@ def estimate_interpretation_time(
         msg = f"num_tokens must be positive, got {num_tokens}"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if model_inference_time_ms <= 0:
         msg = f"model_inference_time_ms must be positive, got {model_inference_time_ms}"
@@ -928,9 +918,7 @@ def format_interpretation_result(
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if top_k <= 0:
         msg = f"top_k must be positive, got {top_k}"

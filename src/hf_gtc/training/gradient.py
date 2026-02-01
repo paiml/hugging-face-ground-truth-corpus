@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class ClippingMethod(Enum):
     """Methods for gradient clipping.
@@ -260,9 +262,7 @@ def validate_clipping_config(config: ClippingConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_norm must be positive for norm clipping
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.method == ClippingMethod.NORM and config.max_norm <= 0:
         msg = f"max_norm must be positive for norm clipping, got {config.max_norm}"
@@ -302,9 +302,7 @@ def validate_scaling_config(config: ScalingConfig) -> None:
         Traceback (most recent call last):
         ValueError: initial_scale must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.initial_scale <= 0:
         msg = f"initial_scale must be positive, got {config.initial_scale}"
@@ -342,9 +340,7 @@ def validate_accumulation_config(config: AccumulationConfig) -> None:
         Traceback (most recent call last):
         ValueError: steps must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.steps <= 0:
         msg = f"steps must be positive, got {config.steps}"
@@ -372,9 +368,7 @@ def validate_gradient_config(config: GradientConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_clipping_config(config.clipping_config)
     validate_scaling_config(config.scaling_config)
@@ -407,9 +401,7 @@ def validate_gradient_stats(stats: GradientStats) -> None:
         Traceback (most recent call last):
         ValueError: grad_norm cannot be negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.grad_norm < 0:
         msg = f"grad_norm cannot be negative, got {stats.grad_norm}"
@@ -756,9 +748,7 @@ def clip_gradients(
         msg = "gradients cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.method == ClippingMethod.NONE:
         return list(gradients), 0.0
@@ -981,9 +971,7 @@ def format_gradient_stats(stats: GradientStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Gradient Norm: {stats.grad_norm:.6f}",

@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class DebugLevel(Enum):
     """Debug verbosity levels.
@@ -237,9 +239,7 @@ def validate_debug_config(config: DebugConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
 
 def validate_gradient_flow_config(config: GradientFlowConfig) -> None:
@@ -266,9 +266,7 @@ def validate_gradient_flow_config(config: GradientFlowConfig) -> None:
         Traceback (most recent call last):
         ValueError: reduction must be one of
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     valid_reductions = {"mean", "max", "min"}
     if config.reduction not in valid_reductions:
@@ -303,9 +301,7 @@ def validate_activation_config(config: ActivationConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_bins must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_bins <= 0:
         msg = f"num_bins must be positive, got {config.num_bins}"
@@ -336,9 +332,7 @@ def validate_debug_stats(stats: DebugStats) -> None:
         Traceback (most recent call last):
         ValueError: anomaly count cannot be negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     for anomaly_type, count in stats.anomalies_detected.items():
         if count < 0:
@@ -682,9 +676,7 @@ def compute_gradient_flow(
         msg = "gradients cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     result: dict[str, float] = {}
     for layer_name, layer_grads in gradients.items():
@@ -741,9 +733,7 @@ def compute_activation_stats(
         msg = "activations cannot be empty"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     result: dict[str, dict[str, float]] = {}
     for layer_name, layer_acts in activations.items():
@@ -991,41 +981,50 @@ def format_debug_stats(stats: DebugStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
-    lines = []
+    lines: list[str] = []
+    _append_anomalies_section(lines, stats.anomalies_detected)
+    _append_gradient_norm_section(lines, stats.gradient_norm_history)
+    _append_activation_section(lines, stats.activation_stats)
 
-    # Anomalies section
+    return "\n".join(lines)
+
+
+def _append_anomalies_section(lines: list[str], anomalies: dict[str, int]) -> None:
+    """Append anomalies section to lines."""
     lines.append("Anomalies Detected:")
-    if stats.anomalies_detected:
-        for anomaly_type, count in sorted(stats.anomalies_detected.items()):
+    if anomalies:
+        for anomaly_type, count in sorted(anomalies.items()):
             lines.append(f"  {anomaly_type}: {count}")
     else:
         lines.append("  None")
 
-    # Gradient norm history
+
+def _append_gradient_norm_section(lines: list[str], history: tuple[float, ...]) -> None:
+    """Append gradient norm history section to lines."""
     lines.append("\nGradient Norm History:")
-    if stats.gradient_norm_history:
-        recent = stats.gradient_norm_history[-5:]
+    if history:
+        recent = history[-5:]
         lines.append(f"  Recent: {[round(n, 4) for n in recent]}")
-        mean_norm = sum(stats.gradient_norm_history) / len(stats.gradient_norm_history)
+        mean_norm = sum(history) / len(history)
         lines.append(f"  Mean: {mean_norm:.4f}")
     else:
         lines.append("  No history")
 
-    # Activation stats
+
+def _append_activation_section(
+    lines: list[str], activation_stats: dict[str, dict[str, float]]
+) -> None:
+    """Append activation statistics section to lines."""
     lines.append("\nActivation Statistics:")
-    if stats.activation_stats:
-        for layer_name, layer_stats in sorted(stats.activation_stats.items()):
+    if activation_stats:
+        for layer_name, layer_stats in sorted(activation_stats.items()):
             lines.append(f"  {layer_name}:")
             for stat_name, value in sorted(layer_stats.items()):
                 lines.append(f"    {stat_name}: {value:.4f}")
     else:
         lines.append("  No statistics")
-
-    return "\n".join(lines)
 
 
 def get_recommended_debug_config(

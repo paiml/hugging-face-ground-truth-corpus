@@ -109,9 +109,9 @@ class TestROMEConfig:
     def test_default_values(self) -> None:
         """Test default configuration values."""
         config = ROMEConfig(layers=[5])
-        assert config.v_lr == 0.5
-        assert config.clamp_norm == 4.0
-        assert config.kl_factor == 0.0625
+        assert config.v_lr == pytest.approx(0.5)
+        assert config.clamp_norm == pytest.approx(4.0)
+        assert config.kl_factor == pytest.approx(0.0625)
 
     def test_custom_values(self) -> None:
         """Test custom configuration values."""
@@ -122,9 +122,9 @@ class TestROMEConfig:
             kl_factor=0.1,
         )
         assert config.layers == [10, 11]
-        assert config.v_lr == 0.3
-        assert config.clamp_norm == 2.0
-        assert config.kl_factor == 0.1
+        assert config.v_lr == pytest.approx(0.3)
+        assert config.clamp_norm == pytest.approx(2.0)
+        assert config.kl_factor == pytest.approx(0.1)
 
     def test_frozen(self) -> None:
         """Test that ROMEConfig is immutable."""
@@ -144,8 +144,8 @@ class TestMEMITConfig:
     def test_default_values(self) -> None:
         """Test default configuration values."""
         config = MEMITConfig(layers=[5])
-        assert config.lambda_weight == 5000.0
-        assert config.edit_weight == 1.0
+        assert config.lambda_weight == pytest.approx(5000.0)
+        assert config.edit_weight == pytest.approx(1.0)
 
     def test_custom_values(self) -> None:
         """Test custom configuration values."""
@@ -155,8 +155,8 @@ class TestMEMITConfig:
             edit_weight=0.5,
         )
         assert config.layers == [8, 9, 10]
-        assert config.lambda_weight == 10000.0
-        assert config.edit_weight == 0.5
+        assert config.lambda_weight == pytest.approx(10000.0)
+        assert config.edit_weight == pytest.approx(0.5)
 
     def test_frozen(self) -> None:
         """Test that MEMITConfig is immutable."""
@@ -230,10 +230,10 @@ class TestEditingStats:
             generalization=0.85,
             locality_score=0.88,
         )
-        assert stats.edit_success_rate == 0.95
-        assert stats.specificity == 0.92
-        assert stats.generalization == 0.85
-        assert stats.locality_score == 0.88
+        assert stats.edit_success_rate == pytest.approx(0.95)
+        assert stats.specificity == pytest.approx(0.92)
+        assert stats.generalization == pytest.approx(0.85)
+        assert stats.locality_score == pytest.approx(0.88)
 
     def test_frozen(self) -> None:
         """Test that EditingStats is immutable."""
@@ -285,7 +285,7 @@ class TestCreateROMEConfig:
         """Test creating default config."""
         config = create_rome_config()
         assert config.layers == [5, 6, 7]
-        assert config.v_lr == 0.5
+        assert config.v_lr == pytest.approx(0.5)
 
     def test_with_custom_layers(self) -> None:
         """Test with custom layers."""
@@ -295,17 +295,17 @@ class TestCreateROMEConfig:
     def test_with_custom_v_lr(self) -> None:
         """Test with custom v_lr."""
         config = create_rome_config(v_lr=0.3)
-        assert config.v_lr == 0.3
+        assert config.v_lr == pytest.approx(0.3)
 
     def test_with_custom_clamp_norm(self) -> None:
         """Test with custom clamp_norm."""
         config = create_rome_config(clamp_norm=2.0)
-        assert config.clamp_norm == 2.0
+        assert config.clamp_norm == pytest.approx(2.0)
 
     def test_with_custom_kl_factor(self) -> None:
         """Test with custom kl_factor."""
         config = create_rome_config(kl_factor=0.1)
-        assert config.kl_factor == 0.1
+        assert config.kl_factor == pytest.approx(0.1)
 
 
 class TestCreateMEMITConfig:
@@ -315,7 +315,7 @@ class TestCreateMEMITConfig:
         """Test creating default config."""
         config = create_memit_config()
         assert config.layers == [4, 5, 6, 7, 8]
-        assert config.lambda_weight == 5000.0
+        assert config.lambda_weight == pytest.approx(5000.0)
 
     def test_with_custom_layers(self) -> None:
         """Test with custom layers."""
@@ -325,12 +325,12 @@ class TestCreateMEMITConfig:
     def test_with_custom_lambda_weight(self) -> None:
         """Test with custom lambda_weight."""
         config = create_memit_config(lambda_weight=10000.0)
-        assert config.lambda_weight == 10000.0
+        assert config.lambda_weight == pytest.approx(10000.0)
 
     def test_with_custom_edit_weight(self) -> None:
         """Test with custom edit_weight."""
         config = create_memit_config(edit_weight=0.5)
-        assert config.edit_weight == 0.5
+        assert config.edit_weight == pytest.approx(0.5)
 
 
 class TestCreateEditRequest:
@@ -816,13 +816,13 @@ class TestCalculateEditSuccess:
         """Test with all predictions matching targets."""
         predictions = ["A", "B", "C"]
         targets = ["A", "B", "C"]
-        assert calculate_edit_success(predictions, targets) == 1.0
+        assert calculate_edit_success(predictions, targets) == pytest.approx(1.0)
 
     def test_none_match(self) -> None:
         """Test with no predictions matching targets."""
         predictions = ["X", "Y", "Z"]
         targets = ["A", "B", "C"]
-        assert calculate_edit_success(predictions, targets) == 0.0
+        assert calculate_edit_success(predictions, targets) == pytest.approx(0.0)
 
     def test_partial_match(self) -> None:
         """Test with partial matches."""
@@ -834,13 +834,13 @@ class TestCalculateEditSuccess:
         """Test that comparison is case insensitive."""
         predictions = ["ROME", "berlin"]
         targets = ["rome", "BERLIN"]
-        assert calculate_edit_success(predictions, targets) == 1.0
+        assert calculate_edit_success(predictions, targets) == pytest.approx(1.0)
 
     def test_strips_whitespace(self) -> None:
         """Test that whitespace is stripped."""
         predictions = ["  A  ", "B"]
         targets = ["A", "  B  "]
-        assert calculate_edit_success(predictions, targets) == 1.0
+        assert calculate_edit_success(predictions, targets) == pytest.approx(1.0)
 
     def test_none_predictions_raises_error(self) -> None:
         """Test that None predictions raises ValueError."""
@@ -875,13 +875,13 @@ class TestMeasureSpecificity:
         """Test with all facts preserved."""
         predictions = ["Paris", "Berlin", "Tokyo"]
         ground_truths = ["Paris", "Berlin", "Tokyo"]
-        assert measure_specificity(predictions, ground_truths) == 1.0
+        assert measure_specificity(predictions, ground_truths) == pytest.approx(1.0)
 
     def test_none_preserved(self) -> None:
         """Test with no facts preserved."""
         predictions = ["X", "Y", "Z"]
         ground_truths = ["Paris", "Berlin", "Tokyo"]
-        assert measure_specificity(predictions, ground_truths) == 0.0
+        assert measure_specificity(predictions, ground_truths) == pytest.approx(0.0)
 
     def test_partial_preserved(self) -> None:
         """Test with partial preservation."""
@@ -922,13 +922,13 @@ class TestMeasureGeneralization:
         """Test with full generalization."""
         predictions = ["Rome", "Rome", "Rome"]
         targets = ["Rome", "Rome", "Rome"]
-        assert measure_generalization(predictions, targets) == 1.0
+        assert measure_generalization(predictions, targets) == pytest.approx(1.0)
 
     def test_no_generalization(self) -> None:
         """Test with no generalization."""
         predictions = ["Paris", "Paris", "Paris"]
         targets = ["Rome", "Rome", "Rome"]
-        assert measure_generalization(predictions, targets) == 0.0
+        assert measure_generalization(predictions, targets) == pytest.approx(0.0)
 
     def test_partial_generalization(self) -> None:
         """Test with partial generalization."""
@@ -1032,8 +1032,8 @@ class TestGetRecommendedEditingConfig:
         config = get_recommended_editing_config(100)
         assert config.method == EditingMethod.MEMIT
         assert config.memit_config is not None
-        assert config.memit_config.lambda_weight == 10000.0
-        assert config.memit_config.edit_weight == 0.5
+        assert config.memit_config.lambda_weight == pytest.approx(10000.0)
+        assert config.memit_config.edit_weight == pytest.approx(0.5)
 
     def test_small_model(self) -> None:
         """Test config for small model."""
@@ -1104,7 +1104,7 @@ class TestPropertyBased:
         if not items:
             return
         success = calculate_edit_success(items, items)
-        assert success == 1.0
+        assert success == pytest.approx(1.0)
 
     @given(
         st.lists(
@@ -1121,7 +1121,7 @@ class TestPropertyBased:
         if not items:
             return
         specificity = measure_specificity(items, items)
-        assert specificity == 1.0
+        assert specificity == pytest.approx(1.0)
 
     @given(
         st.lists(
@@ -1138,7 +1138,7 @@ class TestPropertyBased:
         if not items:
             return
         generalization = measure_generalization(items, items)
-        assert generalization == 1.0
+        assert generalization == pytest.approx(1.0)
 
     @given(st.integers(min_value=1, max_value=1000))
     @settings(max_examples=10)

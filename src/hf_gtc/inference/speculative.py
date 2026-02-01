@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class VerificationStrategy(Enum):
     """Strategy for verifying speculated tokens.
@@ -269,9 +271,7 @@ def validate_draft_model_config(config: DraftModelConfig) -> None:
         Traceback (most recent call last):
         ValueError: temperature must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.gamma_tokens <= 0:
         msg = f"gamma_tokens must be positive, got {config.gamma_tokens}"
@@ -312,9 +312,7 @@ def validate_verification_config(config: VerificationConfig) -> None:
         Traceback (most recent call last):
         ValueError: threshold must be between 0.0 and 1.0
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0.0 <= config.threshold <= 1.0:
         msg = f"threshold must be between 0.0 and 1.0, got {config.threshold}"
@@ -350,9 +348,7 @@ def validate_speculative_config(config: SpeculativeConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_speculation_length must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_speculation_length <= 0:
         msg = (
@@ -1014,9 +1010,7 @@ def format_speculative_stats(stats: SpeculativeStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     total = stats.accepted_tokens + stats.rejected_tokens
     lines = [

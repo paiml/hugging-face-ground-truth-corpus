@@ -819,7 +819,7 @@ class TestCalculateCostPerToken:
     def test_zero_hourly_cost(self) -> None:
         """Test zero hourly cost returns zero."""
         cost = calculate_cost_per_token(0, 1000.0)
-        assert cost == 0.0
+        assert cost == pytest.approx(0.0)
 
     def test_negative_hourly_raises(self) -> None:
         """Test that negative hourly cost raises ValueError."""

@@ -658,7 +658,7 @@ class TestCalculateSampleWeights:
         """Test uniform weighting."""
         labels = ["A", "A", "B", "B"]
         weights = calculate_sample_weights(labels, WeightingScheme.UNIFORM)
-        assert all(w == 1.0 for w in weights)
+        assert all(w == pytest.approx(1.0) for w in weights)
 
     def test_inverse_frequency_weights(self) -> None:
         """Test inverse frequency weighting."""
@@ -882,7 +882,7 @@ class TestEstimateEffectiveSamples:
         """Test with zero count class."""
         counts = {"A": 100, "B": 0}
         effective = estimate_effective_samples(counts)
-        assert effective["B"] == 0.0
+        assert effective["B"] == pytest.approx(0.0)
 
     def test_empty_counts_raises_error(self) -> None:
         """Test that empty counts raises ValueError."""

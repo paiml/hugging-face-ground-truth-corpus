@@ -146,20 +146,20 @@ class TestDPConfig:
             clip_norm=2.0,
             noise_multiplier=1.5,
         )
-        assert config.epsilon == 0.5
+        assert config.epsilon == pytest.approx(0.5)
         assert config.delta == 1e-6
         assert config.mechanism == PrivacyMechanism.GAUSSIAN
-        assert config.clip_norm == 2.0
-        assert config.noise_multiplier == 1.5
+        assert config.clip_norm == pytest.approx(2.0)
+        assert config.noise_multiplier == pytest.approx(1.5)
 
     def test_default_values(self) -> None:
         """Test default values for DPConfig."""
         config = DPConfig()
-        assert config.epsilon == 1.0
+        assert config.epsilon == pytest.approx(1.0)
         assert config.delta == 1e-5
         assert config.mechanism == PrivacyMechanism.LAPLACE
-        assert config.clip_norm == 1.0
-        assert config.noise_multiplier == 1.0
+        assert config.clip_norm == pytest.approx(1.0)
+        assert config.noise_multiplier == pytest.approx(1.0)
 
     def test_frozen(self) -> None:
         """Test that DPConfig is immutable."""
@@ -221,14 +221,14 @@ class TestPrivacyConfig:
             anonymization_config=anon,
             audit_logging=True,
         )
-        assert config.dp_config.epsilon == 0.5
+        assert config.dp_config.epsilon == pytest.approx(0.5)
         assert config.anonymization_config.k_value == 10
         assert config.audit_logging is True
 
     def test_default_values(self) -> None:
         """Test default values for PrivacyConfig."""
         config = PrivacyConfig()
-        assert config.dp_config.epsilon == 1.0
+        assert config.dp_config.epsilon == pytest.approx(1.0)
         assert config.anonymization_config.k_value == 5
         assert config.audit_logging is False
 
@@ -255,10 +255,10 @@ class TestPrivacyStats:
             noise_added=42.5,
             utility_loss=0.15,
         )
-        assert stats.privacy_budget_spent == 0.5
+        assert stats.privacy_budget_spent == pytest.approx(0.5)
         assert stats.records_anonymized == 1000
-        assert stats.noise_added == 42.5
-        assert stats.utility_loss == 0.15
+        assert stats.noise_added == pytest.approx(42.5)
+        assert stats.utility_loss == pytest.approx(0.15)
 
     def test_frozen(self) -> None:
         """Test that PrivacyStats is immutable."""
@@ -377,7 +377,7 @@ class TestCreateDPConfig:
     def test_create_with_defaults(self) -> None:
         """Test creating config with defaults."""
         config = create_dp_config()
-        assert config.epsilon == 1.0
+        assert config.epsilon == pytest.approx(1.0)
         assert config.delta == 1e-5
         assert config.mechanism == PrivacyMechanism.LAPLACE
 
@@ -390,11 +390,11 @@ class TestCreateDPConfig:
             clip_norm=2.0,
             noise_multiplier=1.5,
         )
-        assert config.epsilon == 0.5
+        assert config.epsilon == pytest.approx(0.5)
         assert config.delta == 1e-6
         assert config.mechanism == PrivacyMechanism.GAUSSIAN
-        assert config.clip_norm == 2.0
-        assert config.noise_multiplier == 1.5
+        assert config.clip_norm == pytest.approx(2.0)
+        assert config.noise_multiplier == pytest.approx(1.5)
 
     def test_create_with_string_mechanism(self) -> None:
         """Test creating config with string mechanism."""
@@ -468,7 +468,7 @@ class TestCreatePrivacyConfig:
     def test_create_with_defaults(self) -> None:
         """Test creating config with defaults."""
         config = create_privacy_config()
-        assert config.dp_config.epsilon == 1.0
+        assert config.dp_config.epsilon == pytest.approx(1.0)
         assert config.anonymization_config.k_value == 5
         assert config.audit_logging is False
 
@@ -481,7 +481,7 @@ class TestCreatePrivacyConfig:
             anonymization_config=anon,
             audit_logging=True,
         )
-        assert config.dp_config.epsilon == 0.5
+        assert config.dp_config.epsilon == pytest.approx(0.5)
         assert config.anonymization_config.k_value == 10
         assert config.audit_logging is True
 
@@ -652,17 +652,17 @@ class TestCalculateNoiseScale:
     def test_laplace_basic(self) -> None:
         """Test Laplace mechanism basic calculation."""
         scale = calculate_noise_scale(epsilon=1.0, sensitivity=1.0)
-        assert scale == 1.0
+        assert scale == pytest.approx(1.0)
 
     def test_laplace_higher_sensitivity(self) -> None:
         """Test Laplace with higher sensitivity."""
         scale = calculate_noise_scale(epsilon=0.5, sensitivity=2.0)
-        assert scale == 4.0
+        assert scale == pytest.approx(4.0)
 
     def test_laplace_lower_epsilon(self) -> None:
         """Test Laplace with lower epsilon (more privacy)."""
         scale = calculate_noise_scale(epsilon=0.1, sensitivity=1.0)
-        assert scale == 10.0
+        assert scale == pytest.approx(10.0)
 
     def test_gaussian_mechanism(self) -> None:
         """Test Gaussian mechanism calculation."""
@@ -707,7 +707,7 @@ class TestComputePrivacyBudget:
     def test_simple_composition(self) -> None:
         """Test simple composition (sum)."""
         budget = compute_privacy_budget(10, 0.1, composition="simple")
-        assert budget == 1.0
+        assert budget == pytest.approx(1.0)
 
     def test_advanced_composition(self) -> None:
         """Test advanced composition (sqrt)."""
@@ -888,7 +888,7 @@ class TestGetRecommendedPrivacyConfig:
     def test_training_medium_sensitivity(self) -> None:
         """Test training with medium sensitivity."""
         config = get_recommended_privacy_config("training", "medium")
-        assert config.dp_config.epsilon == 0.5
+        assert config.dp_config.epsilon == pytest.approx(0.5)
         assert config.anonymization_config.k_value == 5
 
     def test_inference_low_sensitivity(self) -> None:

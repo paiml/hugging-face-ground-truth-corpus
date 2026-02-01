@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from transformers import TrainerCallback
 
+from hf_gtc._validation import validate_not_none
+
 
 class MetricMode(Enum):
     """Mode for metric comparison in early stopping.
@@ -176,9 +178,7 @@ def validate_early_stopping_config(config: EarlyStoppingConfig) -> None:
         Traceback (most recent call last):
         ValueError: patience must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.patience <= 0:
         msg = f"patience must be positive, got {config.patience}"
@@ -212,9 +212,7 @@ def validate_logging_config(config: LoggingConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.log_every_n_steps <= 0:
         msg = f"log_every_n_steps must be positive, got {config.log_every_n_steps}"
@@ -244,9 +242,7 @@ def validate_checkpoint_config(config: CheckpointConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.save_every_n_steps <= 0:
         msg = f"save_every_n_steps must be positive, got {config.save_every_n_steps}"
@@ -309,9 +305,7 @@ def should_stop_early(
         >>> epochs
         1
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     # First evaluation - initialize best metric
     if best_metric is None:
@@ -389,6 +383,7 @@ def create_logging_callback(config: LoggingConfig) -> TrainerCallback:
         """Custom logging callback with enhanced features."""
 
         def __init__(self, logging_config: LoggingConfig) -> None:
+            """Initialize with the given logging configuration."""
             self.config = logging_config
             self.step_count = 0
 

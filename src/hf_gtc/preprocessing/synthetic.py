@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class GenerationMethod(Enum):
     """Methods for generating synthetic data.
@@ -301,9 +303,7 @@ def validate_self_instruct_config(config: SelfInstructConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_instructions must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_instructions <= 0:
         msg = f"num_instructions must be positive, got {config.num_instructions}"
@@ -360,9 +360,7 @@ def validate_evol_instruct_config(config: EvolInstructConfig) -> None:
         Traceback (most recent call last):
         ValueError: evolution_steps must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.evolution_steps <= 0:
         msg = f"evolution_steps must be positive, got {config.evolution_steps}"
@@ -421,9 +419,7 @@ def validate_synthetic_config(config: SyntheticConfig) -> None:
         Traceback (most recent call last):
         ValueError: quality_filters cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.quality_filters:
         msg = "quality_filters cannot be empty"
@@ -815,9 +811,7 @@ def estimate_generation_cost(
         Traceback (most recent call last):
         ValueError: tokens_per_sample must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if tokens_per_sample <= 0:
         msg = f"tokens_per_sample must be positive, got {tokens_per_sample}"
@@ -970,9 +964,7 @@ def filter_synthetic_samples(
         msg = "samples cannot be None"
         raise ValueError(msg)
 
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_synthetic_config(config)
 
@@ -1129,9 +1121,7 @@ def format_generation_stats(stats: GenerationStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     quality_pass_rate = (
         stats.passed_quality / stats.total_generated * 100

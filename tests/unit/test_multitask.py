@@ -144,7 +144,7 @@ class TestTaskConfig:
             relation=TaskRelation.INDEPENDENT,
         )
         assert config.name == "classification"
-        assert config.weight == 1.0
+        assert config.weight == pytest.approx(1.0)
         assert config.loss_type == "cross_entropy"
         assert config.relation == TaskRelation.INDEPENDENT
 
@@ -166,7 +166,7 @@ class TestGradientConfig:
             normalize=False,
         )
         assert config.strategy == GradientStrategy.SUM
-        assert config.conflict_threshold == 0.0
+        assert config.conflict_threshold == pytest.approx(0.0)
         assert config.normalize is False
 
     def test_config_is_frozen(self) -> None:
@@ -212,8 +212,8 @@ class TestMultiTaskStats:
             gradient_conflicts=5,
             effective_weights={"task1": 1.0},
         )
-        assert stats.task_losses["task1"] == 0.5
-        assert stats.task_accuracies["task1"] == 0.9
+        assert stats.task_losses["task1"] == pytest.approx(0.5)
+        assert stats.task_accuracies["task1"] == pytest.approx(0.9)
         assert stats.gradient_conflicts == 5
 
     def test_stats_is_frozen(self) -> None:
@@ -396,7 +396,7 @@ class TestCreateTaskConfig:
         """Create default config."""
         config = create_task_config("classification")
         assert config.name == "classification"
-        assert config.weight == 1.0
+        assert config.weight == pytest.approx(1.0)
         assert config.loss_type == "cross_entropy"
         assert config.relation == TaskRelation.INDEPENDENT
 
@@ -409,7 +409,7 @@ class TestCreateTaskConfig:
             relation="auxiliary",
         )
         assert config.name == "auxiliary"
-        assert config.weight == 0.5
+        assert config.weight == pytest.approx(0.5)
         assert config.loss_type == "mse"
         assert config.relation == TaskRelation.AUXILIARY
 
@@ -440,7 +440,7 @@ class TestCreateGradientConfig:
         """Create default config."""
         config = create_gradient_config()
         assert config.strategy == GradientStrategy.SUM
-        assert config.conflict_threshold == 0.0
+        assert config.conflict_threshold == pytest.approx(0.0)
         assert config.normalize is False
 
     def test_custom_config(self) -> None:
@@ -451,7 +451,7 @@ class TestCreateGradientConfig:
             normalize=True,
         )
         assert config.strategy == GradientStrategy.PCGRAD
-        assert config.conflict_threshold == 0.1
+        assert config.conflict_threshold == pytest.approx(0.1)
         assert config.normalize is True
 
     def test_with_enum_strategy(self) -> None:
@@ -543,8 +543,8 @@ class TestCreateMultiTaskStats:
             gradient_conflicts=5,
             effective_weights={"task1": 1.0},
         )
-        assert stats.task_losses["task1"] == 0.5
-        assert stats.task_accuracies["task1"] == 0.9
+        assert stats.task_losses["task1"] == pytest.approx(0.5)
+        assert stats.task_accuracies["task1"] == pytest.approx(0.9)
         assert stats.gradient_conflicts == 5
 
     def test_negative_conflicts_raises(self) -> None:

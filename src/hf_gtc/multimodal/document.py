@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class DocumentModelType(Enum):
     """Supported document model types.
@@ -271,9 +273,7 @@ def validate_document_config(config: DocumentConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_seq_length must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_seq_length <= 0:
         msg = f"max_seq_length must be positive, got {config.max_seq_length}"
@@ -324,9 +324,7 @@ def validate_ocr_config(config: OCRConfig) -> None:
         Traceback (most recent call last):
         ValueError: language cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.language:
         msg = "language cannot be empty"

@@ -660,27 +660,27 @@ class TestCalculatePlanProgress:
     def test_zero_progress(self) -> None:
         """Calculate zero progress."""
         stats = PlanningStats(10, 0, 0, 0)
-        assert calculate_plan_progress(stats) == 0.0
+        assert calculate_plan_progress(stats) == pytest.approx(0.0)
 
     def test_full_progress(self) -> None:
         """Calculate full progress."""
         stats = PlanningStats(10, 10, 0, 0)
-        assert calculate_plan_progress(stats) == 100.0
+        assert calculate_plan_progress(stats) == pytest.approx(100.0)
 
     def test_partial_progress(self) -> None:
         """Calculate partial progress."""
         stats = PlanningStats(10, 5, 0, 0)
-        assert calculate_plan_progress(stats) == 50.0
+        assert calculate_plan_progress(stats) == pytest.approx(50.0)
 
     def test_progress_with_failures(self) -> None:
         """Failed steps count toward progress."""
         stats = PlanningStats(10, 7, 3, 0)
-        assert calculate_plan_progress(stats) == 100.0
+        assert calculate_plan_progress(stats) == pytest.approx(100.0)
 
     def test_progress_with_only_failures(self) -> None:
         """Progress with only failed steps."""
         stats = PlanningStats(10, 0, 5, 0)
-        assert calculate_plan_progress(stats) == 50.0
+        assert calculate_plan_progress(stats) == pytest.approx(50.0)
 
     def test_none_stats_raises(self) -> None:
         """None stats raises ValueError."""
@@ -702,7 +702,7 @@ class TestCalculatePlanProgress:
     def test_replanning_count_ignored(self) -> None:
         """Replanning count doesn't affect progress."""
         stats = PlanningStats(10, 5, 0, 100)
-        assert calculate_plan_progress(stats) == 50.0
+        assert calculate_plan_progress(stats) == pytest.approx(50.0)
 
 
 class TestEstimatePlanComplexity:
@@ -711,7 +711,7 @@ class TestEstimatePlanComplexity:
     def test_empty_plan_complexity(self) -> None:
         """Empty plan has zero complexity."""
         plan = create_execution_plan("Goal", steps=())
-        assert estimate_plan_complexity(plan) == 0.0
+        assert estimate_plan_complexity(plan) == pytest.approx(0.0)
 
     def test_single_step_complexity(self) -> None:
         """Single step plan complexity."""

@@ -189,7 +189,7 @@ class TestSemanticCacheConfig:
             embedding_model="sentence-transformers/all-MiniLM-L6-v2",
             max_entries=10000,
         )
-        assert config.similarity_threshold == 0.95
+        assert config.similarity_threshold == pytest.approx(0.95)
         assert config.max_entries == 10000
 
     def test_config_is_frozen(self) -> None:
@@ -212,7 +212,7 @@ class TestCacheStats:
             memory_used_mb=256.5,
         )
         assert stats.hits == 800
-        assert stats.hit_rate == 0.8
+        assert stats.hit_rate == pytest.approx(0.8)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -477,14 +477,14 @@ class TestCreateSemanticCacheConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_semantic_cache_config()
-        assert config.similarity_threshold == 0.95
+        assert config.similarity_threshold == pytest.approx(0.95)
         assert config.embedding_model == "sentence-transformers/all-MiniLM-L6-v2"
         assert config.max_entries == 10000
 
     def test_custom_threshold(self) -> None:
         """Create config with custom threshold."""
         config = create_semantic_cache_config(similarity_threshold=0.9)
-        assert config.similarity_threshold == 0.9
+        assert config.similarity_threshold == pytest.approx(0.9)
 
     def test_custom_model(self) -> None:
         """Create config with custom model."""
@@ -510,9 +510,9 @@ class TestCreateCacheStats:
         stats = create_cache_stats()
         assert stats.hits == 0
         assert stats.misses == 0
-        assert stats.hit_rate == 0.0
+        assert stats.hit_rate == pytest.approx(0.0)
         assert stats.evictions == 0
-        assert stats.memory_used_mb == 0.0
+        assert stats.memory_used_mb == pytest.approx(0.0)
 
     def test_custom_values(self) -> None:
         """Create stats with custom values."""
@@ -524,7 +524,7 @@ class TestCreateCacheStats:
             memory_used_mb=256.5,
         )
         assert stats.hits == 800
-        assert stats.hit_rate == 0.8
+        assert stats.hit_rate == pytest.approx(0.8)
 
     def test_negative_hits_raises(self) -> None:
         """Negative hits raises ValueError."""
@@ -669,22 +669,22 @@ class TestCalculateCacheHitRate:
     def test_basic_calculation(self) -> None:
         """Basic hit rate calculation."""
         rate = calculate_cache_hit_rate(80, 20)
-        assert rate == 0.8
+        assert rate == pytest.approx(0.8)
 
     def test_all_hits(self) -> None:
         """All hits gives 1.0."""
         rate = calculate_cache_hit_rate(100, 0)
-        assert rate == 1.0
+        assert rate == pytest.approx(1.0)
 
     def test_all_misses(self) -> None:
         """All misses gives 0.0."""
         rate = calculate_cache_hit_rate(0, 100)
-        assert rate == 0.0
+        assert rate == pytest.approx(0.0)
 
     def test_no_requests(self) -> None:
         """No requests gives 0.0."""
         rate = calculate_cache_hit_rate(0, 0)
-        assert rate == 0.0
+        assert rate == pytest.approx(0.0)
 
     def test_negative_hits_raises(self) -> None:
         """Negative hits raises ValueError."""
@@ -706,19 +706,19 @@ class TestEstimateLatencySavings:
         assert savings > 0
         # With 80% hit rate: 0.8 * 1 + 0.2 * 100 = 20.8ms avg
         # Savings = (100 - 20.8) / 100 * 100 = 79.2%
-        assert round(savings, 1) == 79.2
+        assert round(savings, 1) == pytest.approx(79.2)
 
     def test_no_hits(self) -> None:
         """No hits gives 0% savings."""
         savings = estimate_latency_savings(0.0, 100.0)
-        assert savings == 0.0
+        assert savings == pytest.approx(0.0)
 
     def test_all_hits(self) -> None:
         """All hits gives maximum savings."""
         savings = estimate_latency_savings(1.0, 100.0, 1.0)
         # With 100% hit rate: all lookups from cache
         # Savings = (100 - 1) / 100 * 100 = 99%
-        assert savings == 99.0
+        assert savings == pytest.approx(99.0)
 
     def test_invalid_hit_rate_raises(self) -> None:
         """Invalid hit rate raises ValueError."""
@@ -748,12 +748,12 @@ class TestCalculateMemoryOverhead:
         """Basic memory calculation."""
         mem = calculate_memory_overhead(1000, 10.0)
         # 1000 * 10 * 1.2 / 1024 = 11.71875
-        assert round(mem, 2) == 11.72
+        assert round(mem, 2) == pytest.approx(11.72)
 
     def test_zero_entries(self) -> None:
         """Zero entries gives 0 memory."""
         mem = calculate_memory_overhead(0, 10.0)
-        assert mem == 0.0
+        assert mem == pytest.approx(0.0)
 
     def test_negative_entries_raises(self) -> None:
         """Negative entries raises ValueError."""

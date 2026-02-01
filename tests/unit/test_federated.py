@@ -141,7 +141,7 @@ class TestFederatedConfig:
         assert config.num_clients == 100
         assert config.rounds == 50
         assert config.local_epochs == 5
-        assert config.client_fraction == 0.1
+        assert config.client_fraction == pytest.approx(0.1)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -169,7 +169,7 @@ class TestPrivacyConfig:
             noise_multiplier=1.1,
         )
         assert config.mechanism == PrivacyMechanism.LOCAL_DP
-        assert config.epsilon == 1.0
+        assert config.epsilon == pytest.approx(1.0)
         assert config.delta == 1e-5
 
     def test_config_is_frozen(self) -> None:
@@ -198,8 +198,8 @@ class TestClientConfig:
         )
         assert config.client_id == "client_001"
         assert config.data_size == 1000
-        assert config.compute_capacity == 0.8
-        assert config.availability == 0.95
+        assert config.compute_capacity == pytest.approx(0.8)
+        assert config.availability == pytest.approx(0.95)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -226,8 +226,8 @@ class TestFederatedStats:
         )
         assert stats.global_round == 10
         assert stats.participating_clients == 20
-        assert stats.aggregation_time == 5.5
-        assert stats.privacy_budget_spent == 0.5
+        assert stats.aggregation_time == pytest.approx(5.5)
+        assert stats.privacy_budget_spent == pytest.approx(0.5)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -425,7 +425,7 @@ class TestCreateFederatedConfig:
         )
         assert config.aggregation_method == AggregationMethod.FEDPROX
         assert config.num_clients == 100
-        assert config.client_fraction == 0.2
+        assert config.client_fraction == pytest.approx(0.2)
 
     def test_invalid_num_clients_raises(self) -> None:
         """Invalid num_clients raises ValueError."""
@@ -454,8 +454,8 @@ class TestCreatePrivacyConfig:
             noise_multiplier=1.5,
         )
         assert config.mechanism == PrivacyMechanism.LOCAL_DP
-        assert config.epsilon == 0.5
-        assert config.noise_multiplier == 1.5
+        assert config.epsilon == pytest.approx(0.5)
+        assert config.noise_multiplier == pytest.approx(1.5)
 
     def test_invalid_epsilon_raises(self) -> None:
         """Invalid epsilon raises ValueError."""
@@ -476,8 +476,8 @@ class TestCreateClientConfig:
         config = create_client_config("client_001")
         assert config.client_id == "client_001"
         assert config.data_size == 1000
-        assert config.compute_capacity == 1.0
-        assert config.availability == 1.0
+        assert config.compute_capacity == pytest.approx(1.0)
+        assert config.availability == pytest.approx(1.0)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -488,7 +488,7 @@ class TestCreateClientConfig:
         )
         assert config.client_id == "client_002"
         assert config.data_size == 5000
-        assert config.compute_capacity == 0.5
+        assert config.compute_capacity == pytest.approx(0.5)
 
     def test_empty_client_id_raises(self) -> None:
         """Empty client_id raises ValueError."""
@@ -504,8 +504,8 @@ class TestCreateFederatedStats:
         stats = create_federated_stats()
         assert stats.global_round == 0
         assert stats.participating_clients == 0
-        assert stats.aggregation_time == 0.0
-        assert stats.privacy_budget_spent == 0.0
+        assert stats.aggregation_time == pytest.approx(0.0)
+        assert stats.privacy_budget_spent == pytest.approx(0.0)
 
     def test_custom_stats(self) -> None:
         """Create custom stats."""
@@ -516,7 +516,7 @@ class TestCreateFederatedStats:
         )
         assert stats.global_round == 5
         assert stats.participating_clients == 10
-        assert stats.aggregation_time == 2.5
+        assert stats.aggregation_time == pytest.approx(2.5)
 
     def test_negative_round_raises(self) -> None:
         """Negative round raises ValueError."""
@@ -803,7 +803,7 @@ class TestCalculatePrivacyBudget:
         """No privacy mechanism returns zero budget."""
         config = create_privacy_config(mechanism="none")
         budget = calculate_privacy_budget(config, 10, 0.1)
-        assert budget == 0.0
+        assert budget == pytest.approx(0.0)
 
     def test_local_dp_positive_budget(self) -> None:
         """Local DP returns positive budget."""
@@ -915,14 +915,14 @@ class TestGetRecommendedFederatedConfig:
         """Small deployment config."""
         fed_cfg, _priv_cfg = get_recommended_federated_config(10)
         assert fed_cfg.num_clients == 10
-        assert fed_cfg.client_fraction == 1.0
+        assert fed_cfg.client_fraction == pytest.approx(1.0)
         assert fed_cfg.aggregation_method == AggregationMethod.FEDAVG
 
     def test_medium_deployment(self) -> None:
         """Medium deployment config."""
         fed_cfg, _priv_cfg = get_recommended_federated_config(100)
         assert fed_cfg.num_clients == 100
-        assert fed_cfg.client_fraction == 0.1
+        assert fed_cfg.client_fraction == pytest.approx(0.1)
 
     def test_large_deployment(self) -> None:
         """Large deployment uses FedProx."""

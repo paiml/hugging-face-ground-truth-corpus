@@ -134,7 +134,7 @@ class TestKVCacheManagementConfig:
             compression=CacheCompression.NONE,
             dtype="float16",
         )
-        assert config.max_cache_size_gb == 8.0
+        assert config.max_cache_size_gb == pytest.approx(8.0)
         assert config.eviction_policy == EvictionPolicy.LRU
 
     def test_config_is_frozen(self) -> None:
@@ -186,7 +186,7 @@ class TestCacheStats:
             memory_usage_gb=4.5,
             compression_ratio=0.5,
         )
-        assert stats.hit_rate == 0.95
+        assert stats.hit_rate == pytest.approx(0.95)
         assert stats.eviction_count == 100
 
     def test_stats_is_frozen(self) -> None:
@@ -366,7 +366,7 @@ class TestCreateKVCacheManagementConfig:
     def test_default_config(self) -> None:
         """Create default config."""
         config = create_kv_cache_management_config()
-        assert config.max_cache_size_gb == 8.0
+        assert config.max_cache_size_gb == pytest.approx(8.0)
         assert config.eviction_policy == EvictionPolicy.LRU
         assert config.compression == CacheCompression.NONE
         assert config.dtype == "float16"
@@ -374,7 +374,7 @@ class TestCreateKVCacheManagementConfig:
     def test_custom_cache_size(self) -> None:
         """Create config with custom cache size."""
         config = create_kv_cache_management_config(max_cache_size_gb=16.0)
-        assert config.max_cache_size_gb == 16.0
+        assert config.max_cache_size_gb == pytest.approx(16.0)
 
     def test_custom_eviction_policy(self) -> None:
         """Create config with custom eviction policy."""
@@ -468,7 +468,7 @@ class TestCreateCacheEntry:
         assert entry.sequence_id == "seq_001"
         assert entry.num_tokens == 512
         assert entry.memory_bytes == 1048576
-        assert entry.last_access_time == 1704067200.0
+        assert entry.last_access_time == pytest.approx(1704067200.0)
 
     def test_empty_sequence_id_raises(self) -> None:
         """Empty sequence ID raises ValueError."""
@@ -616,7 +616,7 @@ class TestCalculateCacheMemory:
             dtype="float16",
         )
         # 2 * 32 * 1 * 2048 * 32 * 128 * 2 bytes = 1073741824 bytes = 1 GB
-        assert round(mem, 2) == 1.0
+        assert round(mem, 2) == pytest.approx(1.0)
 
     def test_larger_batch_more_memory(self) -> None:
         """Larger batch uses more memory."""
@@ -773,27 +773,27 @@ class TestCalculateCompressionSavings:
     def test_float32_to_float16(self) -> None:
         """Float32 to float16 gives 0.5 ratio."""
         ratio = calculate_compression_savings("float32", "float16")
-        assert ratio == 0.5
+        assert ratio == pytest.approx(0.5)
 
     def test_float16_to_int8(self) -> None:
         """Float16 to int8 gives 0.5 ratio."""
         ratio = calculate_compression_savings("float16", "int8")
-        assert ratio == 0.5
+        assert ratio == pytest.approx(0.5)
 
     def test_same_dtype(self) -> None:
         """Same dtype gives 1.0 ratio."""
         ratio = calculate_compression_savings("float16", "float16")
-        assert ratio == 1.0
+        assert ratio == pytest.approx(1.0)
 
     def test_with_sparsity(self) -> None:
         """Sparsity reduces ratio further."""
         ratio = calculate_compression_savings("float16", "float16", sparsity_ratio=0.5)
-        assert ratio == 0.5
+        assert ratio == pytest.approx(0.5)
 
     def test_full_sparsity(self) -> None:
         """Full sparsity gives 0 ratio."""
         ratio = calculate_compression_savings("float16", "float16", sparsity_ratio=1.0)
-        assert ratio == 0.0
+        assert ratio == pytest.approx(0.0)
 
     def test_invalid_sparsity_raises(self) -> None:
         """Invalid sparsity raises ValueError."""

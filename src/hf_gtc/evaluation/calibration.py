@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class CalibrationMethod(Enum):
     """Calibration methods for model probability adjustment.
@@ -254,9 +256,7 @@ def validate_temperature_config(config: TemperatureConfig) -> None:
         Traceback (most recent call last):
         ValueError: initial_temp must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.initial_temp <= 0.0:
         msg = f"initial_temp must be positive, got {config.initial_temp}"
@@ -291,9 +291,7 @@ def validate_calibration_config(config: CalibrationConfig) -> None:
         Traceback (most recent call last):
         ValueError: n_bins must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.n_bins <= 0:
         msg = f"n_bins must be positive, got {config.n_bins}"
@@ -331,9 +329,7 @@ def validate_uncertainty_result(result: UncertaintyResult) -> None:
         Traceback (most recent call last):
         ValueError: variance cannot be negative
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if result.variance < 0.0:
         msg = f"variance cannot be negative, got {result.variance}"
@@ -374,9 +370,7 @@ def validate_calibration_stats(stats: CalibrationStats) -> None:
         Traceback (most recent call last):
         ValueError: ece cannot be negative
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if stats.ece < 0.0:
         msg = f"ece cannot be negative, got {stats.ece}"
@@ -1085,8 +1079,7 @@ def optimize_temperature(
     if not config.optimize:
         return config.initial_temp
 
-    # Simple grid search for optimal temperature
-    # In production, use scipy.optimize or torch optimization
+    # Grid search across candidate temperatures for lowest NLL
     best_temp = config.initial_temp
     best_nll = float("inf")
 
@@ -1211,6 +1204,44 @@ def estimate_uncertainty(
     )
 
 
+def _interpret_ece(ece: float) -> str:
+    """Interpret ECE value."""
+    if ece < 0.05:
+        return "Excellent calibration (ECE < 0.05)"
+    if ece < 0.10:
+        return "Good calibration (ECE < 0.10)"
+    if ece < 0.15:
+        return "Moderate calibration (ECE < 0.15)"
+    return "Poor calibration (ECE >= 0.15)"
+
+
+def _interpret_brier(brier_score: float) -> str:
+    """Interpret Brier score value."""
+    if brier_score < 0.1:
+        return "Excellent Brier score (< 0.1)"
+    if brier_score < 0.2:
+        return "Good Brier score (< 0.2)"
+    return "High Brier score (>= 0.2)"
+
+
+def _append_reliability_diagram(lines: list[str], diagram: object | None) -> None:
+    """Append reliability diagram lines if present."""
+    if diagram is None:
+        return
+    lines.append("")
+    lines.append("Reliability Diagram:")
+    for i, (conf, acc, count) in enumerate(
+        zip(
+            diagram.bin_confidences,
+            diagram.bin_accuracies,
+            diagram.bin_counts,
+            strict=True,
+        )
+    ):
+        if count > 0:
+            lines.append(f"  Bin {i}: conf={conf:.3f}, acc={acc:.3f}, n={count}")
+
+
 def format_calibration_stats(stats: CalibrationStats) -> str:
     """Format calibration statistics as a human-readable string.
 
@@ -1235,9 +1266,7 @@ def format_calibration_stats(stats: CalibrationStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Model Calibration Statistics",
@@ -1250,39 +1279,12 @@ def format_calibration_stats(stats: CalibrationStats) -> str:
     if stats.optimal_temperature is not None:
         lines.append(f"Optimal Temperature: {stats.optimal_temperature:.3f}")
 
-    # Add interpretation
     lines.append("")
     lines.append("Interpretation:")
+    lines.append(f"  - {_interpret_ece(stats.ece)}")
+    lines.append(f"  - {_interpret_brier(stats.brier_score)}")
 
-    if stats.ece < 0.05:
-        lines.append("  - Excellent calibration (ECE < 0.05)")
-    elif stats.ece < 0.10:
-        lines.append("  - Good calibration (ECE < 0.10)")
-    elif stats.ece < 0.15:
-        lines.append("  - Moderate calibration (ECE < 0.15)")
-    else:
-        lines.append("  - Poor calibration (ECE >= 0.15)")
-
-    if stats.brier_score < 0.1:
-        lines.append("  - Excellent Brier score (< 0.1)")
-    elif stats.brier_score < 0.2:
-        lines.append("  - Good Brier score (< 0.2)")
-    else:
-        lines.append("  - High Brier score (>= 0.2)")
-
-    if stats.reliability_diagram is not None:
-        lines.append("")
-        lines.append("Reliability Diagram:")
-        for i, (conf, acc, count) in enumerate(
-            zip(
-                stats.reliability_diagram.bin_confidences,
-                stats.reliability_diagram.bin_accuracies,
-                stats.reliability_diagram.bin_counts,
-                strict=True,
-            )
-        ):
-            if count > 0:
-                lines.append(f"  Bin {i}: conf={conf:.3f}, acc={acc:.3f}, n={count}")
+    _append_reliability_diagram(lines, stats.reliability_diagram)
 
     return "\n".join(lines)
 

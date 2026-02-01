@@ -152,11 +152,11 @@ class TestRetrievalMetrics:
             ndcg=0.82,
             hit_rate=1.0,
         )
-        assert metrics.precision_at_k == 0.8
-        assert metrics.recall_at_k == 0.6
-        assert metrics.mrr == 0.75
-        assert metrics.ndcg == 0.82
-        assert metrics.hit_rate == 1.0
+        assert metrics.precision_at_k == pytest.approx(0.8)
+        assert metrics.recall_at_k == pytest.approx(0.6)
+        assert metrics.mrr == pytest.approx(0.75)
+        assert metrics.ndcg == pytest.approx(0.82)
+        assert metrics.hit_rate == pytest.approx(1.0)
 
     def test_metrics_is_frozen(self) -> None:
         """Metrics is immutable."""
@@ -176,10 +176,10 @@ class TestGenerationMetrics:
             coherence=0.88,
             groundedness=0.92,
         )
-        assert metrics.faithfulness == 0.9
-        assert metrics.relevance == 0.85
-        assert metrics.coherence == 0.88
-        assert metrics.groundedness == 0.92
+        assert metrics.faithfulness == pytest.approx(0.9)
+        assert metrics.relevance == pytest.approx(0.85)
+        assert metrics.coherence == pytest.approx(0.88)
+        assert metrics.groundedness == pytest.approx(0.92)
 
     def test_metrics_is_frozen(self) -> None:
         """Metrics is immutable."""
@@ -229,7 +229,7 @@ class TestRAGEvalResult:
             overall_score=0.85,
             per_query_scores=(0.82, 0.88, 0.85),
         )
-        assert result.overall_score == 0.85
+        assert result.overall_score == pytest.approx(0.85)
         assert len(result.per_query_scores) == 3
 
     def test_result_is_frozen(self) -> None:
@@ -252,8 +252,8 @@ class TestRAGEvalStats:
             num_queries=100,
             failed_queries=2,
         )
-        assert stats.avg_retrieval_score == 0.78
-        assert stats.avg_generation_score == 0.85
+        assert stats.avg_retrieval_score == pytest.approx(0.78)
+        assert stats.avg_generation_score == pytest.approx(0.85)
         assert stats.num_queries == 100
         assert stats.failed_queries == 2
 
@@ -562,36 +562,36 @@ class TestCreateRetrievalMetrics:
     def test_default_metrics(self) -> None:
         """Create default metrics."""
         metrics = create_retrieval_metrics()
-        assert metrics.precision_at_k == 0.0
-        assert metrics.recall_at_k == 0.0
-        assert metrics.mrr == 0.0
-        assert metrics.ndcg == 0.0
-        assert metrics.hit_rate == 0.0
+        assert metrics.precision_at_k == pytest.approx(0.0)
+        assert metrics.recall_at_k == pytest.approx(0.0)
+        assert metrics.mrr == pytest.approx(0.0)
+        assert metrics.ndcg == pytest.approx(0.0)
+        assert metrics.hit_rate == pytest.approx(0.0)
 
     def test_custom_precision(self) -> None:
         """Create metrics with custom precision."""
         metrics = create_retrieval_metrics(precision_at_k=0.8)
-        assert metrics.precision_at_k == 0.8
+        assert metrics.precision_at_k == pytest.approx(0.8)
 
     def test_custom_recall(self) -> None:
         """Create metrics with custom recall."""
         metrics = create_retrieval_metrics(recall_at_k=0.6)
-        assert metrics.recall_at_k == 0.6
+        assert metrics.recall_at_k == pytest.approx(0.6)
 
     def test_custom_mrr(self) -> None:
         """Create metrics with custom MRR."""
         metrics = create_retrieval_metrics(mrr=0.75)
-        assert metrics.mrr == 0.75
+        assert metrics.mrr == pytest.approx(0.75)
 
     def test_custom_ndcg(self) -> None:
         """Create metrics with custom NDCG."""
         metrics = create_retrieval_metrics(ndcg=0.82)
-        assert metrics.ndcg == 0.82
+        assert metrics.ndcg == pytest.approx(0.82)
 
     def test_custom_hit_rate(self) -> None:
         """Create metrics with custom hit_rate."""
         metrics = create_retrieval_metrics(hit_rate=1.0)
-        assert metrics.hit_rate == 1.0
+        assert metrics.hit_rate == pytest.approx(1.0)
 
     def test_invalid_precision_raises(self) -> None:
         """Invalid precision raises ValueError."""
@@ -605,30 +605,30 @@ class TestCreateGenerationMetrics:
     def test_default_metrics(self) -> None:
         """Create default metrics."""
         metrics = create_generation_metrics()
-        assert metrics.faithfulness == 0.0
-        assert metrics.relevance == 0.0
-        assert metrics.coherence == 0.0
-        assert metrics.groundedness == 0.0
+        assert metrics.faithfulness == pytest.approx(0.0)
+        assert metrics.relevance == pytest.approx(0.0)
+        assert metrics.coherence == pytest.approx(0.0)
+        assert metrics.groundedness == pytest.approx(0.0)
 
     def test_custom_faithfulness(self) -> None:
         """Create metrics with custom faithfulness."""
         metrics = create_generation_metrics(faithfulness=0.9)
-        assert metrics.faithfulness == 0.9
+        assert metrics.faithfulness == pytest.approx(0.9)
 
     def test_custom_relevance(self) -> None:
         """Create metrics with custom relevance."""
         metrics = create_generation_metrics(relevance=0.85)
-        assert metrics.relevance == 0.85
+        assert metrics.relevance == pytest.approx(0.85)
 
     def test_custom_coherence(self) -> None:
         """Create metrics with custom coherence."""
         metrics = create_generation_metrics(coherence=0.88)
-        assert metrics.coherence == 0.88
+        assert metrics.coherence == pytest.approx(0.88)
 
     def test_custom_groundedness(self) -> None:
         """Create metrics with custom groundedness."""
         metrics = create_generation_metrics(groundedness=0.92)
-        assert metrics.groundedness == 0.92
+        assert metrics.groundedness == pytest.approx(0.92)
 
     def test_invalid_faithfulness_raises(self) -> None:
         """Invalid faithfulness raises ValueError."""
@@ -716,7 +716,7 @@ class TestCreateRAGEvalResult:
         retrieval = create_retrieval_metrics(0.8, 0.6, 0.75, 0.82, 1.0)
         generation = create_generation_metrics(0.9, 0.85, 0.88, 0.92)
         result = create_rag_eval_result(retrieval, generation, 0.85, (0.82, 0.88))
-        assert result.overall_score == 0.85
+        assert result.overall_score == pytest.approx(0.85)
         assert len(result.per_query_scores) == 2
 
     def test_empty_per_query_scores(self) -> None:
@@ -740,8 +740,8 @@ class TestCreateRAGEvalStats:
     def test_create_stats(self) -> None:
         """Create RAG eval stats."""
         stats = create_rag_eval_stats(0.78, 0.85, 100, 2)
-        assert stats.avg_retrieval_score == 0.78
-        assert stats.avg_generation_score == 0.85
+        assert stats.avg_retrieval_score == pytest.approx(0.78)
+        assert stats.avg_generation_score == pytest.approx(0.85)
         assert stats.num_queries == 100
         assert stats.failed_queries == 2
 
@@ -920,11 +920,11 @@ class TestEvaluateRetrieval:
             retrieved_ids=("d1", "d2", "d3"),
             relevant_ids=("d1", "d2", "d3"),
         )
-        assert metrics.precision_at_k == 1.0
-        assert metrics.recall_at_k == 1.0
-        assert metrics.mrr == 1.0
-        assert metrics.ndcg == 1.0
-        assert metrics.hit_rate == 1.0
+        assert metrics.precision_at_k == pytest.approx(1.0)
+        assert metrics.recall_at_k == pytest.approx(1.0)
+        assert metrics.mrr == pytest.approx(1.0)
+        assert metrics.ndcg == pytest.approx(1.0)
+        assert metrics.hit_rate == pytest.approx(1.0)
 
     def test_partial_retrieval(self) -> None:
         """Partial retrieval with some relevant documents."""
@@ -932,10 +932,10 @@ class TestEvaluateRetrieval:
             retrieved_ids=("d1", "d2", "d3", "d4", "d5"),
             relevant_ids=("d1", "d3", "d6"),
         )
-        assert metrics.precision_at_k == 0.4  # 2/5
+        assert metrics.precision_at_k == pytest.approx(0.4)  # 2/5
         assert metrics.recall_at_k == pytest.approx(2 / 3)  # 2/3
-        assert metrics.mrr == 1.0  # First relevant at position 1
-        assert metrics.hit_rate == 1.0
+        assert metrics.mrr == pytest.approx(1.0)  # First relevant at position 1
+        assert metrics.hit_rate == pytest.approx(1.0)
 
     def test_no_relevant_retrieved(self) -> None:
         """No relevant documents retrieved."""
@@ -943,11 +943,11 @@ class TestEvaluateRetrieval:
             retrieved_ids=("d1", "d2", "d3"),
             relevant_ids=("d4", "d5", "d6"),
         )
-        assert metrics.precision_at_k == 0.0
-        assert metrics.recall_at_k == 0.0
-        assert metrics.mrr == 0.0
-        assert metrics.ndcg == 0.0
-        assert metrics.hit_rate == 0.0
+        assert metrics.precision_at_k == pytest.approx(0.0)
+        assert metrics.recall_at_k == pytest.approx(0.0)
+        assert metrics.mrr == pytest.approx(0.0)
+        assert metrics.ndcg == pytest.approx(0.0)
+        assert metrics.hit_rate == pytest.approx(0.0)
 
     def test_empty_relevant_set(self) -> None:
         """Empty relevant set returns zeros."""
@@ -955,10 +955,10 @@ class TestEvaluateRetrieval:
             retrieved_ids=("d1", "d2", "d3"),
             relevant_ids=(),
         )
-        assert metrics.precision_at_k == 0.0
-        assert metrics.recall_at_k == 0.0
-        assert metrics.mrr == 0.0
-        assert metrics.hit_rate == 0.0
+        assert metrics.precision_at_k == pytest.approx(0.0)
+        assert metrics.recall_at_k == pytest.approx(0.0)
+        assert metrics.mrr == pytest.approx(0.0)
+        assert metrics.hit_rate == pytest.approx(0.0)
 
     def test_custom_k(self) -> None:
         """Custom k value limits evaluation."""
@@ -967,18 +967,18 @@ class TestEvaluateRetrieval:
             relevant_ids=("d1", "d3"),
             k=2,
         )
-        assert metrics.precision_at_k == 0.5  # 1/2
-        assert metrics.recall_at_k == 0.5  # 1/2
+        assert metrics.precision_at_k == pytest.approx(0.5)  # 1/2
+        assert metrics.recall_at_k == pytest.approx(0.5)  # 1/2
 
     def test_mrr_calculation(self) -> None:
         """MRR calculated correctly for different first positions."""
         # First relevant at position 1
         metrics = evaluate_retrieval(("d1", "d2"), ("d1",))
-        assert metrics.mrr == 1.0
+        assert metrics.mrr == pytest.approx(1.0)
 
         # First relevant at position 2
         metrics = evaluate_retrieval(("d2", "d1"), ("d1",))
-        assert metrics.mrr == 0.5
+        assert metrics.mrr == pytest.approx(0.5)
 
         # First relevant at position 3
         metrics = evaluate_retrieval(("d2", "d3", "d1"), ("d1",))
@@ -1078,7 +1078,7 @@ class TestEvaluateFaithfulness:
             answer="Paris France capital",
             context="Paris is the capital of France located in Europe.",
         )
-        assert score == 1.0
+        assert score == pytest.approx(1.0)
 
     def test_empty_answer_raises(self) -> None:
         """Empty answer raises ValueError."""
@@ -1191,7 +1191,7 @@ class TestComputeRAGScore:
         score = compute_rag_score(
             retrieval, generation, retrieval_weight=1.0, generation_weight=0.0
         )
-        assert score == 1.0
+        assert score == pytest.approx(1.0)
 
     def test_generation_only_weight(self) -> None:
         """Compute with only generation weight."""
@@ -1200,7 +1200,7 @@ class TestComputeRAGScore:
         score = compute_rag_score(
             retrieval, generation, retrieval_weight=0.0, generation_weight=1.0
         )
-        assert score == 1.0
+        assert score == pytest.approx(1.0)
 
     def test_negative_retrieval_weight_raises(self) -> None:
         """Negative retrieval_weight raises ValueError."""

@@ -26,6 +26,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class BenchmarkType(Enum):
     """Standard LLM benchmark types.
@@ -427,9 +429,7 @@ def validate_benchmark_config(config: BenchmarkConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_few_shot cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_few_shot < 0:
         msg = f"num_few_shot cannot be negative, got {config.num_few_shot}"
@@ -464,9 +464,7 @@ def validate_mmlu_config(config: MMLUConfig) -> None:
         Traceback (most recent call last):
         ValueError: num_few_shot cannot be negative
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_few_shot < 0:
         msg = f"num_few_shot cannot be negative, got {config.num_few_shot}"
@@ -509,9 +507,7 @@ def validate_humaneval_config(config: HumanEvalConfig) -> None:
         Traceback (most recent call last):
         ValueError: timeout_seconds must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if len(config.k_values) == 0:
         msg = "k_values cannot be empty"
@@ -561,9 +557,7 @@ def validate_benchmark_result(result: BenchmarkResult) -> None:
         Traceback (most recent call last):
         ValueError: score must be between 0 and 1
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if not 0.0 <= result.score <= 1.0:
         msg = f"score must be between 0 and 1, got {result.score}"
@@ -606,9 +600,7 @@ def validate_benchmark_stats(stats: BenchmarkStats) -> None:
         Traceback (most recent call last):
         ValueError: overall_score must be between 0 and 1
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     if not 0.0 <= stats.overall_score <= 1.0:
         msg = f"overall_score must be between 0 and 1, got {stats.overall_score}"
@@ -649,9 +641,7 @@ def validate_legacy_benchmark_config(config: LegacyBenchmarkConfig) -> None:
         Traceback (most recent call last):
         ValueError: name cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.name:
         msg = "name cannot be empty"
@@ -1399,9 +1389,7 @@ def format_benchmark_stats(stats: BenchmarkStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         "Benchmark Statistics",
@@ -1689,9 +1677,7 @@ def create_benchmark_runner(config: LegacyBenchmarkConfig) -> BenchmarkRunner:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_legacy_benchmark_config(config)
     return BenchmarkRunner(config=config)
@@ -1899,9 +1885,7 @@ def format_benchmark_result(result: LegacyBenchmarkResult) -> str:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [
         f"Benchmark: {result.config.name}",

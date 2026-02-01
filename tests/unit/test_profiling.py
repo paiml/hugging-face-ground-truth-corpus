@@ -436,7 +436,7 @@ class TestCreateLatencyBreakdown:
         breakdown = create_latency_breakdown(10.5)
         assert isinstance(breakdown, LatencyBreakdown)
         assert breakdown.forward_ms == pytest.approx(10.5)
-        assert breakdown.backward_ms == 0.0
+        assert breakdown.backward_ms == pytest.approx(0.0)
 
     def test_with_all_values(self) -> None:
         """Test breakdown creation with all values."""
@@ -460,7 +460,7 @@ class TestCreateMemoryBreakdown:
         breakdown = create_memory_breakdown(500.0)
         assert isinstance(breakdown, MemoryBreakdown)
         assert breakdown.parameters_mb == pytest.approx(500.0)
-        assert breakdown.gradients_mb == 0.0
+        assert breakdown.gradients_mb == pytest.approx(0.0)
 
     def test_with_all_values(self) -> None:
         """Test breakdown creation with all values."""
@@ -727,9 +727,9 @@ class TestEstimateMemoryFootprint:
         )
         assert isinstance(breakdown, MemoryBreakdown)
         assert breakdown.parameters_mb > 0
-        assert breakdown.gradients_mb == 0.0  # Not training
+        assert breakdown.gradients_mb == pytest.approx(0.0)  # Not training
         assert breakdown.activations_mb > 0
-        assert breakdown.optimizer_state_mb == 0.0  # Not training
+        assert breakdown.optimizer_state_mb == pytest.approx(0.0)  # Not training
 
     def test_training_mode(self) -> None:
         """Test memory estimation in training mode."""

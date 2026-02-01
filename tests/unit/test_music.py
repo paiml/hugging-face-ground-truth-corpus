@@ -194,7 +194,7 @@ class TestMusicGenConfig:
         assert config.model_type == MusicModelType.MUSICGEN
         assert config.duration_seconds == 30
         assert config.sample_rate == 32000
-        assert config.guidance_scale == 3.0
+        assert config.guidance_scale == pytest.approx(3.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -262,9 +262,9 @@ class TestMusicGenerationStats:
             duration_generated=30.0,
             samples_per_second=64000.0,
         )
-        assert stats.generation_time == 15.0
-        assert stats.duration_generated == 30.0
-        assert stats.samples_per_second == 64000.0
+        assert stats.generation_time == pytest.approx(15.0)
+        assert stats.duration_generated == pytest.approx(30.0)
+        assert stats.samples_per_second == pytest.approx(64000.0)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -284,7 +284,7 @@ class TestMelodyConfig:
             tempo_bpm=120,
         )
         assert config.melody_audio_path == "/path/to/melody.wav"
-        assert config.melody_influence == 0.5
+        assert config.melody_influence == pytest.approx(0.5)
         assert config.tempo_bpm == 120
 
     def test_config_is_frozen(self) -> None:
@@ -396,7 +396,7 @@ class TestCreateMusicGenConfig:
         assert config.model_type == MusicModelType.MUSICGEN
         assert config.duration_seconds == 30
         assert config.sample_rate == 32000
-        assert config.guidance_scale == 3.0
+        assert config.guidance_scale == pytest.approx(3.0)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -409,7 +409,7 @@ class TestCreateMusicGenConfig:
         assert config.model_type == MusicModelType.AUDIOLDM2
         assert config.duration_seconds == 60
         assert config.sample_rate == 44100
-        assert config.guidance_scale == 5.0
+        assert config.guidance_scale == pytest.approx(5.0)
 
     @pytest.mark.parametrize(
         "model_type",

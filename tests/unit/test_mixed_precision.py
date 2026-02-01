@@ -162,8 +162,8 @@ class TestScalerConfig:
             min_scale=1.0,
         )
         assert config.strategy == ScalingStrategy.DYNAMIC
-        assert config.initial_scale == 65536.0
-        assert config.growth_factor == 2.0
+        assert config.initial_scale == pytest.approx(65536.0)
+        assert config.growth_factor == pytest.approx(2.0)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -215,7 +215,7 @@ class TestPrecisionStats:
             memory_reduction_pct=45.0,
             throughput_improvement_pct=30.0,
         )
-        assert stats.current_scale == 65536.0
+        assert stats.current_scale == pytest.approx(65536.0)
         assert stats.num_overflows == 10
 
 
@@ -410,18 +410,18 @@ class TestCreateScalerConfig:
         """Create default config."""
         config = create_scaler_config()
         assert config.strategy == ScalingStrategy.DYNAMIC
-        assert config.initial_scale == 65536.0
+        assert config.initial_scale == pytest.approx(65536.0)
 
     def test_static_config(self) -> None:
         """Create static config."""
         config = create_scaler_config(strategy="static", initial_scale=1024.0)
         assert config.strategy == ScalingStrategy.STATIC
-        assert config.initial_scale == 1024.0
+        assert config.initial_scale == pytest.approx(1024.0)
 
     def test_custom_growth_factor(self) -> None:
         """Create config with custom growth factor."""
         config = create_scaler_config(growth_factor=4.0)
-        assert config.growth_factor == 4.0
+        assert config.growth_factor == pytest.approx(4.0)
 
     def test_invalid_strategy_raises(self) -> None:
         """Invalid strategy raises ValueError."""
@@ -477,29 +477,29 @@ class TestCalculateMemoryReduction:
     def test_fp32_to_fp16(self) -> None:
         """Calculate FP32 to FP16 reduction."""
         saved, pct = calculate_memory_reduction("fp32", "fp16", 7.0)
-        assert saved == 14.0
-        assert pct == 50.0
+        assert saved == pytest.approx(14.0)
+        assert pct == pytest.approx(50.0)
 
     def test_fp32_to_bf16(self) -> None:
         """Calculate FP32 to BF16 reduction."""
         _, pct = calculate_memory_reduction("fp32", "bf16", 7.0)
-        assert pct == 50.0
+        assert pct == pytest.approx(50.0)
 
     def test_fp32_to_fp8(self) -> None:
         """Calculate FP32 to FP8 reduction."""
         _, pct = calculate_memory_reduction("fp32", "fp8_e4m3", 7.0)
-        assert pct == 75.0
+        assert pct == pytest.approx(75.0)
 
     def test_fp16_to_fp8(self) -> None:
         """Calculate FP16 to FP8 reduction."""
         _, pct = calculate_memory_reduction("fp16", "fp8_e4m3", 7.0)
-        assert pct == 50.0
+        assert pct == pytest.approx(50.0)
 
     def test_same_precision_no_reduction(self) -> None:
         """Same precision has no reduction."""
         saved, pct = calculate_memory_reduction("fp16", "fp16", 7.0)
-        assert saved == 0.0
-        assert pct == 0.0
+        assert saved == pytest.approx(0.0)
+        assert pct == pytest.approx(0.0)
 
     def test_invalid_original_dtype_raises(self) -> None:
         """Invalid original dtype raises ValueError."""

@@ -166,7 +166,7 @@ class TestPacingConfig:
             warmup_steps=1000,
         )
         assert config.function == PacingFunction.LINEAR
-        assert config.initial_difficulty == 0.0
+        assert config.initial_difficulty == pytest.approx(0.0)
         assert config.warmup_steps == 1000
 
     def test_config_is_frozen(self) -> None:
@@ -214,9 +214,9 @@ class TestCurriculumStats:
             competence_score=0.8,
             curriculum_progress=0.5,
         )
-        assert stats.current_difficulty == 0.5
+        assert stats.current_difficulty == pytest.approx(0.5)
         assert stats.samples_seen == 10000
-        assert stats.competence_score == 0.8
+        assert stats.competence_score == pytest.approx(0.8)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -415,8 +415,8 @@ class TestCreatePacingConfig:
         """Create default config."""
         config = create_pacing_config()
         assert config.function == PacingFunction.LINEAR
-        assert config.initial_difficulty == 0.0
-        assert config.target_difficulty == 1.0
+        assert config.initial_difficulty == pytest.approx(0.0)
+        assert config.target_difficulty == pytest.approx(1.0)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -427,7 +427,7 @@ class TestCreatePacingConfig:
             warmup_steps=500,
         )
         assert config.function == PacingFunction.EXPONENTIAL
-        assert config.initial_difficulty == 0.2
+        assert config.initial_difficulty == pytest.approx(0.2)
         assert config.warmup_steps == 500
 
     def test_with_enum_function(self) -> None:
@@ -499,10 +499,10 @@ class TestCreateCurriculumStats:
     def test_default_stats(self) -> None:
         """Create default stats."""
         stats = create_curriculum_stats()
-        assert stats.current_difficulty == 0.0
+        assert stats.current_difficulty == pytest.approx(0.0)
         assert stats.samples_seen == 0
-        assert stats.competence_score == 0.0
-        assert stats.curriculum_progress == 0.0
+        assert stats.competence_score == pytest.approx(0.0)
+        assert stats.curriculum_progress == pytest.approx(0.0)
 
     def test_custom_stats(self) -> None:
         """Create custom stats."""
@@ -512,7 +512,7 @@ class TestCreateCurriculumStats:
             competence_score=0.8,
             curriculum_progress=0.5,
         )
-        assert stats.current_difficulty == 0.5
+        assert stats.current_difficulty == pytest.approx(0.5)
         assert stats.samples_seen == 10000
 
     def test_invalid_current_difficulty_raises(self) -> None:
@@ -623,9 +623,9 @@ class TestCalculateSampleDifficulty:
 
     def test_basic_normalization(self) -> None:
         """Basic normalization calculation."""
-        assert calculate_sample_difficulty(50.0, 0.0, 100.0) == 0.5
-        assert calculate_sample_difficulty(0.0, 0.0, 100.0) == 0.0
-        assert calculate_sample_difficulty(100.0, 0.0, 100.0) == 1.0
+        assert calculate_sample_difficulty(50.0, 0.0, 100.0) == pytest.approx(0.5)
+        assert calculate_sample_difficulty(0.0, 0.0, 100.0) == pytest.approx(0.0)
+        assert calculate_sample_difficulty(100.0, 0.0, 100.0) == pytest.approx(1.0)
 
     def test_descending_order(self) -> None:
         """Descending order inverts values."""
@@ -634,8 +634,8 @@ class TestCalculateSampleDifficulty:
 
     def test_clamping(self) -> None:
         """Values outside range are clamped."""
-        assert calculate_sample_difficulty(-10.0, 0.0, 100.0) == 0.0
-        assert calculate_sample_difficulty(110.0, 0.0, 100.0) == 1.0
+        assert calculate_sample_difficulty(-10.0, 0.0, 100.0) == pytest.approx(0.0)
+        assert calculate_sample_difficulty(110.0, 0.0, 100.0) == pytest.approx(1.0)
 
     def test_equal_min_max_raises(self) -> None:
         """Equal min and max raises ValueError."""
@@ -659,7 +659,7 @@ class TestCalculateCompetenceScore:
     def test_perfect_competence(self) -> None:
         """Perfect performance gives high competence."""
         score = calculate_competence_score((0.1,), target_loss=0.1)
-        assert score == 1.0
+        assert score == pytest.approx(1.0)
 
     def test_poor_competence(self) -> None:
         """Poor performance gives low competence."""
@@ -703,7 +703,7 @@ class TestGetDifficultyAtStep:
     def test_linear_pacing(self) -> None:
         """Linear pacing increases linearly."""
         config = create_pacing_config(function="linear")
-        assert get_difficulty_at_step(config, 0, 1000) == 0.0
+        assert get_difficulty_at_step(config, 0, 1000) == pytest.approx(0.0)
         assert get_difficulty_at_step(config, 500, 1000) == pytest.approx(0.5)
         assert get_difficulty_at_step(config, 1000, 1000) == pytest.approx(1.0)
 
@@ -738,7 +738,7 @@ class TestGetDifficultyAtStep:
     def test_warmup_period(self) -> None:
         """Warmup period returns initial difficulty."""
         config = create_pacing_config(warmup_steps=500, initial_difficulty=0.1)
-        assert get_difficulty_at_step(config, 250, 1000) == 0.1
+        assert get_difficulty_at_step(config, 250, 1000) == pytest.approx(0.1)
 
     def test_negative_step_raises(self) -> None:
         """Negative current_step raises ValueError."""
@@ -761,7 +761,7 @@ class TestGetDifficultyAtStep:
     def test_warmup_exceeds_total(self) -> None:
         """When warmup >= total, returns target difficulty."""
         config = create_pacing_config(warmup_steps=1000, target_difficulty=0.8)
-        assert get_difficulty_at_step(config, 500, 1000) == 0.0
+        assert get_difficulty_at_step(config, 500, 1000) == pytest.approx(0.0)
         assert get_difficulty_at_step(config, 1000, 1000) == pytest.approx(0.8)
 
 

@@ -256,13 +256,13 @@ class TestCreateAgentConfig:
         """Create default config."""
         config = create_agent_config()
         assert config.max_steps == 10
-        assert config.temperature == 0.7
+        assert config.temperature == pytest.approx(0.7)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
         config = create_agent_config(max_steps=20, temperature=0.5)
         assert config.max_steps == 20
-        assert config.temperature == 0.5
+        assert config.temperature == pytest.approx(0.5)
 
     def test_zero_steps_raises(self) -> None:
         """Zero steps raises ValueError."""

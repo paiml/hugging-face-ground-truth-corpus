@@ -226,6 +226,23 @@ class EmbeddingStats:
     isotropy_score: float
 
 
+def _validate_layer_weights(weights: tuple[float, ...]) -> None:
+    """Validate layer weights: non-empty, non-negative, sum to 1.0."""
+    if len(weights) == 0:
+        msg = "layer_weights cannot be empty if provided"
+        raise ValueError(msg)
+
+    weight_sum = sum(weights)
+    if abs(weight_sum - 1.0) > 1e-6:
+        msg = f"layer_weights must sum to 1.0, got {weight_sum}"
+        raise ValueError(msg)
+
+    for i, w in enumerate(weights):
+        if w < 0:
+            msg = f"layer_weights[{i}] cannot be negative, got {w}"
+            raise ValueError(msg)
+
+
 def validate_pooling_config(config: PoolingConfig) -> None:
     """Validate pooling configuration.
 
@@ -248,19 +265,7 @@ def validate_pooling_config(config: PoolingConfig) -> None:
         ValueError: layer_weights cannot be empty if provided
     """
     if config.layer_weights is not None:
-        if len(config.layer_weights) == 0:
-            msg = "layer_weights cannot be empty if provided"
-            raise ValueError(msg)
-
-        weight_sum = sum(config.layer_weights)
-        if abs(weight_sum - 1.0) > 1e-6:
-            msg = f"layer_weights must sum to 1.0, got {weight_sum}"
-            raise ValueError(msg)
-
-        for i, w in enumerate(config.layer_weights):
-            if w < 0:
-                msg = f"layer_weights[{i}] cannot be negative, got {w}"
-                raise ValueError(msg)
+        _validate_layer_weights(config.layer_weights)
 
 
 def validate_embedding_config(config: EmbeddingConfig) -> None:

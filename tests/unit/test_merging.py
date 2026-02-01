@@ -70,8 +70,8 @@ class TestMergeConfig:
             normalize=True,
         )
         assert config.method == MergeMethod.SLERP
-        assert config.t == 0.5
-        assert config.density == 0.5
+        assert config.t == pytest.approx(0.5)
+        assert config.density == pytest.approx(0.5)
         assert config.normalize is True
 
     def test_frozen(self) -> None:
@@ -100,7 +100,7 @@ class TestModelSlice:
         assert slice_cfg.model_id == "model_a"
         assert slice_cfg.start_layer == 0
         assert slice_cfg.end_layer == 16
-        assert slice_cfg.weight == 1.0
+        assert slice_cfg.weight == pytest.approx(1.0)
 
     def test_frozen(self) -> None:
         """Test slice is immutable."""
@@ -264,8 +264,8 @@ class TestCreateMergeConfig:
         """Test default values."""
         config = create_merge_config()
         assert config.method == MergeMethod.SLERP
-        assert config.t == 0.5
-        assert config.density == 0.5
+        assert config.t == pytest.approx(0.5)
+        assert config.density == pytest.approx(0.5)
         assert config.normalize is True
 
     def test_custom_method(self) -> None:
@@ -296,12 +296,12 @@ class TestCreateMergeConfig:
     def test_custom_t(self) -> None:
         """Test custom t parameter."""
         config = create_merge_config(t=0.7)
-        assert config.t == 0.7
+        assert config.t == pytest.approx(0.7)
 
     def test_custom_density(self) -> None:
         """Test custom density."""
         config = create_merge_config(density=0.3)
-        assert config.density == 0.3
+        assert config.density == pytest.approx(0.3)
 
     def test_no_normalize(self) -> None:
         """Test normalize=False."""
@@ -328,12 +328,12 @@ class TestCreateModelSlice:
         assert slice_cfg.model_id == "model_a"
         assert slice_cfg.start_layer == 0
         assert slice_cfg.end_layer == 16
-        assert slice_cfg.weight == 1.0
+        assert slice_cfg.weight == pytest.approx(1.0)
 
     def test_custom_weight(self) -> None:
         """Test custom weight."""
         slice_cfg = create_model_slice("model_b", 16, 32, weight=0.5)
-        assert slice_cfg.weight == 0.5
+        assert slice_cfg.weight == pytest.approx(0.5)
 
     def test_empty_model_id(self) -> None:
         """Test empty model_id."""
@@ -374,32 +374,32 @@ class TestLinearInterpolate:
     def test_midpoint(self) -> None:
         """Test interpolation at midpoint."""
         result = linear_interpolate(0.0, 1.0, 0.5)
-        assert result == 0.5
+        assert result == pytest.approx(0.5)
 
     def test_at_start(self) -> None:
         """Test interpolation at t=0."""
         result = linear_interpolate(5.0, 10.0, 0.0)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_at_end(self) -> None:
         """Test interpolation at t=1."""
         result = linear_interpolate(5.0, 10.0, 1.0)
-        assert result == 10.0
+        assert result == pytest.approx(10.0)
 
     def test_custom_t(self) -> None:
         """Test interpolation at custom t."""
         result = linear_interpolate(0.0, 10.0, 0.3)
-        assert result == 3.0
+        assert result == pytest.approx(3.0)
 
     def test_same_values(self) -> None:
         """Test interpolation between same values."""
         result = linear_interpolate(5.0, 5.0, 0.7)
-        assert result == 5.0
+        assert result == pytest.approx(5.0)
 
     def test_negative_values(self) -> None:
         """Test interpolation with negative values."""
         result = linear_interpolate(-10.0, 10.0, 0.5)
-        assert result == 0.0
+        assert result == pytest.approx(0.0)
 
     def test_t_below_range(self) -> None:
         """Test t below valid range."""
@@ -421,8 +421,8 @@ class TestSlerp:
         v1 = (0.0, 1.0)
         result = slerp(v0, v1, 0.5)
         # At t=0.5, should be roughly (0.7071, 0.7071)
-        assert round(result[0], 4) == 0.7071
-        assert round(result[1], 4) == 0.7071
+        assert round(result[0], 4) == pytest.approx(0.7071)
+        assert round(result[1], 4) == pytest.approx(0.7071)
 
     def test_at_start(self) -> None:
         """Test SLERP at t=0."""
@@ -487,15 +487,15 @@ class TestGetDensityValue:
 
     def test_low_density(self) -> None:
         """Test low density value."""
-        assert get_density_value("low") == 0.3
+        assert get_density_value("low") == pytest.approx(0.3)
 
     def test_medium_density(self) -> None:
         """Test medium density value."""
-        assert get_density_value("medium") == 0.5
+        assert get_density_value("medium") == pytest.approx(0.5)
 
     def test_high_density(self) -> None:
         """Test high density value."""
-        assert get_density_value("high") == 0.7
+        assert get_density_value("high") == pytest.approx(0.7)
 
     def test_all_density_values(self) -> None:
         """Test all density values are in DENSITY_VALUES."""

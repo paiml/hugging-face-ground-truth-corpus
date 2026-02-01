@@ -147,7 +147,7 @@ class TestQueryConfig:
         )
         assert config.strategy == QueryStrategy.UNCERTAINTY
         assert config.batch_size == 32
-        assert config.diversity_weight == 0.5
+        assert config.diversity_weight == pytest.approx(0.5)
 
     def test_config_is_frozen(self) -> None:
         """Config is immutable."""
@@ -227,7 +227,7 @@ class TestActiveLearningStats:
             labeling_cost=250.0,
         )
         assert stats.total_labeled == 500
-        assert stats.query_efficiency == 0.015
+        assert stats.query_efficiency == pytest.approx(0.015)
 
     def test_stats_is_frozen(self) -> None:
         """Stats is immutable."""
@@ -431,7 +431,7 @@ class TestCreateQueryConfig:
         assert config.strategy == QueryStrategy.UNCERTAINTY
         assert config.batch_size == 32
         assert config.uncertainty_measure == UncertaintyMeasure.PREDICTIVE_ENTROPY
-        assert config.diversity_weight == 0.5
+        assert config.diversity_weight == pytest.approx(0.5)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -444,7 +444,7 @@ class TestCreateQueryConfig:
         assert config.strategy == QueryStrategy.MARGIN
         assert config.batch_size == 64
         assert config.uncertainty_measure == UncertaintyMeasure.LEAST_CONFIDENCE
-        assert config.diversity_weight == 0.3
+        assert config.diversity_weight == pytest.approx(0.3)
 
     def test_with_enum_strategy(self) -> None:
         """Create with enum strategy."""
@@ -496,7 +496,7 @@ class TestCreateActiveLearningConfig:
         assert config.query_config.strategy == QueryStrategy.UNCERTAINTY
         assert config.initial_pool_size == 100
         assert config.labeling_budget == 1000
-        assert config.stopping_criterion == 0.001
+        assert config.stopping_criterion == pytest.approx(0.001)
 
     def test_custom_config(self) -> None:
         """Create custom config."""
@@ -561,8 +561,8 @@ class TestCreateActiveLearningStats:
         stats = create_active_learning_stats()
         assert stats.total_labeled == 0
         assert stats.accuracy_history == ()
-        assert stats.query_efficiency == 0.0
-        assert stats.labeling_cost == 0.0
+        assert stats.query_efficiency == pytest.approx(0.0)
+        assert stats.labeling_cost == pytest.approx(0.0)
 
     def test_custom_stats(self) -> None:
         """Create custom stats."""
@@ -687,7 +687,7 @@ class TestCalculateUncertainty:
         """Minimum uncertainty for certain prediction."""
         probs = (1.0, 0.0)
         uncertainty = calculate_uncertainty(probs)
-        assert uncertainty == 0.0
+        assert uncertainty == pytest.approx(0.0)
 
     def test_low_uncertainty_confident(self) -> None:
         """Low uncertainty for confident prediction."""
@@ -816,22 +816,22 @@ class TestEstimateLabelingCost:
     def test_basic_cost(self) -> None:
         """Basic cost calculation."""
         cost = estimate_labeling_cost(100)
-        assert cost == 50.0
+        assert cost == pytest.approx(50.0)
 
     def test_custom_cost_per_sample(self) -> None:
         """Custom cost per sample."""
         cost = estimate_labeling_cost(100, cost_per_sample=1.0)
-        assert cost == 100.0
+        assert cost == pytest.approx(100.0)
 
     def test_complexity_factor(self) -> None:
         """Complexity factor multiplier."""
         cost = estimate_labeling_cost(100, cost_per_sample=0.5, complexity_factor=2.0)
-        assert cost == 100.0
+        assert cost == pytest.approx(100.0)
 
     def test_zero_samples(self) -> None:
         """Zero samples costs nothing."""
         cost = estimate_labeling_cost(0)
-        assert cost == 0.0
+        assert cost == pytest.approx(0.0)
 
     def test_negative_samples_raises(self) -> None:
         """Negative samples raises ValueError."""
@@ -865,14 +865,14 @@ class TestCalculateQueryEfficiency:
         accuracy_history = (0.5, 0.5, 0.5)
         samples_per_round = (100, 50, 50)
         efficiency = calculate_query_efficiency(accuracy_history, samples_per_round)
-        assert efficiency == 0.0
+        assert efficiency == pytest.approx(0.0)
 
     def test_single_round(self) -> None:
         """Single round gives zero efficiency."""
         accuracy_history = (0.5,)
         samples_per_round = (100,)
         efficiency = calculate_query_efficiency(accuracy_history, samples_per_round)
-        assert efficiency == 0.0
+        assert efficiency == pytest.approx(0.0)
 
     def test_empty_history_raises(self) -> None:
         """Empty history raises ValueError."""
@@ -889,7 +889,7 @@ class TestCalculateQueryEfficiency:
         accuracy_history = (0.5, 0.6)
         samples_per_round = (100, 0)
         efficiency = calculate_query_efficiency(accuracy_history, samples_per_round)
-        assert efficiency == 0.0
+        assert efficiency == pytest.approx(0.0)
 
 
 class TestFormatActiveLearningStats:
@@ -944,7 +944,7 @@ class TestGetRecommendedActiveLearningConfig:
             config.query_config.uncertainty_measure
             == UncertaintyMeasure.PREDICTIVE_ENTROPY
         )
-        assert config.query_config.diversity_weight == 0.3
+        assert config.query_config.diversity_weight == pytest.approx(0.3)
 
     def test_ner_config(self) -> None:
         """Get config for NER task."""
@@ -954,7 +954,7 @@ class TestGetRecommendedActiveLearningConfig:
             config.query_config.uncertainty_measure
             == UncertaintyMeasure.MUTUAL_INFORMATION
         )
-        assert config.query_config.diversity_weight == 0.5
+        assert config.query_config.diversity_weight == pytest.approx(0.5)
 
     def test_sentiment_config(self) -> None:
         """Get config for sentiment task."""
@@ -978,7 +978,7 @@ class TestGetRecommendedActiveLearningConfig:
         """Get config for generation task."""
         config = get_recommended_active_learning_config("generation")
         assert config.query_config.strategy == QueryStrategy.CORESET
-        assert config.query_config.diversity_weight == 0.7
+        assert config.query_config.diversity_weight == pytest.approx(0.7)
 
     def test_invalid_task_raises(self) -> None:
         """Invalid task raises ValueError."""

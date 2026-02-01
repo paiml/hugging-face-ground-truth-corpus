@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class PrecisionType(Enum):
     """Precision data types for mixed precision training.
@@ -255,9 +257,7 @@ def validate_precision_config(config: PrecisionConfig) -> None:
         Traceback (most recent call last):
         ValueError: FP8 types cannot be used for storage
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     fp8_types = {PrecisionType.FP8_E4M3, PrecisionType.FP8_E5M2}
     if config.storage_dtype in fp8_types:
@@ -296,9 +296,7 @@ def validate_scaler_config(config: ScalerConfig) -> None:
         Traceback (most recent call last):
         ValueError: initial_scale must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.initial_scale <= 0:
         msg = f"initial_scale must be positive, got {config.initial_scale}"
@@ -350,9 +348,7 @@ def validate_mixed_precision_config(config: MixedPrecisionConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     validate_precision_config(config.precision_config)
     validate_scaler_config(config.scaler_config)
@@ -835,9 +831,7 @@ def format_precision_stats(stats: PrecisionStats) -> str:
         Traceback (most recent call last):
         ValueError: stats cannot be None
     """
-    if stats is None:
-        msg = "stats cannot be None"
-        raise ValueError(msg)
+    validate_not_none(stats, "stats")
 
     lines = [
         f"Current Scale: {stats.current_scale:,.0f}",

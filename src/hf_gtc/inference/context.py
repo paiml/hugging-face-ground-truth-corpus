@@ -298,6 +298,31 @@ def validate_sliding_window_config(config: SlidingWindowConfig) -> None:
         raise ValueError(msg)
 
 
+def _validate_extension_method_config(config: ContextConfig) -> None:
+    """Validate extension method sub-config."""
+    method_validators: dict[ExtensionMethod, tuple[str, str, object]] = {
+        ExtensionMethod.ROPE_SCALING: (
+            "rope_config",
+            "rope_scaling method",
+            validate_rope_config,
+        ),
+        ExtensionMethod.SLIDING_WINDOW: (
+            "window_config",
+            "sliding_window method",
+            validate_sliding_window_config,
+        ),
+    }
+    entry = method_validators.get(config.extension_method)
+    if entry is None:
+        return
+    attr_name, label, validator = entry
+    sub_config = getattr(config, attr_name)
+    if sub_config is None:
+        msg = f"{attr_name} is required for {label}"
+        raise ValueError(msg)
+    validator(sub_config)
+
+
 def validate_context_config(config: ContextConfig) -> None:
     """Validate context configuration.
 
@@ -334,17 +359,7 @@ def validate_context_config(config: ContextConfig) -> None:
         msg = f"max_length must be positive, got {config.max_length}"
         raise ValueError(msg)
 
-    if config.extension_method == ExtensionMethod.ROPE_SCALING:
-        if config.rope_config is None:
-            msg = "rope_config is required for rope_scaling method"
-            raise ValueError(msg)
-        validate_rope_config(config.rope_config)
-
-    if config.extension_method == ExtensionMethod.SLIDING_WINDOW:
-        if config.window_config is None:
-            msg = "window_config is required for sliding_window method"
-            raise ValueError(msg)
-        validate_sliding_window_config(config.window_config)
+    _validate_extension_method_config(config)
 
 
 def validate_context_stats(stats: ContextStats) -> None:

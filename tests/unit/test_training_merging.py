@@ -132,7 +132,7 @@ class TestTIESConfig:
             normalize=True,
             conflict_resolution=ConflictResolution.SUM,
         )
-        assert config.density == 0.5
+        assert config.density == pytest.approx(0.5)
         assert config.normalize is True
         assert config.conflict_resolution == ConflictResolution.SUM
 
@@ -153,7 +153,7 @@ class TestDAREConfig:
     def test_create_config(self) -> None:
         """Test creating DARE config."""
         config = DAREConfig(drop_rate=0.1, rescale=True)
-        assert config.drop_rate == 0.1
+        assert config.drop_rate == pytest.approx(0.1)
         assert config.rescale is True
 
     def test_frozen(self) -> None:
@@ -169,7 +169,7 @@ class TestSLERPConfig:
     def test_create_config(self) -> None:
         """Test creating SLERP config."""
         config = SLERPConfig(interpolation_factor=0.5)
-        assert config.interpolation_factor == 0.5
+        assert config.interpolation_factor == pytest.approx(0.5)
 
     def test_frozen(self) -> None:
         """Test config is immutable."""
@@ -226,7 +226,7 @@ class TestMergeStats:
         )
         assert stats.num_models == 3
         assert stats.total_parameters == 7_000_000_000
-        assert stats.conflict_rate == 0.15
+        assert stats.conflict_rate == pytest.approx(0.15)
 
     def test_frozen(self) -> None:
         """Test stats is immutable."""
@@ -490,14 +490,14 @@ class TestCreateTIESConfig:
     def test_default_values(self) -> None:
         """Test default values."""
         config = create_ties_config()
-        assert config.density == 0.5
+        assert config.density == pytest.approx(0.5)
         assert config.normalize is True
         assert config.conflict_resolution == ConflictResolution.SUM
 
     def test_custom_density(self) -> None:
         """Test custom density."""
         config = create_ties_config(density=0.7)
-        assert config.density == 0.7
+        assert config.density == pytest.approx(0.7)
 
     def test_custom_conflict_resolution_string(self) -> None:
         """Test custom conflict resolution from string."""
@@ -521,13 +521,13 @@ class TestCreateDAREConfig:
     def test_default_values(self) -> None:
         """Test default values."""
         config = create_dare_config()
-        assert config.drop_rate == 0.1
+        assert config.drop_rate == pytest.approx(0.1)
         assert config.rescale is True
 
     def test_custom_drop_rate(self) -> None:
         """Test custom drop_rate."""
         config = create_dare_config(drop_rate=0.2)
-        assert config.drop_rate == 0.2
+        assert config.drop_rate == pytest.approx(0.2)
 
     def test_rescale_false(self) -> None:
         """Test rescale=False."""
@@ -548,12 +548,12 @@ class TestCreateSLERPConfig:
     def test_default_values(self) -> None:
         """Test default values."""
         config = create_slerp_config()
-        assert config.interpolation_factor == 0.5
+        assert config.interpolation_factor == pytest.approx(0.5)
 
     def test_custom_factor(self) -> None:
         """Test custom interpolation factor."""
         config = create_slerp_config(interpolation_factor=0.7)
-        assert config.interpolation_factor == 0.7
+        assert config.interpolation_factor == pytest.approx(0.7)
 
     def test_invalid_factor(self) -> None:
         """Test invalid interpolation factor."""
@@ -582,19 +582,19 @@ class TestCreateMergeConfig:
         """Test auto-creation of ties_config."""
         config = create_merge_config(method="ties")
         assert config.ties_config is not None
-        assert config.ties_config.density == 0.5
+        assert config.ties_config.density == pytest.approx(0.5)
 
     def test_auto_create_dare_config(self) -> None:
         """Test auto-creation of dare_config."""
         config = create_merge_config(method="dare")
         assert config.dare_config is not None
-        assert config.dare_config.drop_rate == 0.1
+        assert config.dare_config.drop_rate == pytest.approx(0.1)
 
     def test_auto_create_slerp_config(self) -> None:
         """Test auto-creation of slerp_config."""
         config = create_merge_config(method="slerp")
         assert config.slerp_config is not None
-        assert config.slerp_config.interpolation_factor == 0.5
+        assert config.slerp_config.interpolation_factor == pytest.approx(0.5)
 
     def test_custom_weights(self) -> None:
         """Test custom weights."""
@@ -620,7 +620,7 @@ class TestCreateMergeStats:
         stats = create_merge_stats()
         assert stats.num_models == 2
         assert stats.total_parameters == 0
-        assert stats.conflict_rate == 0.0
+        assert stats.conflict_rate == pytest.approx(0.0)
 
     def test_custom_values(self) -> None:
         """Test custom values."""
@@ -1019,14 +1019,14 @@ class TestGetRecommendedMergeConfig:
         config = get_recommended_merge_config(3, task_type="classification")
         assert config.method == MergeMethod.TIES
         assert config.ties_config is not None
-        assert config.ties_config.density == 0.5
+        assert config.ties_config.density == pytest.approx(0.5)
 
     def test_generation_task(self) -> None:
         """Test recommendation for generation."""
         config = get_recommended_merge_config(3, task_type="generation")
         assert config.method == MergeMethod.TIES
         assert config.ties_config is not None
-        assert config.ties_config.density == 0.7
+        assert config.ties_config.density == pytest.approx(0.7)
 
     def test_too_few_models(self) -> None:
         """Test too few models."""
@@ -1047,8 +1047,8 @@ class TestSlerpInterpolate:
         v0 = (1.0, 0.0)
         v1 = (0.0, 1.0)
         result = slerp_interpolate(v0, v1, 0.5)
-        assert round(result[0], 4) == 0.7071
-        assert round(result[1], 4) == 0.7071
+        assert round(result[0], 4) == pytest.approx(0.7071)
+        assert round(result[1], 4) == pytest.approx(0.7071)
 
     def test_at_start(self) -> None:
         """Test SLERP at t=0."""

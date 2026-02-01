@@ -730,7 +730,7 @@ class TestCompareTokenizers:
         result = compare_tokenizers(text, tokenizations)
         assert "bpe" in result
         assert "wordpiece" in result
-        assert result["bpe"]["token_count"] == 2.0
+        assert result["bpe"]["token_count"] == pytest.approx(2.0)
 
     def test_fertility_calculation(self) -> None:
         """Test that fertility is calculated correctly."""

@@ -365,12 +365,23 @@ def validate_evaluation_results(results: EvaluationResults) -> None:
         msg = "datasets cannot be empty"
         raise ValueError(msg)
 
-    for metric in results.metrics:
-        if metric not in results.scores:
+    _validate_metrics_in_scores(results.metrics, results.scores)
+    _validate_scores_numeric(results.scores)
+
+
+def _validate_metrics_in_scores(
+    metrics: tuple[str, ...], scores: dict[str, object]
+) -> None:
+    """Validate all metrics have corresponding scores."""
+    for metric in metrics:
+        if metric not in scores:
             msg = f"metric '{metric}' not found in scores"
             raise ValueError(msg)
 
-    for metric, score in results.scores.items():
+
+def _validate_scores_numeric(scores: dict[str, object]) -> None:
+    """Validate all scores are numeric."""
+    for metric, score in scores.items():
         if not isinstance(score, (int, float)):
             msg = f"score for '{metric}' must be numeric, got {type(score).__name__}"
             raise ValueError(msg)
@@ -821,24 +832,35 @@ def _generate_frontmatter(config: ModelCardConfig) -> str:
     lines = ["---"]
     lines.append(f"license: {config.metadata.license.value}")
 
-    if config.language:
-        if len(config.language) == 1:
-            lines.append(f"language: {config.language[0]}")
-        else:
-            lines.append("language:")
-            for lang in config.language:
-                lines.append(f"  - {lang}")
-
-    if config.metadata.tags:
-        lines.append("tags:")
-        for tag in config.metadata.tags:
-            lines.append(f"  - {tag}")
+    _append_language_frontmatter(lines, config.language)
+    _append_tags_frontmatter(lines, config.metadata.tags)
 
     if config.metadata.pipeline_tag is not None:
         lines.append(f"pipeline_tag: {config.metadata.pipeline_tag.value}")
 
     lines.append("---")
     return "\n".join(lines)
+
+
+def _append_language_frontmatter(lines: list[str], language: tuple[str, ...]) -> None:
+    """Append language frontmatter entries."""
+    if not language:
+        return
+    if len(language) == 1:
+        lines.append(f"language: {language[0]}")
+    else:
+        lines.append("language:")
+        for lang in language:
+            lines.append(f"  - {lang}")
+
+
+def _append_tags_frontmatter(lines: list[str], tags: tuple[str, ...]) -> None:
+    """Append tags frontmatter entries."""
+    if not tags:
+        return
+    lines.append("tags:")
+    for tag in tags:
+        lines.append(f"  - {tag}")
 
 
 def _generate_overview_section(config: ModelCardConfig) -> str:

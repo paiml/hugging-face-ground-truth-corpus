@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class QuantMethod(Enum):
     """Quantization method types.
@@ -266,9 +268,7 @@ def validate_calibration_config(config: CalibrationConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.num_samples <= 0:
         msg = f"num_samples must be positive, got {config.num_samples}"
@@ -617,9 +617,7 @@ def get_gptq_dict(config: GPTQConfig) -> dict[str, Any]:
         >>> d["group_size"]
         128
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "bits": config.bits,
@@ -651,9 +649,7 @@ def get_awq_dict(config: AWQConfig) -> dict[str, Any]:
         >>> d["zero_point"]
         True
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     return {
         "bits": config.bits,
@@ -683,9 +679,7 @@ def format_quant_result(result: QuantResult) -> str:
         >>> "Compression:" in formatted
         True
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     lines = [
         f"Original: {result.original_size_mb:.1f} MB",

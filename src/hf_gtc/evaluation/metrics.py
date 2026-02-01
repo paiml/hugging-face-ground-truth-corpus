@@ -25,6 +25,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+from hf_gtc._validation import validate_not_none
+
 
 class MetricType(Enum):
     """Types of evaluation metrics.
@@ -442,9 +444,7 @@ def validate_bleu_config(config: BLEUConfig) -> None:
         Traceback (most recent call last):
         ValueError: max_ngram must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.max_ngram <= 0:
         msg = f"max_ngram must be positive, got {config.max_ngram}"
@@ -483,9 +483,7 @@ def validate_rouge_config(config: ROUGEConfig) -> None:
         Traceback (most recent call last):
         ValueError: variants cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.variants:
         msg = "variants cannot be empty"
@@ -516,9 +514,7 @@ def validate_bertscore_config(config: BERTScoreConfig) -> None:
         Traceback (most recent call last):
         ValueError: model_name cannot be empty
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not config.model_name:
         msg = "model_name cannot be empty"
@@ -546,9 +542,7 @@ def validate_metric_config(config: MetricConfig) -> None:
         Traceback (most recent call last):
         ValueError: config cannot be None
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.bleu_config is not None:
         validate_bleu_config(config.bleu_config)
@@ -576,9 +570,7 @@ def validate_metric_result(result: MetricResult) -> None:
         Traceback (most recent call last):
         ValueError: result cannot be None
     """
-    if result is None:
-        msg = "result cannot be None"
-        raise ValueError(msg)
+    validate_not_none(result, "result")
 
     if math.isnan(result.score):
         msg = "score cannot be NaN"

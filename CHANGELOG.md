@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **PMAT-113**: Complete documentation suite for 100/100 PMAT score
+  - `CONTRIBUTING.md` - Contribution guidelines with TDD workflow
+  - `CODE_OF_CONDUCT.md` - Contributor Covenant v2.1
+  - `SECURITY.md` - Security policy and vulnerability reporting
+  - `docs/pmat-scorecard.md` - Detailed PMAT score breakdown
+
 - **PMAT-100 through PMAT-112**: 13 advanced ML modules
   - `training/losses.py` - Focal, contrastive, label smoothing losses
   - `training/collators.py` - Padding/truncation strategies
@@ -85,3 +91,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Quality gates: lint, format, typecheck, security, coverage
 - Pre-commit hooks with PMAT integration
 - CI/CD pipeline with GitHub Actions
+
+[Unreleased]: https://github.com/noahgift/hf-ground-truth-corpus/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/noahgift/hf-ground-truth-corpus/releases/tag/v0.1.0

@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
+from hf_gtc._validation import validate_not_none
+
 
 class WatermarkType(Enum):
     """Types of watermarking strategies.
@@ -296,9 +298,7 @@ def validate_watermark_config(config: WatermarkConfig) -> None:
         Traceback (most recent call last):
         ValueError: delta must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if not 0 < config.gamma < 1:
         msg = f"gamma must be between 0 and 1, got {config.gamma}"
@@ -342,9 +342,7 @@ def validate_detection_config(config: DetectionConfig) -> None:
         Traceback (most recent call last):
         ValueError: window_size must be positive
     """
-    if config is None:
-        msg = "config cannot be None"
-        raise ValueError(msg)
+    validate_not_none(config, "config")
 
     if config.threshold <= 0:
         msg = f"threshold must be positive, got {config.threshold}"
