@@ -404,7 +404,11 @@ def validate_grammar_constraint(constraint: GrammarConstraint) -> None:
 
 def _validate_constraint_type_config(config: ConstraintConfig) -> None:
     """Validate constraint sub-config based on constraint type."""
-    constraint_validators: dict[ConstraintType, tuple[str, str, object]] = {
+    from collections.abc import Callable
+
+    constraint_validators: dict[
+        ConstraintType, tuple[str, str, Callable[[Any], None]]
+    ] = {
         ConstraintType.JSON_SCHEMA: (
             "json_constraint",
             "JSON_SCHEMA type",
@@ -1090,7 +1094,7 @@ def _validate_grammar(
 
 def _validate_regex_output(
     output: str,
-    constraint: object | None,
+    constraint: RegexConstraint | None,
     compiled_pattern: re.Pattern[str],
 ) -> tuple[bool, tuple[str, ...]]:
     """Validate output against a compiled regex constraint."""

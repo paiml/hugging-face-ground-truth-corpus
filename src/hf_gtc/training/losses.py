@@ -19,9 +19,10 @@ Examples:
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     pass
@@ -403,7 +404,7 @@ def _validate_loss_type_config(config: LossConfig) -> None:
     """Validate that the correct sub-config is present for the loss type."""
     loss_type_validators: dict[
         LossType,
-        tuple[str, str, object],
+        tuple[str, str, Callable[[Any], None]],
     ] = {
         LossType.FOCAL: ("focal_config", "focal loss", validate_focal_loss_config),
         LossType.CONTRASTIVE: (

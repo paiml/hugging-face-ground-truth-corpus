@@ -12,9 +12,10 @@ Examples:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     pass
@@ -481,7 +482,7 @@ def _validate_optimizer_type_config(config: OptimizerConfig) -> None:
         validate_adamw_config(config.adamw_config)
         return
 
-    single_validators: dict[OptimizerType, tuple[str, str, object]] = {
+    single_validators: dict[OptimizerType, tuple[str, str, Callable[[Any], None]]] = {
         OptimizerType.LION: ("lion_config", "lion optimizer", validate_lion_config),
         OptimizerType.SOPHIA: (
             "sophia_config",

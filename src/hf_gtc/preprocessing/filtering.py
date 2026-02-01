@@ -18,9 +18,10 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -410,7 +411,7 @@ def validate_language_config(config: LanguageConfig) -> None:
 
 def _validate_filter_type_config(config: FilterConfig) -> None:
     """Validate filter sub-config based on filter type."""
-    filter_validators: dict[FilterType, tuple[str, str, object]] = {
+    filter_validators: dict[FilterType, tuple[str, str, Callable[[Any], None]]] = {
         FilterType.TOXICITY: (
             "toxicity_config",
             "TOXICITY filter",

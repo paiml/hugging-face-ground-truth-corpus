@@ -20,6 +20,7 @@ Examples:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Any
@@ -1475,7 +1476,7 @@ def get_recommended_collator_config(task_type: str) -> CollatorConfig:
         msg = f"task_type must be one of {valid_tasks}, got '{task_type}'"
         raise ValueError(msg)
 
-    builders: dict[str, object] = {
+    builders: dict[str, Callable[[], CollatorConfig]] = {
         "classification": _collator_classification,
         "generation": _collator_generation,
         "seq2seq": _collator_seq2seq,

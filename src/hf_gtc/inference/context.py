@@ -12,9 +12,10 @@ Examples:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     pass
@@ -300,7 +301,7 @@ def validate_sliding_window_config(config: SlidingWindowConfig) -> None:
 
 def _validate_extension_method_config(config: ContextConfig) -> None:
     """Validate extension method sub-config."""
-    method_validators: dict[ExtensionMethod, tuple[str, str, object]] = {
+    method_validators: dict[ExtensionMethod, tuple[str, str, Callable[[Any], None]]] = {
         ExtensionMethod.ROPE_SCALING: (
             "rope_config",
             "rope_scaling method",

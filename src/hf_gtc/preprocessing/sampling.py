@@ -20,9 +20,10 @@ from __future__ import annotations
 import math
 import random
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -352,7 +353,7 @@ def validate_balanced_config(config: BalancedConfig) -> None:
 
 def _validate_sampling_method_config(config: SamplingConfig) -> None:
     """Validate method-specific sampling sub-config."""
-    method_validators: dict[SamplingMethod, tuple[str, str, object]] = {
+    method_validators: dict[SamplingMethod, tuple[str, str, Callable[[Any], None]]] = {
         SamplingMethod.STRATIFIED: (
             "stratified_config",
             "STRATIFIED sampling",

@@ -17,9 +17,10 @@ Examples:
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     pass
@@ -315,7 +316,7 @@ def validate_alibi_config(config: ALiBiConfig) -> None:
 
 def _validate_positional_type_config(config: PositionalConfig) -> None:
     """Validate positional sub-config based on type."""
-    pos_validators: dict[PositionalType, tuple[str, str, object]] = {
+    pos_validators: dict[PositionalType, tuple[str, str, Callable[[Any], None]]] = {
         PositionalType.ROTARY: (
             "rope_config",
             "ROTARY positional type",

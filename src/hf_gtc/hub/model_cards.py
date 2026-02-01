@@ -370,7 +370,7 @@ def validate_evaluation_results(results: EvaluationResults) -> None:
 
 
 def _validate_metrics_in_scores(
-    metrics: tuple[str, ...], scores: dict[str, object]
+    metrics: tuple[str, ...], scores: dict[str, int | float]
 ) -> None:
     """Validate all metrics have corresponding scores."""
     for metric in metrics:
@@ -379,7 +379,7 @@ def _validate_metrics_in_scores(
             raise ValueError(msg)
 
 
-def _validate_scores_numeric(scores: dict[str, object]) -> None:
+def _validate_scores_numeric(scores: dict[str, int | float]) -> None:
     """Validate all scores are numeric."""
     for metric, score in scores.items():
         if not isinstance(score, (int, float)):

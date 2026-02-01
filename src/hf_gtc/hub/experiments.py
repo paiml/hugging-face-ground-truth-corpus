@@ -1161,7 +1161,7 @@ def _append_hyperparameters(
 
 
 def _append_metrics_summary(
-    lines: list[str], metrics: dict[str, list[tuple[object, float]]]
+    lines: list[str], metrics: dict[str, list[tuple[int, float]]]
 ) -> None:
     """Append metrics summary section if present."""
     if not metrics:
@@ -1173,7 +1173,9 @@ def _append_metrics_summary(
             lines.append(f"  {metric_name}: {sorted_values[-1][1]}")
 
 
-def _append_artifacts_summary(lines: list[str], artifacts: tuple[object, ...]) -> None:
+def _append_artifacts_summary(
+    lines: list[str], artifacts: tuple[ArtifactConfig, ...]
+) -> None:
     """Append artifacts section if present."""
     if not artifacts:
         return

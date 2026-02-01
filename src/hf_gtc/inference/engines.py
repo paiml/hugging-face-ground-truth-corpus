@@ -16,9 +16,10 @@ Examples:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     pass
@@ -378,7 +379,7 @@ def validate_llamacpp_config(config: LlamaCppConfig) -> None:
 
 def _validate_engine_type_config(config: EngineConfig) -> None:
     """Validate engine-specific sub-config based on engine type."""
-    engine_validators: dict[EngineType, tuple[str, str, object]] = {
+    engine_validators: dict[EngineType, tuple[str, str, Callable[[Any], None]]] = {
         EngineType.VLLM: ("vllm_config", "VLLM engine", validate_vllm_config),
         EngineType.TGI: ("tgi_config", "TGI engine", validate_tgi_config),
         EngineType.LLAMACPP: (

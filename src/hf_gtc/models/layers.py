@@ -20,9 +20,10 @@ Examples:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     pass
@@ -424,7 +425,7 @@ def _validate_layer_type_config(config: LayerConfig) -> None:
         validate_mlp_config(config.mlp_config)
         return
 
-    layer_validators: dict[LayerType, tuple[str, str, object]] = {
+    layer_validators: dict[LayerType, tuple[str, str, Callable[[Any], None]]] = {
         LayerType.GATED_MLP: (
             "gated_mlp_config",
             "gated_mlp",

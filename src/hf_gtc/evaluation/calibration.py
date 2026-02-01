@@ -1224,7 +1224,9 @@ def _interpret_brier(brier_score: float) -> str:
     return "High Brier score (>= 0.2)"
 
 
-def _append_reliability_diagram(lines: list[str], diagram: object | None) -> None:
+def _append_reliability_diagram(
+    lines: list[str], diagram: ReliabilityDiagram | None
+) -> None:
     """Append reliability diagram lines if present."""
     if diagram is None:
         return
